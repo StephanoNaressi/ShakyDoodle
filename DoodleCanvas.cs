@@ -35,6 +35,9 @@ namespace ShakyDoodle
         float _offset = 10;
         float _speed = 0.2f;
 
+        Pen _mainPen;
+        PenLineCap _currentCap;
+
         Dictionary<Point, Vector> _shakeSeeds = new();
 
         public DoodleCanvas()
@@ -44,6 +47,7 @@ namespace ShakyDoodle
             PointerReleased += OnPointerReleased;
             _gridSize = 50;
             _alpha = 1;
+            _currentCap = PenLineCap.Square;
         }
 
         private async void StartRenderLoopAsync()
@@ -81,7 +85,7 @@ namespace ShakyDoodle
         {
             if (events.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
-                _currentStroke = new(_currentColor, events.GetPosition(this), _currentSize, _alpha);
+                _currentStroke = new(_currentColor, events.GetPosition(this), _currentSize, _alpha, _currentCap);
                 _strokes.Add(_currentStroke);
                 //Updates the control so the canvas repaints
                 InvalidateVisual();
@@ -140,8 +144,8 @@ namespace ShakyDoodle
                 };
                 var brush = new SolidColorBrush(color.Color, stroke.Alpha);
                 //Brush to paint with
-                Pen pen = new(brush, size);
-                pen.LineCap = PenLineCap.Square;
+                _mainPen = new(brush, size);
+                _mainPen.LineCap = stroke.PenLineCap;
 
 
                 //Draw lines with our strokes
@@ -149,7 +153,7 @@ namespace ShakyDoodle
                 {
                     var p1 = GetShakenPoint(stroke.Points[i - 1]);
                     var p2 = GetShakenPoint(stroke.Points[i]);
-                    context.DrawLine(pen, p1, p2);
+                    context.DrawLine(_mainPen, p1, p2);
                 }
             }
         }
@@ -160,12 +164,11 @@ namespace ShakyDoodle
             InvalidateVisual();
         }
         public void SelectColor(ColorType color) => _currentColor = color;
-
         public void SelectSize(SizeType size) => _currentSize = size;
-
-        public void ChangeAlpha(double val)
+        public void ChangeAlpha(double val) => _alpha = val;
+        public void ChangeBrushTip(PenLineCap cap)
         {
-            _alpha = val;
+            _currentCap = cap;
         }
     }
 }

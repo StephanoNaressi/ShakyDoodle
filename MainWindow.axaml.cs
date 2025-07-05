@@ -21,6 +21,10 @@ namespace ShakyDoodle
         private void OnSizeMedium(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Medium);
         private void OnSizeLarge(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Large);
         private void OnAlphaChanged(object? sender, RangeBaseValueChangedEventArgs events) => doodleCanvas.ChangeAlpha((double)events.NewValue);
+        private void OnBrushSquare(object? sender, RoutedEventArgs events) => doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Square);
+        private void OnBrushFlat(object? sender, RoutedEventArgs events) => doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Flat);
+        private void OnBrushRound(object? sender, RoutedEventArgs events) => doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Round);
+
 
     }
 }

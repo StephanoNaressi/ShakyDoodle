@@ -29,9 +29,9 @@
 			<!--Alpha-->
 			<Slider Minimum="0" Maximum="1" Value="1" ValueChanged="OnAlphaChanged" />
 			<!--Shapes-->
-			<!--<Button Width="15" Height="15" CornerRadius="20" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnSizeMedium"/>
-			<Button Width="15" Height="15" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnSizeMedium"/>
-			<Button Width="10" Height="15" CornerRadius="0" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnSizeMedium"/>-->
+			<Button Width="15" Height="15" CornerRadius="20" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnBrushRound"/>
+			<Button Width="15" Height="15" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnBrushSquare"/>
+			<Button Width="10" Height="15" CornerRadius="0" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnBrushFlat"/>
 		</StackPanel>
 
 		<local:DoodleCanvas Name="doodleCanvas" Grid.Column="1"/>
