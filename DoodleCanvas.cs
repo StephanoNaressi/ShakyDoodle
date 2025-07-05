@@ -36,6 +36,8 @@ namespace ShakyDoodle
         PenLineCap _currentCap;
         Dictionary<Point, Vector> _shakeSeeds = new();
 
+        bool _isShake = true;
+
         public DoodleCanvas()
         {
             Focusable = true;
@@ -80,6 +82,7 @@ namespace ShakyDoodle
         }
         private Point GetShakenPoint(Point point)
         {
+            if (!_isShake) return point;
             //If the point is not in our dict then we assign a random double offset to it
             if (!_shakeSeeds.ContainsKey(point))
             {
@@ -197,5 +200,6 @@ namespace ShakyDoodle
         {
             _currentCap = cap;
         }
+        public void ShouldShake(bool shake) => _isShake = shake;
     }
 }
