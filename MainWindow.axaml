@@ -32,7 +32,9 @@
 				<Button Width="10" Height="15" CornerRadius="0" Background="DarkSlateBlue" Margin="5" Click="OnBrushFlat" BorderBrush="BlanchedAlmond" BorderThickness="2" />
 			</UniformGrid>
 			<!-- Alpha -->
+			<TextBlock Text="Alpha" HorizontalAlignment="Center" FontSize="10"/>
 			<Slider Minimum="0" Maximum="1" Value="1" ValueChanged="OnAlphaChanged" />
+
 
 
 			<!-- Colors -->

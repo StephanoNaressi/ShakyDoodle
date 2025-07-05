@@ -28,9 +28,9 @@ namespace ShakyDoodle
         double _time;
 
         //Shake values
-        float _amp = 3;
-        float _offset = 10;
-        float _speed = 0.2f;
+        float _amp = 2;
+        float _offset = 7;
+        float _speed = 0.3f;
 
         Pen _mainPen;
         PenLineCap _currentCap;
@@ -164,21 +164,24 @@ namespace ShakyDoodle
 
                 var size = stroke.Size switch
                 {
-                    SizeType.Small => 5,
-                    SizeType.Medium => 10,
-                    SizeType.Large => 15,
+                    SizeType.Small => 2,
+                    SizeType.Medium => 8,
+                    SizeType.Large => 20,
                     _ => 5
                 };
-                var brush = new SolidColorBrush(color.Color, stroke.Alpha);
+
 
 
 
                 //Draw lines with our strokes
                 for (int i = 1; i < stroke.Points.Count; i++)
                 {
+
                     float pressure = stroke.Pressures[i];
                     var sizeP = size * pressure;
                     //Brush to paint with
+                    double scaledPressure = Math.Clamp(pressure / 0.5, 0, 1);
+                    var brush = new SolidColorBrush(color.Color, stroke.Alpha * scaledPressure);
                     _mainPen = new(brush, sizeP);
                     _mainPen.LineCap = stroke.PenLineCap;
                     var p1 = GetShakenPoint(stroke.Points[i - 1]);
