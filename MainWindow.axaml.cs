@@ -17,6 +17,7 @@ namespace ShakyDoodle
         private void OnFirstColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.First);
         private void OnSecondColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Second);
         private void OnThirdColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Third);
+        private void OnFourthColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Fourth);
         private void OnSizeSmall(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Small);
         private void OnSizeMedium(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Medium);
         private void OnSizeLarge(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Large);

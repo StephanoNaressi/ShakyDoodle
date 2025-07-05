@@ -2,7 +2,8 @@
 {
     First,
     Second,
-    Third
+    Third,
+    Fourth
 }
 public enum SizeType
 {

@@ -2,13 +2,9 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Skia;
-using SkiaSharp;
-using SkiaSharp.Views.Desktop;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShakyDoodle
@@ -37,7 +33,6 @@ namespace ShakyDoodle
 
         Pen _mainPen;
         PenLineCap _currentCap;
-
         Dictionary<Point, Vector> _shakeSeeds = new();
 
         public DoodleCanvas()
@@ -103,7 +98,7 @@ namespace ShakyDoodle
             //Updates the control so the canvas repaints
             InvalidateVisual();
         }
-
+        
         public override void Render(DrawingContext context)
         {
             //PushPop to avoid drawing outside the canvas
@@ -133,6 +128,8 @@ namespace ShakyDoodle
                     ColorType.First => Brushes.Black,
                     ColorType.Second => Brushes.Blue,
                     ColorType.Third => Brushes.Red,
+                    ColorType.Fourth => Brushes.White,
+                    ColorType.Eraser => Brushes.Transparent,
                     _ => Brushes.Black
                 };
                 var size = stroke.Size switch
