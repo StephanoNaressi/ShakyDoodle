@@ -2,8 +2,10 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.TextFormatting.Unicode;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShakyDoodle
@@ -36,14 +38,34 @@ namespace ShakyDoodle
 
         public DoodleCanvas()
         {
+            Focusable = true;
+            Focus();
+            PointerPressed += (s, e) => Focus();
+
             PointerMoved += OnPointerMoved;
             PointerPressed += OnPointerPressed;
             PointerReleased += OnPointerReleased;
+
+            KeyDown += OnKeyDown;
+
             _gridSize = 50;
             _alpha = 1;
             _currentCap = PenLineCap.Square;
 
             _ = new PointerPointProperties();
+        }
+
+        private void OnKeyDown(object? sender, KeyEventArgs e)
+        {
+            var isCtrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
+            var isAlt = e.KeyModifiers.HasFlag(KeyModifiers.Alt);
+
+            if (isCtrl && e.Key == Key.Z)
+            {
+                if (_strokes == null || _strokes.Count <= 0) return;
+                _strokes.Remove(_strokes.Last());
+                InvalidateVisual();
+            }
         }
 
         private async void StartRenderLoopAsync()
