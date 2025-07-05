@@ -3,12 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Skia; 
+using Avalonia.Skia;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ShakyDoodle
 {
@@ -25,6 +26,17 @@ namespace ShakyDoodle
         int _gridSize;
         double _alpha;
 
+        // Shake
+        Random _r = new();
+        double _time;
+
+        //Shake values
+        float _amp = 3;
+        float _offset = 10;
+        float _speed = 0.2f;
+
+        Dictionary<Point, Vector> _shakeSeeds = new();
+
         public DoodleCanvas()
         {
             PointerMoved += OnPointerMoved;
@@ -32,6 +44,35 @@ namespace ShakyDoodle
             PointerReleased += OnPointerReleased;
             _gridSize = 50;
             _alpha = 1;
+        }
+
+        private async void StartRenderLoopAsync()
+        {
+            while (true)
+            {
+                _time += _speed;
+                InvalidateVisual();
+                await Task.Delay(16);
+            }
+
+        }
+        private Point GetShakenPoint(Point point)
+        {
+            //If the point is not in our dict then we assign a random double offset to it
+            if (!_shakeSeeds.ContainsKey(point))
+            {
+                _shakeSeeds[point] = new Vector(_r.NextDouble() * _offset, _r.NextDouble() * _offset);
+            }
+
+            // We return our point with an offset added to a sine and cosine to add looping smooth transitions :P
+            var seed = _shakeSeeds[point];
+            return new Point(point.X + Math.Sin(_time + seed.X) * _amp,
+                point.Y + Math.Cos(_time + seed.Y) * _amp);
+        }
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            StartRenderLoopAsync();
         }
 
         private void OnPointerReleased(object? sender, PointerReleasedEventArgs events) => _currentStroke = null;
@@ -106,7 +147,9 @@ namespace ShakyDoodle
                 //Draw lines with our strokes
                 for (int i = 1; i < stroke.Points.Count; i++)
                 {
-                    context.DrawLine(pen, stroke.Points[i - 1], stroke.Points[i]);
+                    var p1 = GetShakenPoint(stroke.Points[i - 1]);
+                    var p2 = GetShakenPoint(stroke.Points[i]);
+                    context.DrawLine(pen, p1, p2);
                 }
             }
         }
