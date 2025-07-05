@@ -16,7 +16,7 @@
 		</Grid.ColumnDefinitions>
 
 		<!-- Toolbar -->
-		<StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center">
+		<StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Center">
 			<Button Content="Clear" Click="OnClearClick" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 			<CheckBox Content="Shake?" Margin="5" HorizontalAlignment="Center" IsChecked="true" Checked="OnShake" Unchecked="OnUnshake"/>
 			<UniformGrid Columns="3" Margin="5">
