@@ -57,7 +57,7 @@ namespace ShakyDoodle
             _gridSize = 50;
             _alpha = 1;
             _currentCap = PenLineCap.Square;
-            _maxStrokes = 10;
+            _maxStrokes = 300;
 
             _ = new PointerPointProperties();
         }
