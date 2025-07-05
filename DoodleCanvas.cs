@@ -4,7 +4,6 @@ using Avalonia.Input;
 using Avalonia.Media;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShakyDoodle
@@ -43,6 +42,8 @@ namespace ShakyDoodle
             _gridSize = 50;
             _alpha = 1;
             _currentCap = PenLineCap.Square;
+
+            _ = new PointerPointProperties();
         }
 
         private async void StartRenderLoopAsync()
@@ -80,7 +81,7 @@ namespace ShakyDoodle
         {
             if (events.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
-                _currentStroke = new(_currentColor, events.GetPosition(this), _currentSize, _alpha, _currentCap);
+                _currentStroke = new(_currentColor, events.GetPosition(this), _currentSize, _alpha, _currentCap, events.GetCurrentPoint(this).Properties.Pressure);
                 _strokes.Add(_currentStroke);
                 //Updates the control so the canvas repaints
                 InvalidateVisual();
@@ -94,11 +95,11 @@ namespace ShakyDoodle
 
             //Else we add the current stroke onto our list of strokes :p
             _currentStroke.Points.Add(events.GetPosition(this));
-
+            _currentStroke.Pressures.Add(events.GetCurrentPoint(this).Properties.Pressure);
             //Updates the control so the canvas repaints
             InvalidateVisual();
         }
-        
+
         public override void Render(DrawingContext context)
         {
             //PushPop to avoid drawing outside the canvas
@@ -129,7 +130,6 @@ namespace ShakyDoodle
                     ColorType.Second => Brushes.Blue,
                     ColorType.Third => Brushes.Red,
                     ColorType.Fourth => Brushes.White,
-                    ColorType.Eraser => Brushes.Transparent,
                     _ => Brushes.Black
                 };
                 var size = stroke.Size switch
@@ -140,14 +140,17 @@ namespace ShakyDoodle
                     _ => 5
                 };
                 var brush = new SolidColorBrush(color.Color, stroke.Alpha);
-                //Brush to paint with
-                _mainPen = new(brush, size);
-                _mainPen.LineCap = stroke.PenLineCap;
+
 
 
                 //Draw lines with our strokes
                 for (int i = 1; i < stroke.Points.Count; i++)
                 {
+                    float pressure = stroke.Pressures[i];
+                    var sizeP = size * pressure;
+                    //Brush to paint with
+                    _mainPen = new(brush, sizeP);
+                    _mainPen.LineCap = stroke.PenLineCap;
                     var p1 = GetShakenPoint(stroke.Points[i - 1]);
                     var p2 = GetShakenPoint(stroke.Points[i]);
                     context.DrawLine(_mainPen, p1, p2);
