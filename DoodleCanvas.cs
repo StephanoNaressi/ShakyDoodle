@@ -130,8 +130,13 @@ namespace ShakyDoodle
                     ColorType.Second => Brushes.Blue,
                     ColorType.Third => Brushes.Red,
                     ColorType.Fourth => Brushes.White,
+                    ColorType.Fifth => Brushes.Yellow,
+                    ColorType.Sixth => Brushes.GreenYellow,
+                    ColorType.Seventh => Brushes.Purple,
+                    ColorType.Eighth => Brushes.Pink,
                     _ => Brushes.Black
                 };
+
                 var size = stroke.Size switch
                 {
                     SizeType.Small => 5,

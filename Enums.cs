@@ -3,7 +3,11 @@
     First,
     Second,
     Third,
-    Fourth
+    Fourth,
+    Fifth,
+    Sixth,
+    Seventh,
+    Eighth
 }
 public enum SizeType
 {

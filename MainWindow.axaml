@@ -2,43 +2,52 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:local="clr-namespace:ShakyDoodle"
-		Width="400" Height="400"
+        xmlns:local="clr-namespace:ShakyDoodle"
+        Width="400" Height="400"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
         x:Class="ShakyDoodle.MainWindow"
         Title="ShakyDoodle">
+
 	<Grid>
-		<!--Define how the grid actually looks like-->
+		<!-- Grid setup: left = tools, right = canvas -->
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 
-		<!--Define the content of the grid-->
-
-		<StackPanel Grid.Column="0" Orientation="Vertical" Margin="10" >
-			<Button Content="Clear" Click="OnClearClick" Margin="5"/>
-			<!--Colors-->
-			<Button Width="50" Background="Black" Click="OnFirstColor" Margin="5"  BorderBrush="BlanchedAlmond" BorderThickness="2"/>
-			<Button Width="50" Background="Blue" Click="OnSecondColor" Margin="5"  BorderBrush="BlanchedAlmond" BorderThickness="2"/>
-			<Button Width="50" Background="Red" Click="OnThirdColor" Margin="5"  BorderBrush="BlanchedAlmond" BorderThickness="2"/>
-			<Button Width="50" Background="White" Click="OnFourthColor" Margin="5"  BorderBrush="BlanchedAlmond" BorderThickness="2"/>
-			<!--Sizes-->
-			<Button Width="10" Height="10" CornerRadius="20" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnSizeSmall" BorderBrush="BlanchedAlmond" BorderThickness="2"/>
-			<Button Width="15" Height="15" CornerRadius="20" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnSizeMedium" BorderBrush="BlanchedAlmond" BorderThickness="2"/>
-			<Button Width="20" Height="20" CornerRadius="20" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnSizeLarge"  BorderBrush="BlanchedAlmond" BorderThickness="2"/>
-			<!--Alpha-->
+		<!-- Toolbar -->
+		<StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center">
+			<Button Content="Clear" Click="OnClearClick" Margin="5" HorizontalAlignment="Center"/>
+			<UniformGrid Columns="3" Margin="5">
+				<!-- Sizes -->
+				<Button Width="10" Height="10" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeSmall" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Width="15" Height="15" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeMedium" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Width="20" Height="20" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeLarge" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+			</UniformGrid>
+			<UniformGrid Columns="3" Margin="5">
+				<!-- Shapes -->
+				<Button Width="15" Height="15" CornerRadius="20" Background="DarkSlateBlue" Margin="5" Click="OnBrushRound" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Width="15" Height="15" Background="DarkSlateBlue" Margin="5" Click="OnBrushSquare" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Width="10" Height="15" CornerRadius="0" Background="DarkSlateBlue" Margin="5" Click="OnBrushFlat" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+			</UniformGrid>
+			<!-- Alpha -->
 			<Slider Minimum="0" Maximum="1" Value="1" ValueChanged="OnAlphaChanged" />
-			<!--Shapes-->
-			<Button Width="15" Height="15" CornerRadius="20" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnBrushRound" BorderBrush="BlanchedAlmond" BorderThickness="2"/>
-			<Button Width="15" Height="15" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnBrushSquare" BorderBrush="BlanchedAlmond" BorderThickness="2"/>
-			<Button Width="10" Height="15" CornerRadius="0" Background="Black" Margin="5" HorizontalAlignment="Center" Click="OnBrushFlat" BorderBrush="BlanchedAlmond" BorderThickness="2"/>
+
+
+			<!-- Colors -->
+			<UniformGrid Columns="2" Rows="4" Margin="5" HorizontalAlignment="Center">
+				<Button Background="Black" Click="OnFirstColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Background="Blue" Click="OnSecondColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Background="Red" Click="OnThirdColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Background="White" Click="OnFourthColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Background="Yellow" Click="OnFifthColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Background="GreenYellow" Click="OnSixthColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Background="Purple" Click="OnSeventhColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+				<Button Background="Pink" Click="OnEighthColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
+			</UniformGrid>
 		</StackPanel>
 
-		<local:DoodleCanvas Name="doodleCanvas" Grid.Column="1"/>
-
-
-
+		<!-- Canvas Area -->
+		<local:DoodleCanvas Name="doodleCanvas" Grid.Column="1" />
 	</Grid>
-
 </Window>
