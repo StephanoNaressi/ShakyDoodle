@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Media.TextFormatting.Unicode;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,7 @@ namespace ShakyDoodle
         float _amp = 2;
         float _offset = 7;
         float _speed = 0.3f;
+        int _maxStrokes;
 
         Pen _mainPen;
         PenLineCap _currentCap;
@@ -53,9 +55,16 @@ namespace ShakyDoodle
             _gridSize = 50;
             _alpha = 1;
             _currentCap = PenLineCap.Square;
+            _maxStrokes = 50;
 
             _ = new PointerPointProperties();
         }
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            StartRenderLoopAsync();
+        }
+
 
         private void OnKeyDown(object? sender, KeyEventArgs e)
         {
@@ -74,15 +83,18 @@ namespace ShakyDoodle
         {
             while (true)
             {
-                _time += _speed;
-                InvalidateVisual();
+                if (_isShake)
+                {
+                    _time += _speed;
+                    InvalidateVisual();
+                }
                 await Task.Delay(16);
             }
 
         }
-        private Point GetShakenPoint(Point point)
+        private Point GetShakenPoint(Point point, double shakeIntensity)
         {
-            if (!_isShake) return point;
+            if (!_isShake || shakeIntensity <= 0) return point;
             //If the point is not in our dict then we assign a random double offset to it
             if (!_shakeSeeds.ContainsKey(point))
             {
@@ -91,13 +103,8 @@ namespace ShakyDoodle
 
             // We return our point with an offset added to a sine and cosine to add looping smooth transitions :P
             var seed = _shakeSeeds[point];
-            return new Point(point.X + Math.Sin(_time + seed.X) * _amp,
-                point.Y + Math.Cos(_time + seed.Y) * _amp);
-        }
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-            StartRenderLoopAsync();
+            return new Point(point.X + Math.Sin(_time + seed.X) * _amp * shakeIntensity,
+                point.Y + Math.Cos(_time + seed.Y) * _amp * shakeIntensity);
         }
 
         private void OnPointerReleased(object? sender, PointerReleasedEventArgs events) => _currentStroke = null;
@@ -109,6 +116,7 @@ namespace ShakyDoodle
                 _currentStroke = new(_currentColor, events.GetPosition(this), _currentSize, _alpha, _currentCap, events.GetCurrentPoint(this).Properties.Pressure);
                 _strokes.Add(_currentStroke);
                 //Updates the control so the canvas repaints
+
                 InvalidateVisual();
             }
         }
@@ -149,48 +157,60 @@ namespace ShakyDoodle
             //For each of our current strokes stored
             foreach (var stroke in _strokes)
             {
-                var color = stroke.Color switch
-                {
-                    ColorType.First => Brushes.Black,
-                    ColorType.Second => Brushes.Blue,
-                    ColorType.Third => Brushes.Red,
-                    ColorType.Fourth => Brushes.White,
-                    ColorType.Fifth => Brushes.Yellow,
-                    ColorType.Sixth => Brushes.GreenYellow,
-                    ColorType.Seventh => Brushes.Purple,
-                    ColorType.Eighth => Brushes.Pink,
-                    _ => Brushes.Black
-                };
-
-                var size = stroke.Size switch
-                {
-                    SizeType.Small => 2,
-                    SizeType.Medium => 8,
-                    SizeType.Large => 20,
-                    _ => 5
-                };
-
-
-
-
+                double shakeIntensity = GetShakeIntensity(_strokes.IndexOf(stroke));
                 //Draw lines with our strokes
                 for (int i = 1; i < stroke.Points.Count; i++)
                 {
-
-                    float pressure = stroke.Pressures[i];
-                    var sizeP = size * pressure;
-                    //Brush to paint with
-                    double scaledPressure = Math.Clamp(pressure / 0.5, 0, 1);
-                    var brush = new SolidColorBrush(color.Color, stroke.Alpha * scaledPressure);
-                    _mainPen = new(brush, sizeP);
-                    _mainPen.LineCap = stroke.PenLineCap;
-                    var p1 = GetShakenPoint(stroke.Points[i - 1]);
-                    var p2 = GetShakenPoint(stroke.Points[i]);
+                    SetupMainPen(stroke, i, shakeIntensity);
+                    var p1 = GetShakenPoint(stroke.Points[i - 1], shakeIntensity);
+                    var p2 = GetShakenPoint(stroke.Points[i], shakeIntensity);
                     context.DrawLine(_mainPen, p1, p2);
                 }
             }
         }
+        private double GetShakeIntensity(int strokeIndex)
+        {
+            int count = _strokes.Count;
+            int newer = count - 1 - strokeIndex;
+            double t = newer / (double)_maxStrokes;
+            return Math.Clamp(1.0 - t, 0.0, 1.0);
+        }
 
+        private void SetupMainPen(Stroke stroke, int i, double shakeIntensity)
+        {
+            float pressure = stroke.Pressures[i];
+
+            //Brush to paint with
+            double scaledPressure = Math.Clamp(pressure / 0.5, 0, 1);
+            var brush = ChooseBrushSettings(stroke, scaledPressure, pressure);
+            _mainPen = brush;
+            _mainPen.LineCap = stroke.PenLineCap;
+        }
+        private Pen ChooseBrushSettings(Stroke stroke, double scaledPressure, double rawPressure)
+        {
+            var color = stroke.Color switch
+            {
+                ColorType.First => Brushes.Black,
+                ColorType.Second => Brushes.Blue,
+                ColorType.Third => Brushes.Red,
+                ColorType.Fourth => Brushes.White,
+                ColorType.Fifth => Brushes.Yellow,
+                ColorType.Sixth => Brushes.GreenYellow,
+                ColorType.Seventh => Brushes.Purple,
+                ColorType.Eighth => Brushes.Pink,
+                _ => Brushes.Black
+            };
+
+            var size = stroke.Size switch
+            {
+                SizeType.Small => 2,
+                SizeType.Medium => 8,
+                SizeType.Large => 20,
+                _ => 5
+            };
+
+            return new Pen(new SolidColorBrush(color.Color, stroke.Alpha * scaledPressure), size * rawPressure);
+        }
         public void ClearCanvas()
         {
             _strokes.Clear();

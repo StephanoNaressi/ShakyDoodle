@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Media;
@@ -7,6 +8,7 @@ namespace ShakyDoodle
 {
     public class Stroke
     {
+        public DateTime CreatedAt { get; } = DateTime.UtcNow;
         public List<Point> Points { get; } = new();
         public List<float> Pressures { get; } = new();
         public ColorType Color { get; }

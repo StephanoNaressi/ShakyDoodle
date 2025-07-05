@@ -11,7 +11,9 @@
 		<PublishTrimmed>false</PublishTrimmed>
 		<PublishReadyToRun>false</PublishReadyToRun>
 	</PropertyGroup>
-
+	<PropertyGroup>
+		<ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+	</PropertyGroup>
 	<ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.2" />
     <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.2" />
