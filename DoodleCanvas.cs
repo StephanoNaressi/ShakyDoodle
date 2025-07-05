@@ -163,8 +163,11 @@ namespace ShakyDoodle
         public override void Render(DrawingContext context)
         {
             base.Render(context);
+            
+            //PushPop to avoid drawing outside the canvas
+            using var clip = context.PushClip(new Rect(Bounds.Size));
 
-            context.FillRectangle(Brushes.Transparent, new Rect(Bounds.Size));
+            context.FillRectangle(Brushes.White, new Rect(Bounds.Size));
 
             DrawGrid(context);
 
@@ -254,7 +257,14 @@ namespace ShakyDoodle
         public void SelectSize(SizeType size) => _currentSize = size;
         public void ChangeAlpha(double val) => _alpha = val;
         public void ChangeBrushTip(PenLineCap cap) => _currentCap = cap;
-        public void ShouldShake(bool shake) => _isShake = shake;
+        public void ShouldShake(bool shake)
+        {
+            _isShake = shake;
+            if (!_isShake)
+            {
+                InvalidateVisual();
+            }
+        }
 
         #endregion
     }
