@@ -1,0 +1,26 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+
+namespace ShakyDoodle
+{
+    public partial class MainWindow : Window
+    {
+
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void OnClearClick(object? sender, RoutedEventArgs events) => doodleCanvas.ClearCanvas();
+        private void OnFirstColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.First);
+        private void OnSecondColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Second);
+        private void OnThirdColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Third);
+        private void OnSizeSmall(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Small);
+        private void OnSizeMedium(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Medium);
+        private void OnSizeLarge(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Large);
+        private void OnAlphaChanged(object? sender, RangeBaseValueChangedEventArgs events) => doodleCanvas.ChangeAlpha((double)events.NewValue);
+
+    }
+}
