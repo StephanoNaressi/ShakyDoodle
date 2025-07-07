@@ -232,7 +232,18 @@ namespace ShakyDoodle
             _undoStack.Push(_strokes.Select(s => s.Clone()).ToList());
             _redoStack.Clear(); // Clear redo stack on new action
         }
-
+        private Color GetAvaloniaColor(ColorType colorType) => colorType switch
+        {
+            ColorType.First => Colors.Black,
+            ColorType.Second => Colors.Blue,
+            ColorType.Third => Colors.Red,
+            ColorType.Fourth => Colors.White,
+            ColorType.Fifth => Colors.Yellow,
+            ColorType.Sixth => Colors.GreenYellow,
+            ColorType.Seventh => Colors.Purple,
+            ColorType.Eighth => Colors.Pink,
+            _ => Colors.Black
+        };
         #endregion
 
         #region Rendering
@@ -456,39 +467,23 @@ namespace ShakyDoodle
         public void ExportFramesAsPng(string folderPath, int width, int height)
         {
             var pixelSize = new PixelSize(width, height);
-            var dpi = new Vector(96, 96); // standard screen DPI
             string sessionId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             for (int i = 0; i < frames.Count; i++)
             {
                 var frameStrokes = frames[i];
 
-                // Create a bitmap
-                using var renderTarget = new RenderTargetBitmap(pixelSize, dpi);
+                using var renderTarget = new RenderTargetBitmap(pixelSize);
 
                 using (var context = renderTarget.CreateDrawingContext(true))
                 {
                     context.FillRectangle(Brushes.White, new Rect(new Size(width, height)));
 
-
                     DrawGrid(context);
-
-
                     foreach (var stroke in frameStrokes)
                     {
                         var sIntensity = stroke.Shake ? 1 : 0;
-
-                        DrawStrokeWithColorOverride(stroke, sIntensity, context, new SolidColorBrush(stroke.Color switch
-                        {
-                            ColorType.First => Colors.Black,
-                            ColorType.Second => Colors.Blue,
-                            ColorType.Third => Colors.Red,
-                            ColorType.Fourth => Colors.White,
-                            ColorType.Fifth => Colors.Yellow,
-                            ColorType.Sixth => Colors.GreenYellow,
-                            ColorType.Seventh => Colors.Purple,
-                            ColorType.Eighth => Colors.Pink,
-                            _ => Colors.Black
-                        }));
+                        var brush = new SolidColorBrush(GetAvaloniaColor(stroke.Color));
+                        DrawStrokeWithColorOverride(stroke, sIntensity, context, brush);
                     }
                 }
                 string fileName = $"frame_{sessionId}_{i:D3}.png";
