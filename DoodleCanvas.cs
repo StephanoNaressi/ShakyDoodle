@@ -13,7 +13,7 @@ namespace ShakyDoodle
     {
         #region Fields
 
-        List<Stroke> _strokes = new();
+        List<Stroke> _strokes;
         Stroke _currentStroke;
 
         ColorType _currentColor;
@@ -35,7 +35,7 @@ namespace ShakyDoodle
 
         bool _isShake = true;
         bool _isInvalidating = false;
-
+        Pen _gridPen = new(Brushes.LightBlue, 1);
 
 
         #endregion
@@ -44,6 +44,8 @@ namespace ShakyDoodle
 
         public DoodleCanvas()
         {
+            _strokes = new List<Stroke>(_maxStrokes);
+
             Focusable = true;
             Focus();
             PointerPressed += (s, e) => Focus();
@@ -59,7 +61,7 @@ namespace ShakyDoodle
             _currentCap = PenLineCap.Square;
             _maxStrokes = 300;
 
-            _ = new PointerPointProperties();
+            //_ = new PointerPointProperties();
         }
 
         protected override void OnInitialized()
@@ -133,8 +135,11 @@ namespace ShakyDoodle
 
         private Point GetShakenPoint(Point point, double shakeIntensity)
         {
-            if (_shakeSeeds.Count > 10000)
-                _shakeSeeds.Clear();
+            if (_shakeSeeds.Count > 5000)
+            {
+                foreach (var key in _shakeSeeds.Keys.Take(1000).ToList())
+                    _shakeSeeds.Remove(key);
+            }
 
             if (!_isShake || shakeIntensity <= 0) return point;
 
@@ -181,14 +186,13 @@ namespace ShakyDoodle
 
         private void DrawGrid(DrawingContext context)
         {
-            Pen gridPen = new(Brushes.LightBlue, 1);
             for (int i = 0; i <= Bounds.Width; i += _gridSize)
             {
-                context.DrawLine(gridPen, new Point(i, 0), new Point(i, Bounds.Height));
+                context.DrawLine(_gridPen, new Point(i, 0), new Point(i, Bounds.Height));
             }
             for (int j = 0; j <= Bounds.Height; j += _gridSize)
             {
-                context.DrawLine(gridPen, new Point(0, j), new Point(Bounds.Width, j));
+                context.DrawLine(_gridPen, new Point(0, j), new Point(Bounds.Width, j));
             }
         }
         private void DrawStroke(Stroke stroke, double shakeIntensity, DrawingContext context)
@@ -210,7 +214,7 @@ namespace ShakyDoodle
         private void SetupMainPen(Stroke stroke, int i, double shakeIntensity)
         {
             float pressure = stroke.Pressures[i];
-            double scaledPressure = Math.Clamp(pressure / 0.5, 0, 1);
+            double scaledPressure = Math.Min(pressure * 2, 1);
             var brush = ChooseBrushSettings(stroke, scaledPressure, pressure);
             _mainPen = brush;
             _mainPen.LineCap = stroke.PenLineCap;
