@@ -60,6 +60,7 @@ namespace ShakyDoodle
             _alpha = 1;
             _currentCap = PenLineCap.Square;
             _maxStrokes = 300;
+            Cursor = new Cursor(StandardCursorType.Cross);
 
             //_ = new PointerPointProperties();
         }
@@ -210,7 +211,6 @@ namespace ShakyDoodle
         }
         private void DrawStroke(Stroke stroke, double shakeIntensity, DrawingContext context)
         {
-            // If stroke shaking is disabled, force shakeIntensity to 0 to avoid jitter
             if (!stroke.Shake)
                 shakeIntensity = 0;
 
