@@ -15,7 +15,8 @@ namespace ShakyDoodle
         public SizeType Size { get; }
         public double Alpha {  get; }
         public PenLineCap PenLineCap { get; }
-        public Stroke(ColorType color, Point startPoint, SizeType size, double alpha, PenLineCap cap, float startPressure)
+        public bool Shake {  get; }
+        public Stroke(ColorType color, Point startPoint, SizeType size, double alpha, PenLineCap cap, float startPressure, bool shake)
         {
             Color = color;
             Points.Add(startPoint);
@@ -23,6 +24,7 @@ namespace ShakyDoodle
             Alpha = alpha;
             PenLineCap = cap;
             Pressures.Add(startPressure);
+            Shake = shake;
         }
     }
 }

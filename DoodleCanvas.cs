@@ -76,7 +76,7 @@ namespace ShakyDoodle
 
             _isInvalidating = true;
             InvalidateVisual();
-            await Task.Delay(16);
+            await Task.Delay(24);
             _isInvalidating = false;
         }
 
@@ -100,7 +100,7 @@ namespace ShakyDoodle
         {
             if (events.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
-                _currentStroke = new(_currentColor, events.GetPosition(this), _currentSize, _alpha, _currentCap, events.GetCurrentPoint(this).Properties.Pressure);
+                _currentStroke = new(_currentColor, events.GetPosition(this), _currentSize, _alpha, _currentCap, events.GetCurrentPoint(this).Properties.Pressure, _isShake);
                 _strokes.Add(_currentStroke);
                 System.Diagnostics.Debug.WriteLine($"Strokes: {_strokes.Count}");
                 RequestInvalidate();
@@ -111,10 +111,16 @@ namespace ShakyDoodle
         {
             if (_currentStroke == null || !events.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
 
-            _currentStroke.Points.Add(events.GetPosition(this));
-            _currentStroke.Pressures.Add(events.GetCurrentPoint(this).Properties.Pressure);
-            RequestInvalidate();
+            var pos = events.GetPosition(this);
+
+            if (_currentStroke.Points.Count == 0 || Distance(pos, _currentStroke.Points.Last()) > 2)
+            {
+                _currentStroke.Points.Add(pos);
+                _currentStroke.Pressures.Add(events.GetCurrentPoint(this).Properties.Pressure);
+                RequestInvalidate();
+            }
         }
+
 
         private async void StartRenderLoopAsync()
         {
@@ -135,22 +141,29 @@ namespace ShakyDoodle
 
         private Point GetShakenPoint(Point point, double shakeIntensity)
         {
-            if (_shakeSeeds.Count > 5000)
-            {
-                foreach (var key in _shakeSeeds.Keys.Take(1000).ToList())
-                    _shakeSeeds.Remove(key);
-            }
-
             if (!_isShake || shakeIntensity <= 0) return point;
 
-            if (!_shakeSeeds.ContainsKey(point))
-            {
-                _shakeSeeds[point] = new Vector(_r.NextDouble() * _offset, _r.NextDouble() * _offset);
-            }
+            // Mix point coords * different primes for uniqueness
+            double seedX = Math.Sin(point.X * 12.9898 + point.Y * 78.233);
+            double seedY = Math.Cos(point.X * 93.9898 + point.Y * 67.345);
 
-            var seed = _shakeSeeds[point];
-            return new Point(point.X + Math.Sin(_time + seed.X) * _amp * shakeIntensity,
-                point.Y + Math.Cos(_time + seed.Y) * _amp * shakeIntensity);
+            // Scale seeds to range [-1, 1]
+            double offsetX = (seedX * 43758.5453) % 2 - 1;
+            double offsetY = (seedY * 12737.2349) % 2 - 1;
+
+            // Jiggle independently with time and random offset
+            double shakenX = point.X + Math.Sin(_time + offsetX * 10) * _amp * shakeIntensity;
+            double shakenY = point.Y + Math.Cos(_time + offsetY * 10) * _amp * shakeIntensity;
+
+            return new Point(shakenX, shakenY);
+        }
+
+
+        private double Distance(Point p1, Point p2)
+        {
+            double dx = p2.X - p1.X;
+            double dy = p2.Y - p1.Y;
+            return Math.Sqrt(dx * dx + dy * dy);
         }
 
         private double GetShakeIntensity(int strokeIndex)
@@ -197,6 +210,10 @@ namespace ShakyDoodle
         }
         private void DrawStroke(Stroke stroke, double shakeIntensity, DrawingContext context)
         {
+            // If stroke shaking is disabled, force shakeIntensity to 0 to avoid jitter
+            if (!stroke.Shake)
+                shakeIntensity = 0;
+
             for (int i = 1; i < stroke.Points.Count; i++)
             {
                 SetupMainPen(stroke, i, shakeIntensity);
@@ -205,6 +222,7 @@ namespace ShakyDoodle
                 context.DrawLine(_mainPen, p1, p2);
             }
         }
+
 
 
         #endregion
