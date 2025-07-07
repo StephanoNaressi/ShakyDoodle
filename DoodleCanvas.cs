@@ -12,39 +12,42 @@ namespace ShakyDoodle
 {
     public class DoodleCanvas : Control
     {
-        #region Fields
-        public int CurrentFrame => currentFrame; 
+        #region Fields and Properties
+
+        public int CurrentFrame => currentFrame;
         public int TotalFrames => frames.Count;
-        List<Stroke> _strokes;
-        Stroke? _currentStroke;
-
-        ColorType _currentColor;
-        SizeType _currentSize;
-        int _gridSize;
-        double _alpha;
-
-        double _time;
-
-        float _amp = 2;
-        float _speed = 0.3f;
-        int _maxStrokes;
-
-        Pen _mainPen;
-        PenLineCap _currentCap;
-
-        bool _isShake = true;
-        Pen _gridPen = new(Brushes.LightBlue, 1);
-        private bool _needsRedraw = false;
-
-        List<List<Stroke>> frames = new();
-        int currentFrame = 0;
-        private bool _onionSkinEnabled = false;
         public List<Stroke> Strokes => _strokes;
-        private bool _isPlaying = false;
 
+        private List<Stroke> _strokes;
+        private Stroke? _currentStroke;
+        private List<List<Stroke>> frames = new();
         private Stack<List<Stroke>> _undoStack = new();
         private Stack<List<Stroke>> _redoStack = new();
+
+        private int currentFrame = 0;
+        private int _gridSize;
+        private int _maxStrokes;
+
+        private double _alpha;
+        private double _time;
+
+        private float _amp = 2f;
+        private float _speed = 0.3f;
+
+        private ColorType _currentColor;
+        private SizeType _currentSize;
+        private PenLineCap _currentCap;
+
+        private Pen _mainPen;
+        private Pen _gridPen = new(Brushes.LightBlue, 1);
+
+        private bool _isShake = true;
+        private bool _needsRedraw = false;
+        private bool _onionSkinEnabled = false;
+        private bool _isPlaying = false;
+
         #endregion
+
 
         #region Systems
 
@@ -431,6 +434,20 @@ namespace ShakyDoodle
             _undoStack.Push(_strokes.Select(s => s.Clone()).ToList());
             _strokes = _redoStack.Pop();
             SyncStrokesToFrame();
+            InvalidateVisual();
+        }
+        public void DuplicateFrame()
+        {
+            if (currentFrame < 0 || currentFrame >= frames.Count) return;
+            //We grab our current frame strokes
+            var currentFrameStrokes = frames[currentFrame];
+            var clonedStrokes = currentFrameStrokes.Select(x => x.Clone()).ToList();
+
+            int i = currentFrame + 1;
+            frames.Insert(i, clonedStrokes);
+
+            LoadFrame(i);
+
             InvalidateVisual();
         }
         #endregion

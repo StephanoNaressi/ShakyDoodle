@@ -53,6 +53,11 @@ namespace ShakyDoodle
         private void OnBrushSquare(object? sender, RoutedEventArgs events) => doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Square);
         private void OnBrushFlat(object? sender, RoutedEventArgs events) => doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Flat);
         private void OnBrushRound(object? sender, RoutedEventArgs events) => doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Round);
+        private void OnDuplicateFrame(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.DuplicateFrame();
+            UpdateFrameLabel();
+        }
 
         private void OnShake(object? sender, RoutedEventArgs events) => doodleCanvas.ShouldShake(true);
         private void OnUnshake(object? sender, RoutedEventArgs events) => doodleCanvas.ShouldShake(false);
