@@ -2,9 +2,11 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -238,7 +240,7 @@ namespace ShakyDoodle
         public override void Render(DrawingContext context)
         {
             base.Render(context);
-            
+
             //PushPop to avoid drawing outside the canvas
             using var clip = context.PushClip(new Rect(Bounds.Size));
 
@@ -247,8 +249,8 @@ namespace ShakyDoodle
             DrawGrid(context);
             if (_onionSkinEnabled)
             {
-                DrawFrameIfExists(currentFrame - 1, Brushes.LightBlue, context); 
-                DrawFrameIfExists(currentFrame + 1, Brushes.Pink, context); 
+                DrawFrameIfExists(currentFrame - 1, Brushes.LightBlue, context);
+                DrawFrameIfExists(currentFrame + 1, Brushes.Pink, context);
             }
             // Draw all existing strokes with shake effect based on their index
             for (int i = 0; i < _strokes.Count; i++)
@@ -360,7 +362,7 @@ namespace ShakyDoodle
 
             frames.Add(new List<Stroke>());
 
-            Stop(); 
+            Stop();
             RequestInvalidate();
 
             if (_isShake)
@@ -450,6 +452,52 @@ namespace ShakyDoodle
 
             InvalidateVisual();
         }
+
+        public void ExportFramesAsPng(string folderPath, int width, int height)
+        {
+            var pixelSize = new PixelSize(width, height);
+            var dpi = new Vector(96, 96); // standard screen DPI
+            string sessionId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            for (int i = 0; i < frames.Count; i++)
+            {
+                var frameStrokes = frames[i];
+
+                // Create a bitmap
+                using var renderTarget = new RenderTargetBitmap(pixelSize, dpi);
+
+                using (var context = renderTarget.CreateDrawingContext(true))
+                {
+                    context.FillRectangle(Brushes.White, new Rect(new Size(width, height)));
+
+
+                    DrawGrid(context);
+
+
+                    foreach (var stroke in frameStrokes)
+                    {
+                        var sIntensity = stroke.Shake ? 1 : 0;
+
+                        DrawStrokeWithColorOverride(stroke, sIntensity, context, new SolidColorBrush(stroke.Color switch
+                        {
+                            ColorType.First => Colors.Black,
+                            ColorType.Second => Colors.Blue,
+                            ColorType.Third => Colors.Red,
+                            ColorType.Fourth => Colors.White,
+                            ColorType.Fifth => Colors.Yellow,
+                            ColorType.Sixth => Colors.GreenYellow,
+                            ColorType.Seventh => Colors.Purple,
+                            ColorType.Eighth => Colors.Pink,
+                            _ => Colors.Black
+                        }));
+                    }
+                }
+                string fileName = $"frame_{sessionId}_{i:D3}.png";
+                string filePath = Path.Combine(folderPath, fileName);
+                using var fileStream = File.OpenWrite(filePath);
+                renderTarget.Save(fileStream);
+            }
+        }
+
         #endregion
     }
 }

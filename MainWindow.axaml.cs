@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+using System.IO;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -83,6 +85,23 @@ namespace ShakyDoodle
 
         private void ToggleOnionSkin(object? sender, RoutedEventArgs events) => doodleCanvas.ToggleOnionSkin(true);
         private void UntoggleOnionSkin(object? sender, RoutedEventArgs events) => doodleCanvas.ToggleOnionSkin(false);
+        private void OnSaveFile(object? sender, RoutedEventArgs e)
+        {
+            string baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            string folderName = "ShakyDoodle"; 
+            string folderPath = Path.Combine(baseFolder, folderName);
+
+            Directory.CreateDirectory(folderPath); 
+
+            int width = (int)doodleCanvas.Bounds.Width;
+            int height = (int)doodleCanvas.Bounds.Height;
+
+            doodleCanvas.ExportFramesAsPng(folderPath, width, height);
+        }
+
+
+
+
 
 
     }
