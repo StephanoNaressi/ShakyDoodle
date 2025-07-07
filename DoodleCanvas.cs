@@ -36,7 +36,7 @@ namespace ShakyDoodle
         bool _isShake = true;
         bool _isInvalidating = false;
         Pen _gridPen = new(Brushes.LightBlue, 1);
-
+        private bool _needsRedraw = false;
 
         #endregion
 
@@ -73,12 +73,8 @@ namespace ShakyDoodle
 
         private async void RequestInvalidate()
         {
-            if (_isInvalidating) return;
-
-            _isInvalidating = true;
-            InvalidateVisual();
-            await Task.Delay(24);
-            _isInvalidating = false;
+            if (!_isShake)
+                _needsRedraw = true;
         }
 
         private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -130,11 +126,18 @@ namespace ShakyDoodle
                 if (_isShake)
                 {
                     _time += _speed;
-                    RequestInvalidate();
+                    InvalidateVisual();
                 }
+                else if (_needsRedraw)
+                {
+                    InvalidateVisual();
+                    _needsRedraw = false;
+                }
+
                 await Task.Delay(16);
             }
         }
+
 
         #endregion
 
@@ -144,15 +147,12 @@ namespace ShakyDoodle
         {
             if (!_isShake || shakeIntensity <= 0) return point;
 
-            // Mix point coords * different primes for uniqueness
             double seedX = Math.Sin(point.X * 12.9898 + point.Y * 78.233);
             double seedY = Math.Cos(point.X * 93.9898 + point.Y * 67.345);
 
-            // Scale seeds to range [-1, 1]
             double offsetX = (seedX * 43758.5453) % 2 - 1;
             double offsetY = (seedY * 12737.2349) % 2 - 1;
 
-            // Jiggle independently with time and random offset
             double shakenX = point.X + Math.Sin(_time + offsetX * 10) * _amp * shakeIntensity;
             double shakenY = point.Y + Math.Cos(_time + offsetY * 10) * _amp * shakeIntensity;
 
