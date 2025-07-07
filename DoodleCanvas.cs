@@ -21,20 +21,16 @@ namespace ShakyDoodle
         int _gridSize;
         double _alpha;
 
-        Random _r = new();
         double _time;
 
         float _amp = 2;
-        float _offset = 7;
         float _speed = 0.3f;
         int _maxStrokes;
 
         Pen _mainPen;
         PenLineCap _currentCap;
-        Dictionary<Point, Vector> _shakeSeeds = new();
 
         bool _isShake = true;
-        bool _isInvalidating = false;
         Pen _gridPen = new(Brushes.LightBlue, 1);
         private bool _needsRedraw = false;
 
@@ -62,7 +58,6 @@ namespace ShakyDoodle
             _maxStrokes = 300;
             Cursor = new Cursor(StandardCursorType.Cross);
 
-            //_ = new PointerPointProperties();
         }
 
         protected override void OnInitialized()
@@ -123,7 +118,9 @@ namespace ShakyDoodle
         {
             while (true)
             {
-                if (_isShake)
+                bool anyShakeStrokes = _strokes.Any(s => s.Shake);
+
+                if (anyShakeStrokes)
                 {
                     _time += _speed;
                     InvalidateVisual();
@@ -139,13 +136,14 @@ namespace ShakyDoodle
         }
 
 
+
         #endregion
 
         #region Utility
 
         private Point GetShakenPoint(Point point, double shakeIntensity)
         {
-            if (!_isShake || shakeIntensity <= 0) return point;
+            if (shakeIntensity <= 0) return point;
 
             double seedX = Math.Sin(point.X * 12.9898 + point.Y * 78.233);
             double seedY = Math.Cos(point.X * 93.9898 + point.Y * 67.345);
@@ -280,10 +278,7 @@ namespace ShakyDoodle
         public void ShouldShake(bool shake)
         {
             _isShake = shake;
-            if (!_isShake)
-            {
-                InvalidateVisual();
-            }
+            _needsRedraw = true;
         }
 
         #endregion

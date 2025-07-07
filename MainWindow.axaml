@@ -17,8 +17,8 @@
 
 		<!-- Toolbar -->
 		<StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Center">
-			<Button Content="Clear" Click="OnClearClick" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-			<CheckBox Content="Shake?" Margin="5" HorizontalAlignment="Center" IsChecked="true" Checked="OnShake" Unchecked="OnUnshake"/>
+			<Button Content="Shake Pen" Click="OnShake" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+			<Button Content="Normal Pen" Click="OnUnshake" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 			<UniformGrid Columns="3" Margin="5">
 				<!-- Sizes -->
 				<Button Width="10" Height="10" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeSmall" BorderBrush="BlanchedAlmond" BorderThickness="2" />
@@ -35,8 +35,6 @@
 			<TextBlock Text="Alpha" HorizontalAlignment="Center" FontSize="10"/>
 			<Slider Minimum="0" Maximum="1" Value="1" ValueChanged="OnAlphaChanged" />
 
-
-
 			<!-- Colors -->
 			<UniformGrid Columns="2" Rows="4" Margin="5" HorizontalAlignment="Center">
 				<Button Background="Black" Click="OnFirstColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
@@ -48,6 +46,8 @@
 				<Button Background="Purple" Click="OnSeventhColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
 				<Button Background="Pink" Click="OnEighthColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
 			</UniformGrid>
+			<Button Content="Clear" Click="OnClearClick" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+
 		</StackPanel>
 
 		<!-- Canvas Area -->
