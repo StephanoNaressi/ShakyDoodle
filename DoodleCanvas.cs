@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,11 @@ namespace ShakyDoodle
         Pen _gridPen = new(Brushes.LightBlue, 1);
         private bool _needsRedraw = false;
 
+        List<List<Stroke>> frames = new();
+        int currentFrame = 0;
+
+        public List<Stroke> Strokes => _strokes;
+        private bool _isPlaying = false;
         #endregion
 
         #region Systems
@@ -81,7 +87,11 @@ namespace ShakyDoodle
             {
                 if (_strokes == null || _strokes.Count <= 0) return;
                 _strokes.Remove(_strokes.Last());
-                RequestInvalidate();
+
+                if (_isShake)
+                    InvalidateVisual();
+                else
+                    _needsRedraw = true;
             }
         }
 
@@ -157,7 +167,31 @@ namespace ShakyDoodle
             return new Point(shakenX, shakenY);
         }
 
+        private void SaveCurrentFrame()
+        {
+            var strokesCopy = _strokes.Select(x => x.Clone()).ToList();
+            // If our current frame is less than the total amount of frames then we assign the copy of our strokes
+            if (currentFrame < frames.Count) frames[currentFrame] = strokesCopy;
+            // Else we add the copy to our list of frames
+            else frames.Add(strokesCopy);
 
+        }
+        void LoadFrame(int i)
+        {
+            // If our index is invalid we dont do nothin'
+            if (i < 0 || i >= frames.Count) return;
+            // We set our strokes to the ones from the desired frame
+            SetStrokes(frames[i]);
+            currentFrame = i;
+            InvalidateVisual();
+            
+        }
+
+        public void SetStrokes(List<Stroke> strokes)
+        {
+            _strokes = strokes;
+            InvalidateVisual();
+        }
         private double Distance(Point p1, Point p2)
         {
             double dx = p2.X - p1.X;
@@ -172,6 +206,7 @@ namespace ShakyDoodle
             double t = newer / (double)_maxStrokes;
             return Math.Clamp(1.0 - t, 0.0, 1.0);
         }
+
 
         #endregion
 
@@ -268,7 +303,18 @@ namespace ShakyDoodle
         {
             _currentStroke = null;
             _strokes.Clear();
+            frames.Clear();
+            currentFrame = 0;
+
+            frames.Add(new List<Stroke>());
+
+            Stop(); 
             RequestInvalidate();
+
+            if (_isShake)
+                InvalidateVisual();
+            else
+                _needsRedraw = true;
         }
 
         public void SelectColor(ColorType color) => _currentColor = color;
@@ -280,7 +326,39 @@ namespace ShakyDoodle
             _isShake = shake;
             _needsRedraw = true;
         }
+        public void NextFrame()
+        {
+            SaveCurrentFrame();
+            int n = currentFrame + 1;
+            if (n >= frames.Count) frames.Add(new List<Stroke>());
+            LoadFrame(n);
+        }
+        public void PreviousFrame()
+        {
+            SaveCurrentFrame();
+            if (currentFrame > 0) LoadFrame(currentFrame - 1);
+        }
+        public async void Play()
+        {
+            if (frames.Count == 0) return;
+            _isPlaying = true;
+            while (_isPlaying)
+            {
+                LoadFrame(currentFrame);
+                currentFrame = (currentFrame + 1) % frames.Count;
 
+                await Task.Delay(100);
+            }
+        }
+        public void Stop()
+        {
+            _isPlaying = false;
+        }
+        public void TogglePlay()
+        {
+            if (_isPlaying) Stop();
+            else Play();
+        }
         #endregion
     }
 }

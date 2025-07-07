@@ -46,6 +46,13 @@
 				<Button Background="Purple" Click="OnSeventhColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
 				<Button Background="Pink" Click="OnEighthColor" Margin="4" BorderBrush="BlanchedAlmond" BorderThickness="2" />
 			</UniformGrid>
+			<UniformGrid Columns="3" Margin="0" HorizontalAlignment="Center">
+				<!-- Shapes -->
+				<Button Content="&lt;" Click="OnPrevFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
+				<Button Content=":)" Click="OnTogglePlay" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+
+				<Button Content="&gt;" Click="OnNextFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+			</UniformGrid>
 			<Button Content="Clear" Click="OnClearClick" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 
 		</StackPanel>

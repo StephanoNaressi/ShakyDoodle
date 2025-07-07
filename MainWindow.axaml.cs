@@ -32,5 +32,8 @@ namespace ShakyDoodle
 
         private void OnShake(object? sender, RoutedEventArgs events) => doodleCanvas.ShouldShake(true);
         private void OnUnshake(object? sender, RoutedEventArgs events) => doodleCanvas.ShouldShake(false);
+        private void OnNextFrame(object? sender, RoutedEventArgs events) => doodleCanvas.NextFrame();
+        private void OnPrevFrame(object? sender, RoutedEventArgs events) => doodleCanvas.PreviousFrame();
+        private void OnTogglePlay(object? sender, RoutedEventArgs events) => doodleCanvas.TogglePlay();
     }
 }
