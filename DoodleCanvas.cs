@@ -15,7 +15,7 @@ namespace ShakyDoodle
         #region Fields
 
         List<Stroke> _strokes;
-        Stroke _currentStroke;
+        Stroke? _currentStroke;
 
         ColorType _currentColor;
         SizeType _currentSize;
@@ -40,12 +40,16 @@ namespace ShakyDoodle
         private bool _onionSkinEnabled = false;
         public List<Stroke> Strokes => _strokes;
         private bool _isPlaying = false;
+
+        private Stack<List<Stroke>> _undoStack = new();
+        private Stack<List<Stroke>> _redoStack = new();
         #endregion
 
         #region Systems
 
         public DoodleCanvas()
         {
+            _maxStrokes = 300;
             _strokes = new List<Stroke>(_maxStrokes);
 
             Focusable = true;
@@ -57,11 +61,12 @@ namespace ShakyDoodle
             PointerReleased += OnPointerReleased;
 
             KeyDown += OnKeyDown;
-
+            frames = new List<List<Stroke>>() { new List<Stroke>() };
+            currentFrame = 0;
             _gridSize = 50;
             _alpha = 1;
             _currentCap = PenLineCap.Square;
-            _maxStrokes = 300;
+
             Cursor = new Cursor(StandardCursorType.Cross);
 
         }
@@ -81,30 +86,43 @@ namespace ShakyDoodle
         private void OnKeyDown(object? sender, KeyEventArgs e)
         {
             var isCtrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
-            var isAlt = e.KeyModifiers.HasFlag(KeyModifiers.Alt);
 
             if (isCtrl && e.Key == Key.Z)
             {
-                if (_strokes == null || _strokes.Count <= 0) return;
-                _strokes.Remove(_strokes.Last());
+                if (_undoStack.Count == 0) return;
 
-                if (_isShake)
-                    InvalidateVisual();
-                else
-                    _needsRedraw = true;
+                _redoStack.Push(_strokes.Select(s => s.Clone()).ToList());
+                _strokes = _undoStack.Pop();
+                SyncStrokesToFrame();
+                InvalidateVisual();
+            }
+            if (isCtrl && e.Key == Key.Y)
+            {
+                if (_redoStack.Count == 0) return;
+
+                _undoStack.Push(_strokes.Select(s => s.Clone()).ToList());
+                _strokes = _redoStack.Pop();
+                SyncStrokesToFrame();
+                InvalidateVisual();
             }
         }
 
-        private void OnPointerReleased(object? sender, PointerReleasedEventArgs events) => _currentStroke = null;
 
+        private void OnPointerReleased(object? sender, PointerReleasedEventArgs events)
+        {
+            _currentStroke = null;
+            SaveCurrentFrame();
+        }
 
         private void OnPointerPressed(object? sender, PointerPressedEventArgs events)
         {
             if (events.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
                 _currentStroke = new(_currentColor, events.GetPosition(this), _currentSize, _alpha, _currentCap, events.GetCurrentPoint(this).Properties.Pressure, _isShake);
+                PushUndoState();
                 _strokes.Add(_currentStroke);
                 System.Diagnostics.Debug.WriteLine($"Strokes: {_strokes.Count}");
+                SyncStrokesToFrame();
                 RequestInvalidate();
             }
         }
@@ -170,22 +188,19 @@ namespace ShakyDoodle
         private void SaveCurrentFrame()
         {
             var strokesCopy = _strokes.Select(x => x.Clone()).ToList();
-            // If our current frame is less than the total amount of frames then we assign the copy of our strokes
             if (currentFrame < frames.Count) frames[currentFrame] = strokesCopy;
-            // Else we add the copy to our list of frames
             else frames.Add(strokesCopy);
 
         }
         void LoadFrame(int i)
         {
-            // If our index is invalid we dont do nothin'
             if (i < 0 || i >= frames.Count) return;
-            // We set our strokes to the ones from the desired frame
-            SetStrokes(frames[i]);
+
             currentFrame = i;
+            SyncFrameToStrokes(); 
             InvalidateVisual();
-            
         }
+
         private double GetStrokeSize(Stroke stroke)
         {
             return stroke.Size switch
@@ -215,7 +230,22 @@ namespace ShakyDoodle
             double t = newer / (double)_maxStrokes;
             return Math.Clamp(1.0 - t, 0.0, 1.0);
         }
+        private void SyncStrokesToFrame()
+        {
+            if (currentFrame < 0 || currentFrame >= frames.Count) return;
+            frames[currentFrame] = _strokes.Select(s => s.Clone()).ToList();
+        }
 
+        private void SyncFrameToStrokes()
+        {
+            if (currentFrame < 0 || currentFrame >= frames.Count) return;
+            _strokes = frames[currentFrame].Select(s => s.Clone()).ToList();
+        }
+        private void PushUndoState()
+        {
+            _undoStack.Push(_strokes.Select(s => s.Clone()).ToList());
+            _redoStack.Clear(); // Clear redo stack on new action
+        }
 
         #endregion
 
@@ -370,11 +400,13 @@ namespace ShakyDoodle
             int n = currentFrame + 1;
             if (n >= frames.Count) frames.Add(new List<Stroke>());
             LoadFrame(n);
+            InvalidateVisual();
         }
         public void PreviousFrame()
         {
             SaveCurrentFrame();
             if (currentFrame > 0) LoadFrame(currentFrame - 1);
+            InvalidateVisual();
         }
         public async void Play()
         {
