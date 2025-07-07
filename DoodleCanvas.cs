@@ -110,7 +110,7 @@ namespace ShakyDoodle
 
             var pos = events.GetPosition(this);
 
-            if (_currentStroke.Points.Count == 0 || Distance(pos, _currentStroke.Points.Last()) > 2)
+            if (_currentStroke.Points.Count == 0 || Distance(pos, _currentStroke.Points.Last()) > 5)
             {
                 _currentStroke.Points.Add(pos);
                 _currentStroke.Pressures.Add(events.GetCurrentPoint(this).Properties.Pressure);
@@ -222,8 +222,6 @@ namespace ShakyDoodle
                 context.DrawLine(_mainPen, p1, p2);
             }
         }
-
-
 
         #endregion
 
