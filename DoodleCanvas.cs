@@ -262,18 +262,25 @@ namespace ShakyDoodle
             _undoStack.Push(_strokes.Select(s => s.Clone()).ToList());
             _redoStack.Clear(); // Clear redo stack on new action
         }
-        private Color GetAvaloniaColor(ColorType colorType) => colorType switch
+        private Color GetAvaloniaColor(ColorType colorType, double alpha = 1.0)
         {
-            ColorType.First => Colors.Black,
-            ColorType.Second => Colors.Blue,
-            ColorType.Third => Colors.Red,
-            ColorType.Fourth => Colors.White,
-            ColorType.Fifth => Colors.Yellow,
-            ColorType.Sixth => Colors.GreenYellow,
-            ColorType.Seventh => Colors.Purple,
-            ColorType.Eighth => Colors.Pink,
-            _ => Colors.Black
-        };
+            byte a = (byte)(alpha * 255);
+            Color baseColor = colorType switch
+            {
+                ColorType.First => Colors.Black,
+                ColorType.Second => Colors.Blue,
+                ColorType.Third => Colors.Red,
+                ColorType.Fourth => Colors.White,
+                ColorType.Fifth => Colors.Yellow,
+                ColorType.Sixth => Colors.GreenYellow,
+                ColorType.Seventh => Colors.Purple,
+                ColorType.Eighth => Colors.Pink,
+                _ => Colors.Black
+            };
+
+            return Color.FromArgb(a, baseColor.R, baseColor.G, baseColor.B);
+        }
+
         #endregion
 
         #region Rendering
@@ -511,7 +518,7 @@ namespace ShakyDoodle
                     foreach (var stroke in frameStrokes)
                     {
                         var sIntensity = stroke.Shake ? 1 : 0;
-                        var brush = new SolidColorBrush(GetAvaloniaColor(stroke.Color));
+                        var brush = new SolidColorBrush(GetAvaloniaColor(stroke.Color, stroke.Alpha));
                         DrawStrokeWithColorOverride(stroke, sIntensity, context, brush);
                     }
                 }
