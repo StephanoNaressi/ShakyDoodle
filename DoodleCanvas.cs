@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -43,8 +44,8 @@ namespace ShakyDoodle
         private Pen _mainPen;
         private Pen _gridPen = new(Brushes.LightBlue, 1);
 
+        private bool _renderPending = false;
         private bool _isShake = true;
-        private bool _needsRedraw = false;
         private bool _onionSkinEnabled = false;
         private bool _isPlaying = false;
 
@@ -77,7 +78,7 @@ namespace ShakyDoodle
 
         public DoodleCanvas()
         {
-            _maxStrokes = 300;
+            _maxStrokes = 150;
             _strokes = new List<Stroke>(_maxStrokes);
 
             Focusable = true;
@@ -102,15 +103,12 @@ namespace ShakyDoodle
             StartRenderLoopAsync();
         }
 
-        private async void RequestInvalidate()
-        {
-            if (!_isShake)
-                _needsRedraw = true;
-        }
+
 
         private void OnPointerReleased(object? sender, PointerReleasedEventArgs events)
         {
             _currentStroke = null;
+
             SaveCurrentFrame();
         }
 
@@ -124,7 +122,8 @@ namespace ShakyDoodle
                 _strokes.Add(_currentStroke);
                 System.Diagnostics.Debug.WriteLine($"Strokes: {_strokes.Count}");
                 SyncStrokesToFrame();
-                RequestInvalidate();
+                RequestInvalidateThrottled();
+
             }
         }
 
@@ -138,7 +137,8 @@ namespace ShakyDoodle
             {
                 _currentStroke.Points.Add(pos);
                 _currentStroke.Pressures.Add(events.GetCurrentPoint(this).Properties.Pressure);
-                RequestInvalidate();
+                RequestInvalidateThrottled();
+
             }
         }
 
@@ -152,13 +152,8 @@ namespace ShakyDoodle
                 if (anyShakeStrokes)
                 {
                     _time += _speed;
-                    InvalidateVisual();
                 }
-                else if (_needsRedraw)
-                {
-                    InvalidateVisual();
-                    _needsRedraw = false;
-                }
+                RequestInvalidateThrottled();
 
                 await Task.Delay(16);
             }
@@ -167,6 +162,18 @@ namespace ShakyDoodle
         #endregion
 
         #region Utilities
+
+        private void RequestInvalidateThrottled()
+        {
+            if (_renderPending) return;
+
+            _renderPending = true;
+            Dispatcher.UIThread.Post(() =>
+            {
+                _renderPending = false;
+                InvalidateVisual();
+            }, DispatcherPriority.Background);
+        }
         private void LoadPredefinedStrokes(List<Stroke> strokes)
         {
             _strokes = strokes.Select(s => s.Clone()).ToList();
@@ -411,12 +418,12 @@ namespace ShakyDoodle
             frames.Add(new List<Stroke>());
 
             Stop();
-            RequestInvalidate();
+            RequestInvalidateThrottled();
 
             if (_isShake)
                 InvalidateVisual();
             else
-                _needsRedraw = true;
+                RequestInvalidateThrottled();
         }
 
         public void SelectColor(ColorType color) => _currentColor = color;
@@ -426,7 +433,7 @@ namespace ShakyDoodle
         public void ShouldShake(bool shake)
         {
             _isShake = shake;
-            _needsRedraw = true;
+            RequestInvalidateThrottled();
         }
         public void NextFrame()
         {
@@ -465,7 +472,7 @@ namespace ShakyDoodle
         public void ToggleOnionSkin(bool enabled)
         {
             _onionSkinEnabled = enabled;
-            _needsRedraw = true;
+            RequestInvalidateThrottled();
         }
         public void HandleUndo()
         {
