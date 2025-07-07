@@ -29,7 +29,17 @@ namespace ShakyDoodle
                 e.Handled = true;
             }
         }
-        private void OnClearClick(object? sender, RoutedEventArgs events) => doodleCanvas.ClearCanvas();
+        void UpdateFrameLabel()
+        {
+            FrameIndicator.Text = $"{doodleCanvas.CurrentFrame + 1}/{doodleCanvas.TotalFrames}";
+        }
+        private void OnClearClick(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ClearCanvas();
+            UpdateFrameLabel();
+
+        }
+
         private void OnFirstColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.First);
         private void OnSecondColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Second);
         private void OnThirdColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Third);
@@ -48,8 +58,20 @@ namespace ShakyDoodle
 
         private void OnShake(object? sender, RoutedEventArgs events) => doodleCanvas.ShouldShake(true);
         private void OnUnshake(object? sender, RoutedEventArgs events) => doodleCanvas.ShouldShake(false);
-        private void OnNextFrame(object? sender, RoutedEventArgs events) => doodleCanvas.NextFrame();
-        private void OnPrevFrame(object? sender, RoutedEventArgs events) => doodleCanvas.PreviousFrame();
+        private void OnNextFrame(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.NextFrame();
+            UpdateFrameLabel();
+
+        }
+
+        private void OnPrevFrame(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.PreviousFrame();
+            UpdateFrameLabel();
+
+        }
+
         private void OnTogglePlay(object? sender, RoutedEventArgs events) => doodleCanvas.TogglePlay();
         private void ToggleOnionSkin(object? sender, RoutedEventArgs events) => doodleCanvas.ToggleOnionSkin(true);
         private void UntoggleOnionSkin(object? sender, RoutedEventArgs events) => doodleCanvas.ToggleOnionSkin(false);

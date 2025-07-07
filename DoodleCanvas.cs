@@ -13,7 +13,8 @@ namespace ShakyDoodle
     public class DoodleCanvas : Control
     {
         #region Fields
-
+        public int CurrentFrame => currentFrame; 
+        public int TotalFrames => frames.Count;
         List<Stroke> _strokes;
         Stroke? _currentStroke;
 
