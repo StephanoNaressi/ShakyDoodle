@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -29,10 +29,8 @@ namespace ShakyDoodle
                 e.Handled = true;
             }
         }
-        void UpdateFrameLabel()
-        {
-            FrameIndicator.Text = $"{doodleCanvas.CurrentFrame + 1}/{doodleCanvas.TotalFrames}";
-        }
+        void UpdateFrameLabel() => FrameIndicator.Text = $"{doodleCanvas.CurrentFrame + 1}/{doodleCanvas.TotalFrames}";
+        void UpdatePlayLabel() => PlayButton.Content = PlayButton.Content == "▶" ? "■" : "▶";
         private void OnClearClick(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.ClearCanvas();
@@ -72,7 +70,12 @@ namespace ShakyDoodle
 
         }
 
-        private void OnTogglePlay(object? sender, RoutedEventArgs events) => doodleCanvas.TogglePlay();
+        private void OnTogglePlay(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.TogglePlay();
+            UpdatePlayLabel();
+        }
+
         private void ToggleOnionSkin(object? sender, RoutedEventArgs events) => doodleCanvas.ToggleOnionSkin(true);
         private void UntoggleOnionSkin(object? sender, RoutedEventArgs events) => doodleCanvas.ToggleOnionSkin(false);
 
