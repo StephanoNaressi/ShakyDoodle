@@ -49,6 +49,27 @@ namespace ShakyDoodle
         private bool _isPlaying = false;
 
         public Action<int, int>? OnFrameChanged;
+
+        private bool _isLogo;
+        public bool IsLogo
+        {
+            get => _isLogo;
+            set
+            {
+                if (_isLogo == value) return;
+                _isLogo = value;
+                if (_isLogo)
+                {
+                    var logoStrokes = LogoStrokes.Get();
+                    LoadPredefinedStrokes(logoStrokes);
+                }
+                else
+                {
+                    ClearCanvas();
+                }
+                InvalidateVisual();
+            }
+        }
         #endregion
 
 
@@ -71,9 +92,10 @@ namespace ShakyDoodle
             _currentCap = PenLineCap.Square;
 
             Cursor = new Cursor(StandardCursorType.Cross);
-
+            var logoStrokes = LogoStrokes.Get();
         }
 
+        
         protected override void OnInitialized()
         {
             base.OnInitialized();
@@ -142,11 +164,16 @@ namespace ShakyDoodle
             }
         }
 
-
-
         #endregion
 
         #region Utilities
+        private void LoadPredefinedStrokes(List<Stroke> strokes)
+        {
+            _strokes = strokes.Select(s => s.Clone()).ToList();
+            frames = new List<List<Stroke>>() { _strokes.Select(s => s.Clone()).ToList() };
+            currentFrame = 0;
+            InvalidateVisual();
+        }
 
         private Point GetShakenPoint(Point point, double shakeIntensity)
         {
@@ -497,4 +524,5 @@ namespace ShakyDoodle
 
         #endregion
     }
+
 }

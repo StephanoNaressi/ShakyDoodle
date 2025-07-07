@@ -5,7 +5,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using SkiaSharp;
 
 namespace ShakyDoodle
 {
@@ -36,8 +35,9 @@ namespace ShakyDoodle
                 e.Handled = true;
             }
         }
-        void UpdateFrameLabel() => FrameIndicator.Text = $"{doodleCanvas.CurrentFrame + 1}/{doodleCanvas.TotalFrames}";
-        void UpdatePlayLabel() => PlayButton.Content = PlayButton.Content == "▶" ? "■" : "▶";
+
+        private void UpdateFrameLabel() => FrameIndicator.Text = $"{doodleCanvas.CurrentFrame + 1}/{doodleCanvas.TotalFrames}";
+        private void UpdatePlayLabel() => PlayButton.Content = PlayButton.Content == "▶" ? "■" : "▶";
         private void OnClearClick(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.ClearCanvas();
@@ -45,29 +45,92 @@ namespace ShakyDoodle
 
         }
 
-        private void OnFirstColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.First);
-        private void OnSecondColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Second);
-        private void OnThirdColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Third);
-        private void OnFourthColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Fourth);
-        private void OnFifthColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Fifth);
-        private void OnSixthColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Sixth);
-        private void OnSeventhColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Seventh);
-        private void OnEighthColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Eighth);
-        private void OnSizeSmall(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Small);
-        private void OnSizeMedium(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Medium);
-        private void OnSizeLarge(object? sender, RoutedEventArgs events) => doodleCanvas.SelectSize(SizeType.Large);
-        private void OnAlphaChanged(object? sender, RangeBaseValueChangedEventArgs events) => doodleCanvas.ChangeAlpha((double)events.NewValue);
-        private void OnBrushSquare(object? sender, RoutedEventArgs events) => doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Square);
-        private void OnBrushFlat(object? sender, RoutedEventArgs events) => doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Flat);
-        private void OnBrushRound(object? sender, RoutedEventArgs events) => doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Round);
+        private void OnFirstColor(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectColor(ColorType.First);
+            logoCanvas.SelectColor(ColorType.First);
+        }
+        private void OnSecondColor(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectColor(ColorType.Second);
+            logoCanvas.SelectColor(ColorType.Second);
+        }
+        private void OnThirdColor(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectColor(ColorType.Third);
+            logoCanvas.SelectColor(ColorType.Third);
+        }
+        private void OnFourthColor(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectColor(ColorType.Fourth);
+            logoCanvas.SelectColor(ColorType.Fourth);
+        }
+        private void OnFifthColor(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectColor(ColorType.Fifth);
+            logoCanvas.SelectColor(ColorType.Fifth);
+        }
+        private void OnSixthColor(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectColor(ColorType.Sixth);
+            logoCanvas.SelectColor(ColorType.Sixth);
+        }
+        private void OnSeventhColor(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectColor(ColorType.Seventh);
+            logoCanvas.SelectColor(ColorType.Seventh);
+        }
+        private void OnEighthColor(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectColor(ColorType.Eighth);
+            logoCanvas.SelectColor(ColorType.Eighth);
+        }
+        private void OnSizeSmall(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectSize(SizeType.Small);
+            logoCanvas.SelectSize(SizeType.Small);
+        }
+        private void OnSizeMedium(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectSize(SizeType.Medium);
+            logoCanvas.SelectSize(SizeType.Medium);
+        }
+        private void OnSizeLarge(object? sender, RoutedEventArgs events) {
+            doodleCanvas.SelectSize(SizeType.Large);
+            logoCanvas.SelectSize(SizeType.Large);
+        }
+        private void OnAlphaChanged(object? sender, RangeBaseValueChangedEventArgs events)
+        {
+            doodleCanvas.ChangeAlpha((double)events.NewValue);
+            logoCanvas.ChangeAlpha((double)events.NewValue);
+        }
+
+        private void OnBrushSquare(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Square);
+            logoCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Square);
+        }
+
+        private void OnBrushFlat(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Flat);
+            logoCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Flat);
+        }
+
+        private void OnBrushRound(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Round);
+            logoCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Round);
+        }
+
         private void OnDuplicateFrame(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.DuplicateFrame();
             UpdateFrameLabel();
         }
 
-        private void OnShake(object? sender, RoutedEventArgs events) => doodleCanvas.ShouldShake(true);
-        private void OnUnshake(object? sender, RoutedEventArgs events) => doodleCanvas.ShouldShake(false);
+        private void OnShake(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ShouldShake(true);
+            logoCanvas.ShouldShake(true);
+        }
+
+        private void OnUnshake(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ShouldShake(false);
+            logoCanvas.ShouldShake(false);
+        }
+
         private void OnNextFrame(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.NextFrame();
@@ -88,8 +151,16 @@ namespace ShakyDoodle
             UpdatePlayLabel();
         }
 
-        private void ToggleOnionSkin(object? sender, RoutedEventArgs events) => doodleCanvas.ToggleOnionSkin(true);
-        private void UntoggleOnionSkin(object? sender, RoutedEventArgs events) => doodleCanvas.ToggleOnionSkin(false);
+        private void ToggleOnionSkin(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ToggleOnionSkin(true);
+        }
+
+        private void UntoggleOnionSkin(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ToggleOnionSkin(false);
+        }
+
         private void OnSaveFile(object? sender, RoutedEventArgs e)
         {
             string baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
@@ -103,11 +174,6 @@ namespace ShakyDoodle
 
             doodleCanvas.ExportFramesAsPng(folderPath, width, height);
         }
-
-
-
-
-
 
     }
 }
