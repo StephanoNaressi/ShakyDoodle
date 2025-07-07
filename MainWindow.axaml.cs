@@ -16,6 +16,11 @@ namespace ShakyDoodle
         {
             InitializeComponent();
             this.KeyDown += OnGlobalKeyDown;
+
+            doodleCanvas.OnFrameChanged = (current, total) =>
+            {
+                FrameIndicator.Text = $"{current}/{total}";
+            };
         }
         private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
         {

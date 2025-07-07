@@ -48,6 +48,7 @@ namespace ShakyDoodle
         private bool _onionSkinEnabled = false;
         private bool _isPlaying = false;
 
+        public Action<int, int>? OnFrameChanged;
         #endregion
 
 
@@ -213,6 +214,8 @@ namespace ShakyDoodle
             currentFrame = i;
             SyncFrameToStrokes();
             InvalidateVisual();
+
+            OnFrameChanged?.Invoke(CurrentFrame + 1, TotalFrames);
         }
 
         private void SyncStrokesToFrame()
@@ -411,9 +414,8 @@ namespace ShakyDoodle
             _isPlaying = true;
             while (_isPlaying)
             {
-                LoadFrame(currentFrame);
                 currentFrame = (currentFrame + 1) % frames.Count;
-
+                LoadFrame(currentFrame);
                 await Task.Delay(100);
             }
         }
