@@ -37,7 +37,7 @@ namespace ShakyDoodle
 
         List<List<Stroke>> frames = new();
         int currentFrame = 0;
-
+        private bool _onionSkinEnabled = false;
         public List<Stroke> Strokes => _strokes;
         private bool _isPlaying = false;
         #endregion
@@ -186,7 +186,16 @@ namespace ShakyDoodle
             InvalidateVisual();
             
         }
-
+        private double GetStrokeSize(Stroke stroke)
+        {
+            return stroke.Size switch
+            {
+                SizeType.Small => 2,
+                SizeType.Medium => 8,
+                SizeType.Large => 20,
+                _ => 5
+            };
+        }
         public void SetStrokes(List<Stroke> strokes)
         {
             _strokes = strokes;
@@ -222,7 +231,11 @@ namespace ShakyDoodle
             context.FillRectangle(Brushes.White, new Rect(Bounds.Size));
 
             DrawGrid(context);
-
+            if (_onionSkinEnabled)
+            {
+                DrawFrameIfExists(currentFrame - 1, Brushes.LightBlue, context); 
+                DrawFrameIfExists(currentFrame + 1, Brushes.Pink, context); 
+            }
             // Draw all existing strokes with shake effect based on their index
             for (int i = 0; i < _strokes.Count; i++)
             {
@@ -255,7 +268,32 @@ namespace ShakyDoodle
                 context.DrawLine(_mainPen, p1, p2);
             }
         }
+        private void DrawStrokeWithColorOverride(Stroke stroke, double shakeIntensity, DrawingContext context, IBrush overrideColor)
+        {
+            if (!stroke.Shake) shakeIntensity = 0;
 
+            var pen = new Pen(overrideColor, GetStrokeSize(stroke));
+            pen.LineCap = stroke.PenLineCap;
+
+            for (int i = 1; i < stroke.Points.Count; i++)
+            {
+                var p1 = GetShakenPoint(stroke.Points[i - 1], shakeIntensity);
+                var p2 = GetShakenPoint(stroke.Points[i], shakeIntensity);
+                context.DrawLine(pen, p1, p2);
+            }
+        }
+        private void DrawFrameIfExists(int i, IBrush color, DrawingContext context)
+        {
+            //If our index is invalid we dont do nothin'
+            if (i < 0 || i >= frames.Count) return;
+            //We grab the frame 
+            var f = frames[i];
+            //Loop through its strokes
+            foreach (var stroke in f)
+            {
+                DrawStrokeWithColorOverride(stroke, 0, context, color);
+            }
+        }
         #endregion
 
         #region Brush Setup
@@ -358,6 +396,11 @@ namespace ShakyDoodle
         {
             if (_isPlaying) Stop();
             else Play();
+        }
+        public void ToggleOnionSkin(bool enabled)
+        {
+            _onionSkinEnabled = enabled;
+            _needsRedraw = true;
         }
         #endregion
     }

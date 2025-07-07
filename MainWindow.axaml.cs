@@ -35,5 +35,9 @@ namespace ShakyDoodle
         private void OnNextFrame(object? sender, RoutedEventArgs events) => doodleCanvas.NextFrame();
         private void OnPrevFrame(object? sender, RoutedEventArgs events) => doodleCanvas.PreviousFrame();
         private void OnTogglePlay(object? sender, RoutedEventArgs events) => doodleCanvas.TogglePlay();
+        private void ToggleOnionSkin(object? sender, RoutedEventArgs events) => doodleCanvas.ToggleOnionSkin(true);
+        private void UntoggleOnionSkin(object? sender, RoutedEventArgs events) => doodleCanvas.ToggleOnionSkin(false);
+
+
     }
 }

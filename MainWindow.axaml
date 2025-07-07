@@ -54,6 +54,8 @@
 				<Button Content="&gt;" Click="OnNextFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 			</UniformGrid>
 			<Button Content="🗑" Click="OnClearClick" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+			<CheckBox Content="Silky Skin" Checked="ToggleOnionSkin" Unchecked="UntoggleOnionSkin"/>
+
 
 		</StackPanel>
 
