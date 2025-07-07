@@ -140,7 +140,7 @@ namespace ShakyDoodle
 
         #endregion
 
-        #region Utility
+        #region Utilities
 
         private Point GetShakenPoint(Point point, double shakeIntensity)
         {
@@ -158,37 +158,6 @@ namespace ShakyDoodle
             return new Point(shakenX, shakenY);
         }
 
-        private void SaveCurrentFrame()
-        {
-            var strokesCopy = _strokes.Select(x => x.Clone()).ToList();
-            if (currentFrame < frames.Count) frames[currentFrame] = strokesCopy;
-            else frames.Add(strokesCopy);
-
-        }
-        void LoadFrame(int i)
-        {
-            if (i < 0 || i >= frames.Count) return;
-
-            currentFrame = i;
-            SyncFrameToStrokes(); 
-            InvalidateVisual();
-        }
-
-        private double GetStrokeSize(Stroke stroke)
-        {
-            return stroke.Size switch
-            {
-                SizeType.Small => 2,
-                SizeType.Medium => 8,
-                SizeType.Large => 20,
-                _ => 5
-            };
-        }
-        public void SetStrokes(List<Stroke> strokes)
-        {
-            _strokes = strokes;
-            InvalidateVisual();
-        }
         private double Distance(Point p1, Point p2)
         {
             double dx = p2.X - p1.X;
@@ -203,6 +172,44 @@ namespace ShakyDoodle
             double t = newer / (double)_maxStrokes;
             return Math.Clamp(1.0 - t, 0.0, 1.0);
         }
+
+        private double GetStrokeSize(Stroke stroke)
+        {
+            return stroke.Size switch
+            {
+                SizeType.Small => 2,
+                SizeType.Medium => 8,
+                SizeType.Large => 20,
+                _ => 5
+            };
+        }
+
+        public void SetStrokes(List<Stroke> strokes)
+        {
+            _strokes = strokes;
+            InvalidateVisual();
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private void SaveCurrentFrame()
+        {
+            var strokesCopy = _strokes.Select(x => x.Clone()).ToList();
+            if (currentFrame < frames.Count) frames[currentFrame] = strokesCopy;
+            else frames.Add(strokesCopy);
+        }
+
+        private void LoadFrame(int i)
+        {
+            if (i < 0 || i >= frames.Count) return;
+
+            currentFrame = i;
+            SyncFrameToStrokes();
+            InvalidateVisual();
+        }
+
         private void SyncStrokesToFrame()
         {
             if (currentFrame < 0 || currentFrame >= frames.Count) return;
@@ -214,6 +221,7 @@ namespace ShakyDoodle
             if (currentFrame < 0 || currentFrame >= frames.Count) return;
             _strokes = frames[currentFrame].Select(s => s.Clone()).ToList();
         }
+
         private void PushUndoState()
         {
             _undoStack.Push(_strokes.Select(s => s.Clone()).ToList());
