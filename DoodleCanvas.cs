@@ -53,14 +53,10 @@ namespace ShakyDoodle
             _strokes = new List<Stroke>(_maxStrokes);
 
             Focusable = true;
-            Focus();
-            PointerPressed += (s, e) => Focus();
-
             PointerMoved += OnPointerMoved;
             PointerPressed += OnPointerPressed;
             PointerReleased += OnPointerReleased;
 
-            KeyDown += OnKeyDown;
             frames = new List<List<Stroke>>() { new List<Stroke>() };
             currentFrame = 0;
             _gridSize = 50;
@@ -83,31 +79,6 @@ namespace ShakyDoodle
                 _needsRedraw = true;
         }
 
-        private void OnKeyDown(object? sender, KeyEventArgs e)
-        {
-            var isCtrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
-
-            if (isCtrl && e.Key == Key.Z)
-            {
-                if (_undoStack.Count == 0) return;
-
-                _redoStack.Push(_strokes.Select(s => s.Clone()).ToList());
-                _strokes = _undoStack.Pop();
-                SyncStrokesToFrame();
-                InvalidateVisual();
-            }
-            if (isCtrl && e.Key == Key.Y)
-            {
-                if (_redoStack.Count == 0) return;
-
-                _undoStack.Push(_strokes.Select(s => s.Clone()).ToList());
-                _strokes = _redoStack.Pop();
-                SyncStrokesToFrame();
-                InvalidateVisual();
-            }
-        }
-
-
         private void OnPointerReleased(object? sender, PointerReleasedEventArgs events)
         {
             _currentStroke = null;
@@ -116,6 +87,7 @@ namespace ShakyDoodle
 
         private void OnPointerPressed(object? sender, PointerPressedEventArgs events)
         {
+            Focus();
             if (events.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
                 _currentStroke = new(_currentColor, events.GetPosition(this), _currentSize, _alpha, _currentCap, events.GetCurrentPoint(this).Properties.Pressure, _isShake);
@@ -433,6 +405,24 @@ namespace ShakyDoodle
         {
             _onionSkinEnabled = enabled;
             _needsRedraw = true;
+        }
+        public void HandleUndo()
+        {
+            if (_undoStack.Count == 0) return;
+
+            _redoStack.Push(_strokes.Select(s => s.Clone()).ToList());
+            _strokes = _undoStack.Pop();
+            SyncStrokesToFrame();
+            InvalidateVisual();
+        }
+        public void HandleRedo()
+        {
+            if (_redoStack.Count == 0) return;
+
+            _undoStack.Push(_strokes.Select(s => s.Clone()).ToList());
+            _strokes = _redoStack.Pop();
+            SyncStrokesToFrame();
+            InvalidateVisual();
         }
         #endregion
     }

@@ -1,7 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using SkiaSharp;
 
 namespace ShakyDoodle
 {
@@ -11,8 +13,22 @@ namespace ShakyDoodle
         public MainWindow()
         {
             InitializeComponent();
+            this.KeyDown += OnGlobalKeyDown;
         }
-
+        private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
+        {
+            var isCtrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
+            if (isCtrl && e.Key == Key.Z)
+            {
+                doodleCanvas.HandleUndo();
+                e.Handled = true;
+            }
+            else if (isCtrl && e.Key == Key.Y)
+            {
+                doodleCanvas.HandleRedo();
+                e.Handled = true;
+            }
+        }
         private void OnClearClick(object? sender, RoutedEventArgs events) => doodleCanvas.ClearCanvas();
         private void OnFirstColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.First);
         private void OnSecondColor(object? sender, RoutedEventArgs events) => doodleCanvas.SelectColor(ColorType.Second);
