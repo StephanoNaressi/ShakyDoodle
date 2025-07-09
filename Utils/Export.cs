@@ -41,7 +41,7 @@ namespace ShakyDoodle.Utils
                     context.FillRectangle(Brushes.White, new Rect(0, 0, width, height));
 
                     // Draw grid
-                    _strokeRenderer.DrawGrid(context, _bounds);
+                    _strokeRenderer.DrawGrid(context, new Rect(0, 0, width, height));
 
                     // Draw strokes
                     foreach (var stroke in frame.Strokes)
