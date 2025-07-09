@@ -20,6 +20,22 @@ namespace ShakyDoodle.Utils
             return newPen;
         }
 
+        public Pen ChooseBrushSettings(Stroke stroke, IBrush overrideColor, float rawPressure)
+        {
+            var size = GetStrokeSize(stroke);
+
+            double scaledPressure = Math.Min(rawPressure * 2, 1);
+            SolidColorBrush targetBrush;
+
+            if (overrideColor is SolidColorBrush colorBrush)
+            {
+                targetBrush = new SolidColorBrush(colorBrush.Color, stroke.Alpha * scaledPressure);
+            }
+            else throw new NotImplementedException("Impossible to extract brush type");
+
+            return new Pen(targetBrush, size * rawPressure);
+        }
+
         public Pen ChooseBrushSettings(Stroke stroke, double scaledPressure, double rawPressure)
         {
             var color = _colorHelper.GetAvaloniaColor(stroke.Color);

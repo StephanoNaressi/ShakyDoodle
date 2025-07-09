@@ -149,11 +149,11 @@ namespace ShakyDoodle.Rendering
         {
             if (!stroke.Shake) shakeIntensity = 0;
 
-            var pen = new Pen(overrideColor, _brushHelper.GetStrokeSize(stroke));
-            pen.LineCap = stroke.PenLineCap;
-
             for (int i = 1; i < stroke.Points.Count; i++)
             {
+                var pen = _brushHelper.ChooseBrushSettings(stroke, overrideColor, i < stroke.Pressures.Count ? stroke.Pressures[i] : 1f);
+                pen.LineCap = stroke.PenLineCap;
+
                 var p1 = _shakeController.GetShakenPoint(stroke.Points[i - 1], shakeIntensity);
                 var p2 = _shakeController.GetShakenPoint(stroke.Points[i], shakeIntensity);
                 context.DrawLine(pen, p1, p2);
