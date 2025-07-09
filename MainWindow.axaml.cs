@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -16,7 +15,7 @@ namespace ShakyDoodle
             InitializeComponent();
             this.KeyDown += OnGlobalKeyDown;
 
-            doodleCanvas.OnFrameChanged = (current, total) =>
+            doodleCanvas.FrameController.OnFrameChanged = (current, total) =>
             {
                 FrameIndicator.Text = $"{current}/{total}";
             };
@@ -36,8 +35,8 @@ namespace ShakyDoodle
             }
         }
 
-        private void UpdateFrameLabel() => FrameIndicator.Text = $"{doodleCanvas.CurrentFrame + 1}/{doodleCanvas.TotalFrames}";
-        private void UpdatePlayLabel() => PlayButton.Content = PlayButton.Content == "▶" ? "■" : "▶";
+        private void UpdateFrameLabel() => FrameIndicator.Text = $"{doodleCanvas.FrameController.CurrentFrame + 1}/{doodleCanvas.FrameController.TotalFrames}";
+        private void UpdatePlayLabel() => PlayButton.Content = PlayButton.Content as string == "▶" ? "■" : "▶";
         private void OnClearClick(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.ClearCanvas();

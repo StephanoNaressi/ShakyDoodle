@@ -2,7 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Media;
 
-namespace ShakyDoodle
+namespace ShakyDoodle.UIVisuals
 {
     public class NotebookHoles : Control
     {
@@ -31,7 +31,7 @@ namespace ShakyDoodle
             var bindBrush = new SolidColorBrush(BindColor);
             var bindPen = new Pen(new SolidColorBrush(BindBorderColor), BindBorderThickness);
 
-            double x = HoleDiameter / 2 + 5; 
+            double x = HoleDiameter / 2 + 5;
 
             for (int i = 0; i < HoleCount; i++)
             {
