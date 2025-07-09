@@ -191,14 +191,14 @@ namespace ShakyDoodle
             UpdatePlayLabel();
         }
 
-        private void ToggleOnionSkin(object? sender, RoutedEventArgs events)
+        private void ToggleLightbox(object? sender, RoutedEventArgs events)
         {
-            doodleCanvas.ToggleOnionSkin(true);
+            doodleCanvas.ToggleLightbox(true);
         }
 
-        private void UntoggleOnionSkin(object? sender, RoutedEventArgs events)
+        private void UntoggleLightbox(object? sender, RoutedEventArgs events)
         {
-            doodleCanvas.ToggleOnionSkin(false);
+            doodleCanvas.ToggleLightbox(false);
         }
 
         private void OnSaveFile(object? sender, RoutedEventArgs e)

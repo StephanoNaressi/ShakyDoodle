@@ -82,7 +82,7 @@
 					<TextBlock Text="1/1" x:Name="FrameIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
 				</UniformGrid>
 
-				<CheckBox Content="LightBox" Checked="ToggleOnionSkin" Unchecked="UntoggleOnionSkin" HorizontalAlignment="Center"/>
+				<CheckBox Content="LightBox" Checked="ToggleLightbox" Unchecked="UntoggleLightbox" HorizontalAlignment="Center"/>
 			</StackPanel>
 
 		</Border>

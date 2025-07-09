@@ -108,7 +108,7 @@ namespace ShakyDoodle.Controllers
         public void Stop() => FrameController.Stop();
         public void TogglePlay() => FrameController.TogglePlay(this);
 
-        public void ToggleOnionSkin(bool enabled)
+        public void ToggleLightbox(bool enabled)
         {
             _lightbox = enabled;
             _helper.RequestInvalidateThrottled();
