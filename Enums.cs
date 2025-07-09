@@ -7,7 +7,15 @@
     Fifth,
     Sixth,
     Seventh,
-    Eighth
+    Eighth,
+    Nineth,
+    Tenth,
+    Eleventh,
+    Twelveth,
+    Thirteenth,
+    Fourteenth,
+    Fifteenth,
+    Sixteenth
 }
 public enum SizeType
 {

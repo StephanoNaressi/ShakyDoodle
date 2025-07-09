@@ -3,8 +3,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ShakyDoodle"
-        Width="600" Height="600"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+        Width="850" Height="600"
+        mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="600"
         x:Class="ShakyDoodle.MainWindow"
         Title="ShakyDoodle" Background="PeachPuff">
 	<Grid>
@@ -46,15 +46,23 @@
 				<Slider Minimum="0" Maximum="1" Value="1" ValueChanged="OnAlphaChanged" />
 
 				<!-- Colors grid -->
-				<UniformGrid Columns="2" Rows="4" Margin="5" HorizontalAlignment="Center">
+				<UniformGrid Columns="4" Rows="4" Margin="5" HorizontalAlignment="Center">
 					<Button Background="Black" Click="OnFirstColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="Blue" Click="OnSecondColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="Red" Click="OnThirdColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="MediumBlue" Click="OnSecondColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="Firebrick" Click="OnThirdColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
 					<Button Background="White" Click="OnFourthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
 					<Button Background="Yellow" Click="OnFifthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
 					<Button Background="GreenYellow" Click="OnSixthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
 					<Button Background="Purple" Click="OnSeventhColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
 					<Button Background="Pink" Click="OnEighthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="PeachPuff" Click="OnNinthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="SaddleBrown" Click="OnTenthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="Thistle" Click="OnEleventhColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="Tomato" Click="OnTwelvethColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="Turquoise" Click="OnThirteenthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="SeaGreen" Click="OnFourteenthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="DarkSalmon" Click="OnFifteenthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="PaleVioletRed" Click="OnSixteenthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
 				</UniformGrid>
 
 				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">

@@ -275,13 +275,21 @@ namespace ShakyDoodle
             Color baseColor = colorType switch
             {
                 ColorType.First => Colors.Black,
-                ColorType.Second => Colors.Blue,
-                ColorType.Third => Colors.Red,
+                ColorType.Second => Colors.MediumBlue,
+                ColorType.Third => Colors.Firebrick,
                 ColorType.Fourth => Colors.White,
                 ColorType.Fifth => Colors.Yellow,
                 ColorType.Sixth => Colors.GreenYellow,
                 ColorType.Seventh => Colors.Purple,
                 ColorType.Eighth => Colors.Pink,
+                ColorType.Nineth => Colors.PeachPuff,
+                ColorType.Tenth => Colors.SaddleBrown,
+                ColorType.Eleventh => Colors.Thistle,
+                ColorType.Twelveth => Colors.Tomato,
+                ColorType.Thirteenth => Colors.Turquoise,
+                ColorType.Fourteenth => Colors.SeaGreen,
+                ColorType.Fifteenth => Colors.DarkSalmon,
+                ColorType.Sixteenth => Colors.PaleVioletRed,
                 _ => Colors.Black
             };
 
@@ -380,28 +388,10 @@ namespace ShakyDoodle
 
         private Pen ChooseBrushSettings(Stroke stroke, double scaledPressure, double rawPressure)
         {
-            var color = stroke.Color switch
-            {
-                ColorType.First => Brushes.Black,
-                ColorType.Second => Brushes.Blue,
-                ColorType.Third => Brushes.Red,
-                ColorType.Fourth => Brushes.White,
-                ColorType.Fifth => Brushes.Yellow,
-                ColorType.Sixth => Brushes.GreenYellow,
-                ColorType.Seventh => Brushes.Purple,
-                ColorType.Eighth => Brushes.Pink,
-                _ => Brushes.Black
-            };
+            var color = GetAvaloniaColor(stroke.Color);
+            var size = GetStrokeSize(stroke);
 
-            var size = stroke.Size switch
-            {
-                SizeType.Small => 2,
-                SizeType.Medium => 8,
-                SizeType.Large => 20,
-                _ => 5
-            };
-
-            return new Pen(new SolidColorBrush(color.Color, stroke.Alpha * scaledPressure), size * rawPressure);
+            return new Pen(new SolidColorBrush(color, stroke.Alpha * scaledPressure), size * rawPressure);
         }
 
         #endregion

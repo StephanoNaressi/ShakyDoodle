@@ -77,6 +77,47 @@ namespace ShakyDoodle
             doodleCanvas.SelectColor(ColorType.Eighth);
             logoCanvas.SelectColor(ColorType.Eighth);
         }
+        private void OnNinthColor(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.SelectColor(ColorType.Nineth);
+            logoCanvas.SelectColor(ColorType.Nineth);
+        }
+        private void OnTenthColor(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.SelectColor(ColorType.Tenth);
+            logoCanvas.SelectColor(ColorType.Tenth);
+        }
+        private void OnEleventhColor(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.SelectColor(ColorType.Eleventh);
+            logoCanvas.SelectColor(ColorType.Eleventh);
+        }
+        private void OnTwelvethColor(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.SelectColor(ColorType.Twelveth);
+            logoCanvas.SelectColor(ColorType.Twelveth);
+        }
+        private void OnThirteenthColor(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.SelectColor(ColorType.Thirteenth);
+            logoCanvas.SelectColor(ColorType.Thirteenth);
+        }
+        private void OnFourteenthColor(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.SelectColor(ColorType.Fourteenth);
+            logoCanvas.SelectColor(ColorType.Fourteenth);
+        }
+        private void OnFifteenthColor(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.SelectColor(ColorType.Fifteenth);
+            logoCanvas.SelectColor(ColorType.Fifteenth);
+        }
+        private void OnSixteenthColor(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.SelectColor(ColorType.Sixteenth);
+            logoCanvas.SelectColor(ColorType.Sixteenth);
+        }
+
         private void OnSizeSmall(object? sender, RoutedEventArgs events) {
             doodleCanvas.SelectSize(SizeType.Small);
             logoCanvas.SelectSize(SizeType.Small);
