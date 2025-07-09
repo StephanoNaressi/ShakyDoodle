@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Linq;
 using System;
 using ShakyDoodle.Controllers;
-using ShakyDoodle.Models;
 
 namespace ShakyDoodle.Rendering
 {
@@ -59,17 +58,50 @@ namespace ShakyDoodle.Rendering
         }
         private void DrawStroke(Stroke stroke, double shakeIntensity, DrawingContext context)
         {
-            if (!stroke.Shake)
-                shakeIntensity = 0;
-
-            for (int i = 1; i < stroke.Points.Count; i++)
+            if (stroke.Shake)
             {
-                var pen = _brushHelper.SetupMainPen(stroke, i, shakeIntensity);
-                var p1 = _shakeController.GetShakenPoint(stroke.Points[i - 1], shakeIntensity);
-                var p2 = _shakeController.GetShakenPoint(stroke.Points[i], shakeIntensity);
-                context.DrawLine(pen, p1, p2);
+                for (int i = 1; i < stroke.Points.Count; i++)
+                {
+                    var pen = _brushHelper.SetupMainPen(stroke, i, shakeIntensity);
+                    var p1 = _shakeController.GetShakenPoint(stroke.Points[i - 1], shakeIntensity);
+                    var p2 = _shakeController.GetShakenPoint(stroke.Points[i], shakeIntensity);
+                    context.DrawLine(pen, p1, p2);
+                }
+            }
+            else
+            {
+                var strokeBrush = _brushHelper.GetSolidBrush(stroke.Color, stroke.Alpha);
+
+                for (int i = 0; i < stroke.Points.Count; i++)
+                {
+                    var pt = stroke.Points[i];
+                    float pressure = i < stroke.Pressures.Count ? stroke.Pressures[i] : 1f;
+
+                    double size = _brushHelper.GetStrokeSize(stroke) * pressure;
+
+                    switch (stroke.PenLineCap)
+                    {
+                        case PenLineCap.Round:
+                            context.DrawEllipse(strokeBrush, null, pt, size / 2, size / 2);
+                            break;
+
+                        case PenLineCap.Square:
+                                context.DrawRectangle(strokeBrush, null,
+                                new Rect(pt.X - size / 2, pt.Y - size / 2, size, size));
+                            break;
+                        case PenLineCap.Flat:
+                            context.DrawRectangle(strokeBrush, null,
+                                new Rect(pt.X - size / 2, pt.Y - size / 2, size/2, size));
+                            break;
+
+                        default:
+                            context.DrawEllipse(strokeBrush, null, pt, size / 2, size / 2);
+                            break;
+                    }
+                }
             }
         }
+
         public void DrawStrokeWithColorOverride(Stroke stroke, double shakeIntensity, IBrush overrideColor, DrawingContext context)
         {
             if (!stroke.Shake) shakeIntensity = 0;
@@ -97,7 +129,7 @@ namespace ShakyDoodle.Rendering
             }
         }
 
-        public async void StartRenderLoopAsync(Func<List<Stroke>> getStrokes,Func<float> getSpeed)
+        public async void StartRenderLoopAsync(Func<List<Stroke>> getStrokes, Func<float> getSpeed)
         {
             while (true)
             {

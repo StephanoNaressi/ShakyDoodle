@@ -37,6 +37,12 @@ namespace ShakyDoodle.Utils
                 _ => 5
             };
         }
+        public IBrush GetSolidBrush(ColorType colorType, double alpha)
+        {
+            var color = _colorHelper.GetAvaloniaColor(colorType, alpha);
+            return new SolidColorBrush(color);
+        }
+
         #endregion
     }
 }

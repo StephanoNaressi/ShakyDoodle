@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Media;
 using ShakyDoodle.Controllers;
 using ShakyDoodle.Models;
@@ -46,12 +47,34 @@ namespace ShakyDoodle.Utils
 
         public void PointerMoved(Point position, float pressure)
         {
+            float spacing = _isShake ? 5 : 1f;
             if (_currentStroke == null) return;
-            if (_currentStroke.Points.Count == 0 || _mathHelper.Distance(position, _currentStroke.Points.Last()) > 5)
+            if(_currentStroke.Points.Count == 0)
             {
                 _currentStroke.Points.Add(position);
                 _currentStroke.Pressures.Add(pressure);
+                return;
             }
+            var lastPoint = _currentStroke.Points.Last();
+            double dist = _mathHelper.Distance(position, lastPoint);
+
+            if (dist < 1) return;
+            
+            int amountToFill = (int) (dist / spacing);
+
+            for (int i = 1; i <= amountToFill; i++) 
+            {
+                double t = (double) i / amountToFill;
+
+                //Interpolate to fill in the gaps when mouse moves too fast :p
+                var interpolation = new Point(lastPoint.X + (position.X - lastPoint.X) * t, lastPoint.Y + (position.Y - lastPoint.Y) * t);
+
+                _currentStroke.Points.Add(interpolation);
+                _currentStroke.Pressures.Add(pressure);
+            }
+
+            _currentStroke.Points.Add(position);
+            _currentStroke.Pressures.Add(pressure);
         }
 
         public void PointerReleased()
