@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using ShakyDoodle.Controllers;
+using ShakyDoodle.Models;
 
 namespace ShakyDoodle.Utils
 {

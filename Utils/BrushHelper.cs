@@ -1,5 +1,6 @@
 ﻿using System;
 using Avalonia.Media;
+using ShakyDoodle.Models;
 
 namespace ShakyDoodle.Utils
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Avalonia;
+using ShakyDoodle.Models;
 
 namespace ShakyDoodle.Controllers
 {

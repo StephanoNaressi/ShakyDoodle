@@ -4,7 +4,6 @@ using Avalonia.Input;
 using Avalonia.Media;
 using ShakyDoodle.Rendering;
 using ShakyDoodle.Utils;
-using System.Threading.Tasks;
 
 namespace ShakyDoodle.Controllers
 {
