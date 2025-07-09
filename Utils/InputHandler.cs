@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Media;
@@ -58,11 +59,12 @@ namespace ShakyDoodle.Utils
             var lastPoint = _currentStroke.Points.Last();
             double dist = _mathHelper.Distance(position, lastPoint);
 
-            if (dist < 1) return;
-            
-            int amountToFill = (int) (dist / spacing);
+            if (dist == 0) return;
+            int amountToFill = Math.Max(1, (int)(dist / spacing));
 
-            for (int i = 1; i <= amountToFill; i++) 
+
+
+            for (int i = 1; i < amountToFill; i++) 
             {
                 double t = (double) i / amountToFill;
 

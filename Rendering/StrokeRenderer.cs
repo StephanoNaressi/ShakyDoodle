@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System;
 using ShakyDoodle.Controllers;
+using Avalonia.Media.Imaging;
 
 namespace ShakyDoodle.Rendering
 {
@@ -19,6 +20,12 @@ namespace ShakyDoodle.Rendering
         private Pen _gridPen = new(Brushes.LightBlue, 1);
         int _maxStrokes = 150;
 
+        private RenderTargetBitmap? _prevFrameCache;
+        private int _prevFrameCacheIndex = -1;
+
+        private RenderTargetBitmap? _nextFrameCache;
+        private int _nextFrameCacheIndex = -1;
+
         #region Rendering
 
         public StrokeRenderer(Rect bounds, AvaloniaExtras helper)
@@ -27,23 +34,59 @@ namespace ShakyDoodle.Rendering
         }
         public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds)
         {
-            //PushPop to avoid drawing outside the canvas
             using var clip = context.PushClip(new Rect(bounds.Size));
             context.FillRectangle(Brushes.White, new Rect(bounds.Size));
             DrawGrid(context, bounds);
 
+            //If we are using a lightbox we render in a bitmap cache
             if (lightbox)
             {
-                DrawFrameIfExists(currentFrame - 1, Brushes.LightBlue, frames, context);
-                DrawFrameIfExists(currentFrame + 1, Brushes.Pink, frames, context);
+                //Our previous frame
+                int prevIndex = currentFrame - 1;
+                if (prevIndex >= 0 && prevIndex < frames.Count)
+                {
+                    if (_prevFrameCache == null || _prevFrameCacheIndex != prevIndex)
+                    {
+                        _prevFrameCache = RenderFrameToBitmap(frames[prevIndex], Brushes.LightBlue, bounds.Size);
+                        _prevFrameCacheIndex = prevIndex;
+                    }
+                    if (_prevFrameCache != null)
+                    {
+                        context.DrawImage(_prevFrameCache,
+                            new Rect(0, 0, _prevFrameCache.Size.Width, _prevFrameCache.Size.Height),
+                            new Rect(bounds.X, bounds.Y, _prevFrameCache.Size.Width, _prevFrameCache.Size.Height));
+
+                    }
+                }
+                //Our next frame
+                int nextIndex = currentFrame + 1;
+                if (nextIndex >= 0 && nextIndex < frames.Count)
+                {
+                    //If our next frame cache is empty or not the same index
+                    if (_nextFrameCache == null || _nextFrameCacheIndex != nextIndex)
+                    {
+                        //We create our bitmap cache
+                        _nextFrameCache = RenderFrameToBitmap(frames[nextIndex], Brushes.Pink, bounds.Size);
+                        _nextFrameCacheIndex = nextIndex;
+                    }
+                    if (_nextFrameCache != null)
+                    {
+                        //We draw the other frame strokes onto this bitmap
+                        context.DrawImage(_nextFrameCache,
+                            new Rect(0, 0, _nextFrameCache.Size.Width, _nextFrameCache.Size.Height),
+                            new Rect(bounds.X, bounds.Y, _nextFrameCache.Size.Width, _nextFrameCache.Size.Height));
+                    }
+                }
             }
-            // Draw all existing strokes with shake effect based on their index
+
+
             for (int i = 0; i < strokes.Count; i++)
             {
                 double shakeIntensity = _shakeController.GetShakeIntensity(i, strokes, _maxStrokes);
                 DrawStroke(strokes[i], shakeIntensity, context);
             }
         }
+
 
         public void DrawGrid(DrawingContext context, Rect bounds)
         {
@@ -141,6 +184,21 @@ namespace ShakyDoodle.Rendering
                 _helper.RequestInvalidateThrottled();
                 await Task.Delay(16);
             }
+        }
+        private RenderTargetBitmap RenderFrameToBitmap(Frame frame, IBrush overrideColor, Size size)
+        {
+            var pixelSize = new PixelSize((int)size.Width, (int)size.Height);
+            var renderTarget = new RenderTargetBitmap(pixelSize);
+
+            using (var ctx = renderTarget.CreateDrawingContext(true))
+            {
+                ctx.FillRectangle(Brushes.Transparent, new Rect(size));
+                foreach (var stroke in frame.Strokes)
+                {
+                    DrawStrokeWithColorOverride(stroke, 0, overrideColor, ctx);
+                }
+            }
+            return renderTarget;
         }
 
         #endregion
