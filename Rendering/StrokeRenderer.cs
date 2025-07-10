@@ -124,11 +124,7 @@ namespace ShakyDoodle.Rendering
         {
             while (true)
             {
-                var strokes = getStrokes();
-                bool anyShakeStrokes = strokes.Any(s => s.Shake);
-                if (anyShakeStrokes)
-                    _shakeController.UpdateTime(getSpeed());
-
+                _shakeController.UpdateTime(getSpeed());
                 _helper.RequestInvalidateThrottled();
                 await Task.Delay(16);
             }
