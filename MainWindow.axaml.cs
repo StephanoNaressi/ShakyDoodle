@@ -4,12 +4,12 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 
 namespace ShakyDoodle
 {
     public partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             InitializeComponent();
@@ -23,6 +23,7 @@ namespace ShakyDoodle
             {
                 LayerIndicator.Text = $"Layers: {current}/{total}";
             };
+            colorPicker.Color = Avalonia.Media.Colors.Black;
         }
         private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
         {
@@ -49,80 +50,6 @@ namespace ShakyDoodle
             UpdateLayerLabel();
 
         }
-
-        private void OnFirstColor(object? sender, RoutedEventArgs events) {
-            doodleCanvas.SelectColor(ColorType.First);
-            logoCanvas.SelectColor(ColorType.First);
-        }
-        private void OnSecondColor(object? sender, RoutedEventArgs events) {
-            doodleCanvas.SelectColor(ColorType.Second);
-            logoCanvas.SelectColor(ColorType.Second);
-        }
-        private void OnThirdColor(object? sender, RoutedEventArgs events) {
-            doodleCanvas.SelectColor(ColorType.Third);
-            logoCanvas.SelectColor(ColorType.Third);
-        }
-        private void OnFourthColor(object? sender, RoutedEventArgs events) {
-            doodleCanvas.SelectColor(ColorType.Fourth);
-            logoCanvas.SelectColor(ColorType.Fourth);
-        }
-        private void OnFifthColor(object? sender, RoutedEventArgs events) {
-            doodleCanvas.SelectColor(ColorType.Fifth);
-            logoCanvas.SelectColor(ColorType.Fifth);
-        }
-        private void OnSixthColor(object? sender, RoutedEventArgs events) {
-            doodleCanvas.SelectColor(ColorType.Sixth);
-            logoCanvas.SelectColor(ColorType.Sixth);
-        }
-        private void OnSeventhColor(object? sender, RoutedEventArgs events) {
-            doodleCanvas.SelectColor(ColorType.Seventh);
-            logoCanvas.SelectColor(ColorType.Seventh);
-        }
-        private void OnEighthColor(object? sender, RoutedEventArgs events) {
-            doodleCanvas.SelectColor(ColorType.Eighth);
-            logoCanvas.SelectColor(ColorType.Eighth);
-        }
-        private void OnNinthColor(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectColor(ColorType.Nineth);
-            logoCanvas.SelectColor(ColorType.Nineth);
-        }
-        private void OnTenthColor(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectColor(ColorType.Tenth);
-            logoCanvas.SelectColor(ColorType.Tenth);
-        }
-        private void OnEleventhColor(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectColor(ColorType.Eleventh);
-            logoCanvas.SelectColor(ColorType.Eleventh);
-        }
-        private void OnTwelvethColor(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectColor(ColorType.Twelveth);
-            logoCanvas.SelectColor(ColorType.Twelveth);
-        }
-        private void OnThirteenthColor(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectColor(ColorType.Thirteenth);
-            logoCanvas.SelectColor(ColorType.Thirteenth);
-        }
-        private void OnFourteenthColor(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectColor(ColorType.Fourteenth);
-            logoCanvas.SelectColor(ColorType.Fourteenth);
-        }
-        private void OnFifteenthColor(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectColor(ColorType.Fifteenth);
-            logoCanvas.SelectColor(ColorType.Fifteenth);
-        }
-        private void OnSixteenthColor(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectColor(ColorType.Sixteenth);
-            logoCanvas.SelectColor(ColorType.Sixteenth);
-        }
-
         private void OnSizeSmall(object? sender, RoutedEventArgs events) {
             doodleCanvas.SelectSize(SizeType.Small);
             logoCanvas.SelectSize(SizeType.Small);
@@ -213,6 +140,38 @@ namespace ShakyDoodle
             doodleCanvas.TogglePlay();
             UpdatePlayLabel();
             UpdateLayerLabel();
+        }
+        private void OnColorChanged(object? sender, ColorChangedEventArgs events)
+        {
+            var newColor = events.NewColor;
+            doodleCanvas.ChangeColor(newColor);
+        }
+        private void OnChangeBlack(object? sender, RoutedEventArgs events)
+        {
+            var col = new Color(255, 0, 0, 0);
+            doodleCanvas.ChangeColor(col);
+            colorPicker.Color = col;
+        }
+
+        private void OnChangeRed(object? sender, RoutedEventArgs events)
+        {
+            var col = new Color(255, 255, 0, 0);
+            doodleCanvas.ChangeColor(col);
+            colorPicker.Color = col;
+        }
+
+        private void OnChangeBlue(object? sender, RoutedEventArgs events)
+        {
+            var col = new Color(255, 0, 0, 255);
+            doodleCanvas.ChangeColor(col);
+            colorPicker.Color = col;
+        }
+
+        private void OnChangeGreen(object? sender, RoutedEventArgs events)
+        {
+            var col = new Color(255, 0, 255, 0);
+            doodleCanvas.ChangeColor(col);
+            colorPicker.Color = col;
         }
 
         private void ToggleLightbox(object? sender, RoutedEventArgs events)

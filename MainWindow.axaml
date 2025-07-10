@@ -4,6 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ShakyDoodle.Controllers"
 		xmlns:ui="clr-namespace:ShakyDoodle.UIVisuals"
+		xmlns:avalonia="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls"
+
         Width="850" Height="600"
         mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="600"
         x:Class="ShakyDoodle.MainWindow"
@@ -29,47 +31,31 @@
 					<local:DoodleCanvas Name="logoCanvas" IsLogo="True" />
 				</Border>
 				<UniformGrid Columns="2" Rows="1" Margin="5" HorizontalAlignment="Center">
-				<Button Content=" Shake ✏" Click="OnShake" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-				<Button Content="Ink 🖊" Click="OnUnshake" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+					<Button Content=" Shake ✏" Click="OnShake" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+					<Button Content="Ink 🖊" Click="OnUnshake" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 				</UniformGrid>
+
 				<UniformGrid Columns="2" Rows="1" Margin="5" HorizontalAlignment="Center">
-				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
-					<!-- Sizes -->
-					<Button Width="10" Height="10" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeSmall" BorderBrush="Black" BorderThickness="1" />
-					<Button Width="15" Height="15" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeMedium" BorderBrush="Black" BorderThickness="1" />
-					<Button Width="20" Height="20" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeLarge" BorderBrush="Black" BorderThickness="1" />
+					<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
+						<!-- Sizes -->
+						<Button Width="10" Height="10" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeSmall" BorderBrush="Black" BorderThickness="1" />
+						<Button Width="15" Height="15" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeMedium" BorderBrush="Black" BorderThickness="1" />
+						<Button Width="20" Height="20" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeLarge" BorderBrush="Black" BorderThickness="1" />
+					</UniformGrid>
+					<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
+						<!-- Shapes -->
+						<Button Width="15" Height="15" CornerRadius="20" Background="DarkSlateBlue" Margin="5" Click="OnBrushRound" BorderBrush="Black" BorderThickness="1" />
+						<Button Width="15" Height="15" Background="DarkSlateBlue" Margin="5" Click="OnBrushSquare" BorderBrush="Black" BorderThickness="1" />
+						<Button Width="10" Height="15" CornerRadius="0" Background="DarkSlateBlue" Margin="5" Click="OnBrushFlat" BorderBrush="Black" BorderThickness="1" />
+					</UniformGrid>
 				</UniformGrid>
-				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
-					<!-- Shapes -->
-					<Button Width="15" Height="15" CornerRadius="20" Background="DarkSlateBlue" Margin="5" Click="OnBrushRound" BorderBrush="Black" BorderThickness="1" />
-					<Button Width="15" Height="15" Background="DarkSlateBlue" Margin="5" Click="OnBrushSquare" BorderBrush="Black" BorderThickness="1" />
-					<Button Width="10" Height="15" CornerRadius="0" Background="DarkSlateBlue" Margin="5" Click="OnBrushFlat" BorderBrush="Black" BorderThickness="1" />
+				<ColorPicker Name="colorPicker" Width="100" IsColorPaletteVisible="True" ColorChanged="OnColorChanged" IsColorSpectrumVisible="True" IsAlphaEnabled="True"/>
+				<UniformGrid Columns="4" Margin="5" HorizontalAlignment="Center">
+					<Button Background="Black" Click="OnChangeBlack" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="Blue" Click="OnChangeBlue" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="Red" Click="OnChangeRed" Margin="4" BorderBrush="Black" BorderThickness="1" />
+					<Button Background="Green" Click="OnChangeGreen" Margin="4" BorderBrush="Black" BorderThickness="1" />
 				</UniformGrid>
-				</UniformGrid>
-				<!-- Alpha slider -->
-				<TextBlock Text="Alpha" HorizontalAlignment="Center" FontSize="10"/>
-				<Slider Minimum="0" Maximum="1" Value="1" ValueChanged="OnAlphaChanged" />
-
-				<!-- Colors grid -->
-				<UniformGrid Columns="4" Rows="4" Margin="5" HorizontalAlignment="Center">
-					<Button Background="Black" Click="OnFirstColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="MediumBlue" Click="OnSecondColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="Firebrick" Click="OnThirdColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="White" Click="OnFourthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="Yellow" Click="OnFifthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="GreenYellow" Click="OnSixthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="Purple" Click="OnSeventhColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="Pink" Click="OnEighthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="PeachPuff" Click="OnNinthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="SaddleBrown" Click="OnTenthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="Thistle" Click="OnEleventhColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="Tomato" Click="OnTwelvethColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="Turquoise" Click="OnThirteenthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="SeaGreen" Click="OnFourteenthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="DarkSalmon" Click="OnFifteenthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-					<Button Background="PaleVioletRed" Click="OnSixteenthColor" Margin="4" BorderBrush="Black" BorderThickness="1" />
-				</UniformGrid>
-
 				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
 					<Button Content="🠈" Click="OnPrevFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
 					<UniformGrid Columns="1" Margin="5" HorizontalAlignment="Center">

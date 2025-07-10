@@ -9,13 +9,13 @@ namespace ShakyDoodle.Models
         public DateTime CreatedAt { get; } = DateTime.UtcNow;
         public List<Point> Points { get; } = new();
         public List<float> Pressures { get; } = new();
-        public ColorType Color { get; }
+        public Color Color { get; }
         public SizeType Size { get; }
         public double Alpha { get; }
         public PenLineCap PenLineCap { get; }
         public bool Shake { get; }
 
-        public Stroke(ColorType color, Point startPoint, SizeType size, double alpha, PenLineCap cap, float startPressure, bool shake)
+        public Stroke(Color color, Point startPoint, SizeType size, double alpha, PenLineCap cap, float startPressure, bool shake)
         {
             Color = color;
             Points.Add(startPoint);
@@ -26,7 +26,7 @@ namespace ShakyDoodle.Models
             Shake = shake;
         }
 
-        public Stroke(ColorType color, List<Point> points, SizeType size, double alpha, PenLineCap cap, List<float> pressures, bool shake)
+        public Stroke(Color color, List<Point> points, SizeType size, double alpha, PenLineCap cap, List<float> pressures, bool shake)
         {
             Color = color;
             Points = new List<Point>(points);

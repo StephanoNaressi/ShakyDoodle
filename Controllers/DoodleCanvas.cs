@@ -70,7 +70,7 @@ namespace ShakyDoodle.Controllers
                 _inputHandler.PointerReleased();
                 InvalidateVisual();
             };
-            _inputHandler.UpdateSettings(ColorType.First, SizeType.Small, 1,PenLineCap.Round, false);
+            _inputHandler.UpdateSettings(new Color(255, 0, 0, 0), SizeType.Small, 1,PenLineCap.Round, false);
             Cursor = new Cursor(StandardCursorType.Cross);
         }
 
@@ -89,7 +89,7 @@ namespace ShakyDoodle.Controllers
             _helper.RequestInvalidateThrottled();
         }
 
-        public void SelectColor(ColorType color) => _inputHandler.ChangeColor(color);
+        public void ChangeColor(Color color) => _inputHandler.ChangeColor(color);
         public void SelectSize(SizeType size) => _inputHandler.ChangeSize(size);
         public void ChangeAlpha(double val) => _inputHandler.ChangeAlpha(val);
         public void ChangeBrushTip(PenLineCap cap) => _inputHandler.ChangeCap(cap);

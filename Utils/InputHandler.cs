@@ -16,7 +16,7 @@ namespace ShakyDoodle.Utils
         private Stroke? _currentStroke;
 
         private double _alpha;
-        private ColorType _currentColor;
+        private Color _currentColor;
         private SizeType _currentSize;
         private PenLineCap _currentCap;
         private bool _isShake;
@@ -28,7 +28,7 @@ namespace ShakyDoodle.Utils
             _mathHelper = mathHelper;
         }
 
-        public void UpdateSettings(ColorType color, SizeType size, double alpha, PenLineCap cap, bool isShake)
+        public void UpdateSettings(Color color, SizeType size, double alpha, PenLineCap cap, bool isShake)
         {
             _currentColor = color;
             _currentSize = size;
@@ -93,7 +93,7 @@ namespace ShakyDoodle.Utils
             _isShake = shake;
         }
         public void ChangeAlpha(double val) => _alpha = val;
-        public void ChangeColor(ColorType col) => _currentColor = col;
+        public void ChangeColor(Color col) => _currentColor = col;
         public void ChangeSize(SizeType size) => _currentSize = size;
         public void ChangeCap(PenLineCap cap) => _currentCap = cap;
     }

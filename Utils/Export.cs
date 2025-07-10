@@ -49,7 +49,7 @@ namespace ShakyDoodle.Utils
                         foreach (var stroke in layer.Strokes)
                         {
                             var shakeIntensity = stroke.Shake ? 1 : 0;
-                            var brush = new SolidColorBrush(_colorHelper.GetAvaloniaColor(stroke.Color, stroke.Alpha));
+                            var brush = new SolidColorBrush(stroke.Color);
                             _strokeRenderer.DrawStrokeWithColorOverride(stroke, shakeIntensity, brush, context);
                         }
                     }

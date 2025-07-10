@@ -31,7 +31,7 @@ namespace ShakyDoodle.Utils
                     LineCap = stroke.PenLineCap
                 };
             }
-            var color = new ColorTools().GetAvaloniaColor(stroke.Color, stroke.Alpha);
+            var color = stroke.Color;
             return new Pen(new SolidColorBrush(color), thickness) {LineCap = stroke.PenLineCap};
         }
 
@@ -40,7 +40,7 @@ namespace ShakyDoodle.Utils
 
         public Pen ChooseBrushSettings(Stroke stroke, double scaledPressure, double rawPressure)
         {
-            var color = _colorHelper.GetAvaloniaColor(stroke.Color);
+            var color = stroke.Color;
             var size = GetStrokeSize(stroke);
 
             return new Pen(new SolidColorBrush(color, stroke.Alpha * scaledPressure), size * rawPressure);
@@ -55,10 +55,9 @@ namespace ShakyDoodle.Utils
                 _ => 5
             };
         }
-        public IBrush GetSolidBrush(ColorType colorType, double alpha)
+        public IBrush GetSolidBrush(Color col, double alpha)
         {
-            var color = _colorHelper.GetAvaloniaColor(colorType, alpha);
-            return new SolidColorBrush(color);
+            return new SolidColorBrush(col, alpha);
         }
 
         #endregion
