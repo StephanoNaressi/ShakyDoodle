@@ -13,6 +13,7 @@ namespace ShakyDoodle.Rendering
 {
     public class StrokeRenderer
     {
+        private InputHandler _inputHandler;
         private ShakeController _shakeController = new();
         private BrushHelper _brushHelper = new();
         private AvaloniaExtras _helper;
@@ -25,16 +26,43 @@ namespace ShakyDoodle.Rendering
 
         private RenderTargetBitmap? _nextFrameCache;
         private int _nextFrameCacheIndex = -1;
+        private Size _canvasSize = new Size(0, 0);
 
-        public StrokeRenderer(Rect bounds, AvaloniaExtras helper)
+
+        public StrokeRenderer(Rect bounds, AvaloniaExtras helper, InputHandler inputHandler)
         {
             _helper = helper;
+            _inputHandler = inputHandler;
         }
         public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds)
         {
+            var newSize = new Size(
+                Math.Max(_canvasSize.Width, bounds.Width),
+                Math.Max(_canvasSize.Height, bounds.Height)
+            );
+            if (_canvasSize != newSize)
+            {
+                _canvasSize = newSize;
+
+                if (IsValidFrame(currentFrame, frames))
+                {
+                    frames[currentFrame].CachedBitmap = null;
+                    frames[currentFrame].IsDirty = true;
+                }
+
+                _prevFrameCache = null;
+                _nextFrameCache = null;
+                _prevFrameCacheIndex = -1;
+                _nextFrameCacheIndex = -1;
+            }
             using var clip = context.PushClip(new Rect(bounds.Size));
             context.FillRectangle(Brushes.White, new Rect(bounds.Size));
             DrawGrid(context, bounds);
+
+            if (!IsValidFrame(currentFrame, frames))
+                return;
+
+            var frame = frames[currentFrame];
 
             if (lightbox)
             {
@@ -42,11 +70,42 @@ namespace ShakyDoodle.Rendering
                 DrawFrameCache(context, frames, currentFrame + 1, Brushes.Pink, ref _nextFrameCache, ref _nextFrameCacheIndex, bounds);
             }
 
-            if (IsValidFrame(currentFrame, frames))
+            if (frame.CachedBitmap == null || frame.IsDirty)
             {
-                DrawVisibleLayers(context, frames[currentFrame]);
+                var strokesToRasterize = frame.Layers.Where(l => l.IsVisible).SelectMany(l => l.Strokes).Where(s => !s.Shake).ToList();
+                frame.CachedBitmap = RasterizeStrokes(strokesToRasterize, _canvasSize);
+                frame.IsDirty = false;
+            }
+
+            if (frame.CachedBitmap != null)
+            {
+                context.DrawImage(
+                    frame.CachedBitmap,
+                    new Rect(0, 0, frame.CachedBitmap.Size.Width, frame.CachedBitmap.Size.Height),
+                    new Rect(bounds.X, bounds.Y, frame.CachedBitmap.Size.Width, frame.CachedBitmap.Size.Height)
+                );
+            }
+            var activeStroke = _inputHandler.CurrentStroke;
+            using (context.PushTransform(Matrix.CreateTranslation(bounds.X, bounds.Y)))
+            {
+                foreach (var layer in frame.Layers.Where(l => l.IsVisible))
+                {
+                    foreach (var stroke in layer.Strokes.Where(s => s.Shake))
+                    {
+                        if (stroke == activeStroke) continue;
+                        double shakeIntensity = _shakeController.GetShakeIntensity(0, new() { stroke }, 1);
+                        DrawStroke(stroke, shakeIntensity, context);
+                    }
+                }
+
+                if (activeStroke != null)
+                {
+                    double shakeIntensity = activeStroke.Shake ? _shakeController.GetShakeIntensity(0, new() { activeStroke }, 1) : 0;
+                    DrawStroke(activeStroke, shakeIntensity, context);
+                }
             }
         }
+
 
         public void DrawGrid(DrawingContext context, Rect bounds)
         {
@@ -89,12 +148,12 @@ namespace ShakyDoodle.Rendering
                             break;
 
                         case PenLineCap.Square:
-                                context.DrawRectangle(strokeBrush, null,
-                                new Rect(pt.X - size / 2, pt.Y - size / 2, size, size));
+                            context.DrawRectangle(strokeBrush, null,
+                            new Rect(pt.X - size / 2, pt.Y - size / 2, size, size));
                             break;
                         case PenLineCap.Flat:
                             context.DrawRectangle(strokeBrush, null,
-                                new Rect(pt.X - size / 2, pt.Y - size / 2, size/2, size));
+                                new Rect(pt.X - size / 2, pt.Y - size / 2, size / 2, size));
                             break;
 
                         default:
@@ -148,20 +207,6 @@ namespace ShakyDoodle.Rendering
             }
             return renderTarget;
         }
-        private void DrawVisibleLayers(DrawingContext context, Frame frame)
-        {
-            foreach (var layer in frame.Layers.Where(l => l.IsVisible))
-            {
-                foreach (var stroke in layer.Strokes)
-                {
-                    double shakeIntensity = stroke.Shake
-                        ? _shakeController.GetShakeIntensity(layer.Strokes.IndexOf(stroke), layer.Strokes, _maxStrokes)
-                        : 0;
-
-                    DrawStroke(stroke, shakeIntensity, context);
-                }
-            }
-        }
         private void DrawFrameCache(DrawingContext context, List<Frame> frames, int frameIndex, IBrush color, ref RenderTargetBitmap? cache, ref int cacheIndex, Rect bounds)
         {
             if (!IsValidFrame(frameIndex, frames))
@@ -169,7 +214,7 @@ namespace ShakyDoodle.Rendering
 
             if (cache == null || cacheIndex != frameIndex)
             {
-                cache = RenderFrameToBitmap(frames[frameIndex], color, bounds.Size);
+                cache = RenderFrameToBitmap(frames[frameIndex], color, _canvasSize);
                 cacheIndex = frameIndex;
             }
 
@@ -179,6 +224,27 @@ namespace ShakyDoodle.Rendering
                     new Rect(0, 0, cache.Size.Width, cache.Size.Height),
                     new Rect(bounds.X, bounds.Y, cache.Size.Width, cache.Size.Height));
             }
+        }
+        private RenderTargetBitmap RasterizeStrokes(List<Stroke> strokes, Size size)
+        {
+            var pixelSize = new PixelSize((int)size.Width, (int)size.Height);
+            var target = new RenderTargetBitmap(pixelSize);
+
+            using (var ctx = target.CreateDrawingContext(true))
+            {
+                foreach (var stroke in strokes)
+                {
+                    DrawStroke(stroke, 0, ctx);
+                }
+            }
+            return target;
+        }
+        public void ClearCaches()
+        {
+            _prevFrameCache = null;
+            _nextFrameCache = null;
+            _prevFrameCacheIndex = -1;
+            _nextFrameCacheIndex = -1;
         }
         private bool IsValidFrame(int index, List<Frame> frames) => index >= 0 && index < frames.Count;
     }

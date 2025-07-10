@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Avalonia;
-using Avalonia.Animation;
 using Avalonia.Media;
 using ShakyDoodle.Controllers;
 using ShakyDoodle.Models;
@@ -13,21 +12,19 @@ namespace ShakyDoodle.Utils
         private FrameController _frameController;
         private ShortcutHelper _shortcutHelper;
         private MathExtras _mathHelper;
-        private Stroke? _currentStroke;
+        public Stroke? CurrentStroke;
 
         private double _alpha;
         private Color _currentColor;
         private SizeType _currentSize;
         private PenLineCap _currentCap;
         private bool _isShake;
-
-        public InputHandler(FrameController frameController, ShortcutHelper shortcutHelper, MathExtras mathHelper)
+        public void Initialize(FrameController frameController, ShortcutHelper shortcutHelper, MathExtras mathHelper)
         {
             _frameController = frameController;
             _shortcutHelper = shortcutHelper;
             _mathHelper = mathHelper;
         }
-
         public void UpdateSettings(Color color, SizeType size, double alpha, PenLineCap cap, bool isShake)
         {
             _currentColor = color;
@@ -39,27 +36,27 @@ namespace ShakyDoodle.Utils
 
         public void PointerPressed(Point position, float pressure)
         {
-            var strokes = _frameController.GetStrokes(); 
-            _currentStroke = new Stroke(_currentColor, position, _currentSize, _alpha, _currentCap, pressure, _isShake);
-            strokes.Add(_currentStroke); 
+            var strokes = _frameController.GetStrokes();
+            CurrentStroke = new Stroke(_currentColor, position, _currentSize, _alpha, _currentCap, pressure, _isShake);
+            strokes.Add(CurrentStroke);
             _shortcutHelper.PushUndoState(strokes.Select(s => s.Clone()).ToList());
 
         }
 
         public void PointerMoved(Point position, float pressure)
         {
-            if (_currentStroke == null) return;
+            if (CurrentStroke == null) return;
 
             float spacing = _isShake ? 5 : 1f;
 
-            if (_currentStroke.Points.Count == 0)
+            if (CurrentStroke.Points.Count == 0)
             {
-                _currentStroke.Points.Add(position);
-                _currentStroke.Pressures.Add(pressure);
+                CurrentStroke.Points.Add(position);
+                CurrentStroke.Pressures.Add(pressure);
                 return;
             }
 
-            var lastPoint = _currentStroke.Points.Last();
+            var lastPoint = CurrentStroke.Points.Last();
             double dist = _mathHelper.Distance(position, lastPoint);
 
             if (dist == 0) return;
@@ -73,19 +70,19 @@ namespace ShakyDoodle.Utils
                     lastPoint.Y + (position.Y - lastPoint.Y) * t
                 );
 
-                _currentStroke.Points.Add(interpolation);
-                _currentStroke.Pressures.Add(pressure);
+                CurrentStroke.Points.Add(interpolation);
+                CurrentStroke.Pressures.Add(pressure);
             }
 
-            _currentStroke.Points.Add(position);
-            _currentStroke.Pressures.Add(pressure);
+            CurrentStroke.Points.Add(position);
+            CurrentStroke.Pressures.Add(pressure);
 
         }
 
         public void PointerReleased()
         {
-                _frameController.SaveCurrentFrame();
-                _currentStroke = null;
+            _frameController.SaveCurrentFrame();
+            CurrentStroke = null;
         }
 
         public void ChangeShake(bool shake)

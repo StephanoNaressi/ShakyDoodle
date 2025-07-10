@@ -78,13 +78,14 @@
 					<TextBlock Text="Layers: 1/1" x:Name="LayerIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
 				</UniformGrid>
 
-
+				<TextBlock Name="FpsCounter" FontWeight="Bold" Foreground="DarkRed" Margin="5" VerticalAlignment="Bottom"/>
 			</StackPanel>
 
 		</Border>
 
 		<!-- Canvas Area takes remaining space -->
 		<Border Grid.Column="2" BorderBrush="Chocolate"  BorderThickness="3,0,0,0">
+			
 			<local:DoodleCanvas Name="doodleCanvas" IsLogo="False"/>
 		</Border>
 	</Grid>

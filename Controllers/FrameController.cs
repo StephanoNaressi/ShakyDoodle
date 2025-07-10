@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using ShakyDoodle.Models;
 using ShakyDoodle.Rendering;
 
@@ -11,7 +12,7 @@ namespace ShakyDoodle.Controllers
 {
     public class FrameController
     {
-        StrokeRenderer _strokeRenderer;
+        private StrokeRenderer _strokeRenderer;
         public int CurrentFrame;
         public int TotalFrames => _frames.Count;
         public int TotalLayers => _frames[CurrentFrame].Layers.Count;
@@ -24,7 +25,8 @@ namespace ShakyDoodle.Controllers
         }
         public Action<int, int>? OnFrameChanged;
         public Action<int, int>? OnLayerChanged;
-
+        public RenderTargetBitmap? CachedBitmap;
+        public bool IsDirty = true;
         private bool _isPlaying = false;
         public FrameController(Rect bounds, StrokeRenderer strokeRenderer, int startingFrame = 0)
         {
@@ -48,6 +50,7 @@ namespace ShakyDoodle.Controllers
             if (_activeLayerIndex < 0 || _activeLayerIndex >= layers.Count) return;
 
             layers[_activeLayerIndex].Strokes = strokes.Select(s => s.Clone()).ToList();
+            _frames[CurrentFrame].IsDirty = true;
         }
 
         public void SaveCurrentFrame()
@@ -60,6 +63,8 @@ namespace ShakyDoodle.Controllers
             if (_activeLayerIndex < 0 || _activeLayerIndex >= layers.Count) return;
 
             layers[_activeLayerIndex].Strokes = strokesCopy;
+            _frames[CurrentFrame].IsDirty = true;
+            _frames[CurrentFrame].CachedBitmap = null;
         }
 
 
@@ -68,6 +73,8 @@ namespace ShakyDoodle.Controllers
             if (index < 0 || index >= _frames.Count) return;
 
             CurrentFrame = index;
+            _frames[CurrentFrame].CachedBitmap = null;
+            _frames[CurrentFrame].IsDirty = true;
             SyncFrameToStrokes();
             visual.InvalidateVisual();
 
@@ -88,7 +95,7 @@ namespace ShakyDoodle.Controllers
 
         public void AddEmptyFrame()
         {
-            _frames.Add(new Frame{Layers = new List<Layer>{new Layer { Name = "Layer 1", IsVisible = true, Strokes = new List<Stroke>() }}});
+            _frames.Add(new Frame { Layers = new List<Layer> { new Layer { Name = "Layer 1", IsVisible = true, Strokes = new List<Stroke>() } } });
         }
         public void SetCurrentLayer(int index)
         {
@@ -111,14 +118,26 @@ namespace ShakyDoodle.Controllers
                 IsVisible = true,
                 Strokes = new List<Stroke>()
             });
+            _frames[CurrentFrame].IsDirty = true;
         }
 
         public void ClearAll()
         {
             _frames.Clear();
+
             AddEmptyFrame();
+
             CurrentFrame = 0;
             ActiveLayerIndex = 0;
+
+            IsDirty = true;
+            CachedBitmap = null;
+            _strokeRenderer.ClearCaches();
+            foreach (var frame in _frames)
+            {
+                frame.CachedBitmap = null;
+                frame.IsDirty = true;
+            }
         }
 
 
@@ -149,7 +168,8 @@ namespace ShakyDoodle.Controllers
                         Name = layer.Name,
                         IsVisible = layer.IsVisible,
                         Strokes = layer.Strokes.Select(s => s.Clone()).ToList()
-                    }).ToList()
+                    }).ToList(),
+                IsDirty = true
             };
 
             _frames.Insert(cur + 1, newFrame);
@@ -188,6 +208,13 @@ namespace ShakyDoodle.Controllers
         {
             if (_isPlaying) Stop();
             else Play(visual);
+        }
+        public void MarkDirty()
+        {
+            if (CurrentFrame >= 0 && CurrentFrame < _frames.Count)
+            {
+                _frames[CurrentFrame].IsDirty = true;
+            }
         }
     }
 }

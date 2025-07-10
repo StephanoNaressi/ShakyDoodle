@@ -5,14 +5,27 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-
+using System.Diagnostics;
+using System.Timers;
+using Avalonia.Threading;
 namespace ShakyDoodle
 {
     public partial class MainWindow : Window
     {
+        private Timer _fpsTimer;
+        private int _frameCount = 0;
         public MainWindow()
         {
             InitializeComponent();
+
+            var frameSimTimer = new Timer(16); // ~60Hz
+            frameSimTimer.Elapsed += (s, e) => _frameCount++;
+            frameSimTimer.Start();
+
+            _fpsTimer = new Timer(1000);
+            _fpsTimer.Elapsed += FpsTimer_Elapsed;
+            _fpsTimer.Start();
+
             this.KeyDown += OnGlobalKeyDown;
 
             doodleCanvas.FrameController.OnFrameChanged = (current, total) =>
@@ -24,6 +37,16 @@ namespace ShakyDoodle
                 LayerIndicator.Text = $"Layers: {current}/{total}";
             };
             colorPicker.Color = Avalonia.Media.Colors.Black;
+        }
+        private void FpsTimer_Elapsed(object? sender, ElapsedEventArgs e)
+        {
+            int fps = _frameCount;
+            _frameCount = 0;
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                FpsCounter.Text = $"FPS: {fps}";
+            });
         }
         private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
         {

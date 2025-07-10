@@ -44,12 +44,14 @@ namespace ShakyDoodle.Controllers
 
         public DoodleCanvas()
         {
+            _inputHandler = new InputHandler();
             _helper = new(this);
-            _strokeRenderer = new(Bounds, _helper);
-            FrameController = new (Bounds, _strokeRenderer);
+            _strokeRenderer = new(Bounds, _helper, _inputHandler);
+            FrameController = new(Bounds, _strokeRenderer);
             _shortcutHelper = new(FrameController);
             _exportHelper = new(Bounds, FrameController, _strokeRenderer);
-            _inputHandler = new(FrameController, _shortcutHelper, _mathHelper);
+
+            _inputHandler.Initialize(FrameController, _shortcutHelper, _mathHelper);
 
             FrameController.AddEmptyFrame();
             Focusable = true;

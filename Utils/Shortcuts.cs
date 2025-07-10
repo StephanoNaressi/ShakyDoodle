@@ -31,6 +31,7 @@ namespace ShakyDoodle.Utils
 
             _frameController.SetStrokes(strokes);
             _frameController.SyncStrokesToFrame();
+            _frameController.MarkDirty();
         }
 
         public void Redo()
@@ -42,6 +43,7 @@ namespace ShakyDoodle.Utils
 
             _frameController.SetStrokes(strokes);
             _frameController.SyncStrokesToFrame();
+            _frameController.MarkDirty();
         }
 
         public void Clear()
