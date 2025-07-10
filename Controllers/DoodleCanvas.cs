@@ -80,12 +80,11 @@ namespace ShakyDoodle.Controllers
             _strokeRenderer.StartRenderLoopAsync(() => FrameController.GetStrokes(), () => _shakeController.GetSpeed());
         }
 
-        public override void Render(DrawingContext context) => _strokeRenderer.Render(context, _lightbox, FrameController.CurrentFrame, FrameController.GetStrokes(), FrameController.GetAllFrames(), Bounds);
+        public override void Render(DrawingContext context) => _strokeRenderer.Render(context, _lightbox, FrameController.CurrentFrame, FrameController.GetAllVisibleStrokes(), FrameController.GetAllFrames(), Bounds);
 
         public void ClearCanvas()
         {
             FrameController.ClearAll();
-            FrameController.AddEmptyFrame();
             Stop();
             _helper.RequestInvalidateThrottled();
         }
@@ -108,9 +107,9 @@ namespace ShakyDoodle.Controllers
         public void Stop() => FrameController.Stop();
         public void TogglePlay() => FrameController.TogglePlay(this);
 
-        public void ToggleLightbox(bool enabled)
+        public void ToggleLightbox()
         {
-            _lightbox = enabled;
+            _lightbox = _lightbox ? false : true;
             _helper.RequestInvalidateThrottled();
         }
 
@@ -121,6 +120,8 @@ namespace ShakyDoodle.Controllers
         public void DuplicateFrame() => FrameController.DuplicateFrame(this);
 
         public void ExportFramesAsPng(string folderPath, int width, int height) => _exportHelper.ExportFramesAsPng(folderPath, width, height);
+        public void NextLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex + 1);
+        public void PrevLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex - 1);
 
     }
 }

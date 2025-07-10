@@ -26,8 +26,6 @@ namespace ShakyDoodle.Rendering
         private RenderTargetBitmap? _nextFrameCache;
         private int _nextFrameCacheIndex = -1;
 
-        #region Rendering
-
         public StrokeRenderer(Rect bounds, AvaloniaExtras helper)
         {
             _helper = helper;
@@ -38,55 +36,17 @@ namespace ShakyDoodle.Rendering
             context.FillRectangle(Brushes.White, new Rect(bounds.Size));
             DrawGrid(context, bounds);
 
-            //If we are using a lightbox we render in a bitmap cache
             if (lightbox)
             {
-                //Our previous frame
-                int prevIndex = currentFrame - 1;
-                if (prevIndex >= 0 && prevIndex < frames.Count)
-                {
-                    if (_prevFrameCache == null || _prevFrameCacheIndex != prevIndex)
-                    {
-                        _prevFrameCache = RenderFrameToBitmap(frames[prevIndex], Brushes.LightBlue, bounds.Size);
-                        _prevFrameCacheIndex = prevIndex;
-                    }
-                    if (_prevFrameCache != null)
-                    {
-                        context.DrawImage(_prevFrameCache,
-                            new Rect(0, 0, _prevFrameCache.Size.Width, _prevFrameCache.Size.Height),
-                            new Rect(bounds.X, bounds.Y, _prevFrameCache.Size.Width, _prevFrameCache.Size.Height));
-
-                    }
-                }
-                //Our next frame
-                int nextIndex = currentFrame + 1;
-                if (nextIndex >= 0 && nextIndex < frames.Count)
-                {
-                    //If our next frame cache is empty or not the same index
-                    if (_nextFrameCache == null || _nextFrameCacheIndex != nextIndex)
-                    {
-                        //We create our bitmap cache
-                        _nextFrameCache = RenderFrameToBitmap(frames[nextIndex], Brushes.Pink, bounds.Size);
-                        _nextFrameCacheIndex = nextIndex;
-                    }
-                    if (_nextFrameCache != null)
-                    {
-                        //We draw the other frame strokes onto this bitmap
-                        context.DrawImage(_nextFrameCache,
-                            new Rect(0, 0, _nextFrameCache.Size.Width, _nextFrameCache.Size.Height),
-                            new Rect(bounds.X, bounds.Y, _nextFrameCache.Size.Width, _nextFrameCache.Size.Height));
-                    }
-                }
+                DrawFrameCache(context, frames, currentFrame - 1, Brushes.LightBlue, ref _prevFrameCache, ref _prevFrameCacheIndex, bounds);
+                DrawFrameCache(context, frames, currentFrame + 1, Brushes.Pink, ref _nextFrameCache, ref _nextFrameCacheIndex, bounds);
             }
 
-
-            for (int i = 0; i < strokes.Count; i++)
+            if (IsValidFrame(currentFrame, frames))
             {
-                double shakeIntensity = _shakeController.GetShakeIntensity(i, strokes, _maxStrokes);
-                DrawStroke(strokes[i], shakeIntensity, context);
+                DrawVisibleLayers(context, frames[currentFrame]);
             }
         }
-
 
         public void DrawGrid(DrawingContext context, Rect bounds)
         {
@@ -115,9 +75,9 @@ namespace ShakyDoodle.Rendering
             {
                 var strokeBrush = _brushHelper.GetSolidBrush(stroke.Color, stroke.Alpha);
 
-                for (int i = 0; i < stroke.Points.Count; i++)
+                for (int i = 1; i < stroke.Points.Count; i++)
                 {
-                    var pt = stroke.Points[i];
+                    var pt = stroke.Points[i - 1];
                     float pressure = i < stroke.Pressures.Count ? stroke.Pressures[i] : 1f;
 
                     double size = _brushHelper.GetStrokeSize(stroke) * pressure;
@@ -159,18 +119,6 @@ namespace ShakyDoodle.Rendering
                 context.DrawLine(pen, p1, p2);
             }
         }
-        private void DrawFrameIfExists(int i, IBrush color, List<Frame> frames, DrawingContext context)
-        {
-            //If our index is invalid we dont do nothin'
-            if (i < 0 || i >= frames.Count) return;
-            //We grab the frame 
-            var f = frames[i];
-            //Loop through its strokes
-            foreach (var stroke in f.Strokes)
-            {
-                DrawStrokeWithColorOverride(stroke, 0, color, context);
-            }
-        }
 
         public async void StartRenderLoopAsync(Func<List<Stroke>> getStrokes, Func<float> getSpeed)
         {
@@ -192,16 +140,50 @@ namespace ShakyDoodle.Rendering
 
             using (var ctx = renderTarget.CreateDrawingContext(true))
             {
-                ctx.FillRectangle(Brushes.Transparent, new Rect(size));
-                foreach (var stroke in frame.Strokes)
+                foreach (var layer in frame.Layers.Where(l => l.IsVisible))
                 {
-                    DrawStrokeWithColorOverride(stroke, 0, overrideColor, ctx);
+                    ctx.FillRectangle(Brushes.Transparent, new Rect(size));
+                    foreach (var stroke in layer.Strokes)
+                    {
+                        DrawStrokeWithColorOverride(stroke, 0, overrideColor, ctx);
+                    }
                 }
+
             }
             return renderTarget;
         }
+        private void DrawVisibleLayers(DrawingContext context, Frame frame)
+        {
+            foreach (var layer in frame.Layers.Where(l => l.IsVisible))
+            {
+                foreach (var stroke in layer.Strokes)
+                {
+                    double shakeIntensity = stroke.Shake
+                        ? _shakeController.GetShakeIntensity(layer.Strokes.IndexOf(stroke), layer.Strokes, _maxStrokes)
+                        : 0;
 
-        #endregion
+                    DrawStroke(stroke, shakeIntensity, context);
+                }
+            }
+        }
+        private void DrawFrameCache(DrawingContext context, List<Frame> frames, int frameIndex, IBrush color, ref RenderTargetBitmap? cache, ref int cacheIndex, Rect bounds)
+        {
+            if (!IsValidFrame(frameIndex, frames))
+                return;
 
+            if (cache == null || cacheIndex != frameIndex)
+            {
+                cache = RenderFrameToBitmap(frames[frameIndex], color, bounds.Size);
+                cacheIndex = frameIndex;
+            }
+
+            if (cache != null)
+            {
+                context.DrawImage(cache,
+                    new Rect(0, 0, cache.Size.Width, cache.Size.Height),
+                    new Rect(bounds.X, bounds.Y, cache.Size.Width, cache.Size.Height));
+            }
+        }
+        private bool IsValidFrame(int index, List<Frame> frames) => index >= 0 && index < frames.Count;
     }
 }

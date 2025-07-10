@@ -17,7 +17,11 @@ namespace ShakyDoodle
 
             doodleCanvas.FrameController.OnFrameChanged = (current, total) =>
             {
-                FrameIndicator.Text = $"{current}/{total}";
+                FrameIndicator.Text = $"Frames: {current}/{total}";
+            };
+            doodleCanvas.FrameController.OnLayerChanged = (current, total) =>
+            {
+                LayerIndicator.Text = $"Layers: {current}/{total}";
             };
         }
         private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
@@ -35,12 +39,14 @@ namespace ShakyDoodle
             }
         }
 
-        private void UpdateFrameLabel() => FrameIndicator.Text = $"{doodleCanvas.FrameController.CurrentFrame + 1}/{doodleCanvas.FrameController.TotalFrames}";
+        private void UpdateFrameLabel() => FrameIndicator.Text = $"Frames: {doodleCanvas.FrameController.CurrentFrame + 1}/{doodleCanvas.FrameController.TotalFrames}";
+        private void UpdateLayerLabel() => LayerIndicator.Text = $"Layers: {doodleCanvas.FrameController.ActiveLayerIndex + 1}/{doodleCanvas.FrameController.TotalLayers}";
         private void UpdatePlayLabel() => PlayButton.Content = PlayButton.Content as string == "▶" ? "■" : "▶";
         private void OnClearClick(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.ClearCanvas();
             UpdateFrameLabel();
+            UpdateLayerLabel();
 
         }
 
@@ -157,6 +163,7 @@ namespace ShakyDoodle
         {
             doodleCanvas.DuplicateFrame();
             UpdateFrameLabel();
+            UpdateLayerLabel();
         }
 
         private void OnShake(object? sender, RoutedEventArgs events)
@@ -175,6 +182,7 @@ namespace ShakyDoodle
         {
             doodleCanvas.NextFrame();
             UpdateFrameLabel();
+            UpdateLayerLabel();
 
         }
 
@@ -182,23 +190,34 @@ namespace ShakyDoodle
         {
             doodleCanvas.PreviousFrame();
             UpdateFrameLabel();
+            UpdateLayerLabel();
+
+        }
+        private void OnNextLayer(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.NextLayer();
+            UpdateFrameLabel();
+            UpdateLayerLabel();
 
         }
 
+        private void OnPrevLayer(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.PrevLayer();
+            UpdateFrameLabel();
+            UpdateLayerLabel();
+
+        }
         private void OnTogglePlay(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.TogglePlay();
             UpdatePlayLabel();
+            UpdateLayerLabel();
         }
 
         private void ToggleLightbox(object? sender, RoutedEventArgs events)
         {
-            doodleCanvas.ToggleLightbox(true);
-        }
-
-        private void UntoggleLightbox(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.ToggleLightbox(false);
+            doodleCanvas.ToggleLightbox();
         }
 
         private void OnSaveFile(object? sender, RoutedEventArgs e)

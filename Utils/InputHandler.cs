@@ -39,37 +39,39 @@ namespace ShakyDoodle.Utils
 
         public void PointerPressed(Point position, float pressure)
         {
-            var strokes = _frameController.GetStrokes();
-            _currentStroke = new(_currentColor, position, _currentSize, _alpha, _currentCap, pressure, _isShake);
-            _shortcutHelper.PushUndoState(strokes);
-            strokes.Add(_currentStroke);
-            _frameController.SyncStrokesToFrame();
+            var strokes = _frameController.GetStrokes(); 
+            _currentStroke = new Stroke(_currentColor, position, _currentSize, _alpha, _currentCap, pressure, _isShake);
+            strokes.Add(_currentStroke); 
+            _shortcutHelper.PushUndoState(strokes.Select(s => s.Clone()).ToList());
+
         }
 
         public void PointerMoved(Point position, float pressure)
         {
-            float spacing = _isShake ? 5 : 1f;
             if (_currentStroke == null) return;
-            if(_currentStroke.Points.Count == 0)
+
+            float spacing = _isShake ? 5 : 1f;
+
+            if (_currentStroke.Points.Count == 0)
             {
                 _currentStroke.Points.Add(position);
                 _currentStroke.Pressures.Add(pressure);
                 return;
             }
+
             var lastPoint = _currentStroke.Points.Last();
             double dist = _mathHelper.Distance(position, lastPoint);
 
             if (dist == 0) return;
+
             int amountToFill = Math.Max(1, (int)(dist / spacing));
-
-
-
-            for (int i = 1; i < amountToFill; i++) 
+            for (int i = 1; i < amountToFill; i++)
             {
-                double t = (double) i / amountToFill;
-
-                //Interpolate to fill in the gaps when mouse moves too fast :p
-                var interpolation = new Point(lastPoint.X + (position.X - lastPoint.X) * t, lastPoint.Y + (position.Y - lastPoint.Y) * t);
+                double t = (double)i / amountToFill;
+                var interpolation = new Point(
+                    lastPoint.X + (position.X - lastPoint.X) * t,
+                    lastPoint.Y + (position.Y - lastPoint.Y) * t
+                );
 
                 _currentStroke.Points.Add(interpolation);
                 _currentStroke.Pressures.Add(pressure);
@@ -77,13 +79,15 @@ namespace ShakyDoodle.Utils
 
             _currentStroke.Points.Add(position);
             _currentStroke.Pressures.Add(pressure);
+
         }
 
         public void PointerReleased()
         {
-            _currentStroke = null;
-            _frameController.SaveCurrentFrame();
+                _frameController.SaveCurrentFrame();
+                _currentStroke = null;
         }
+
         public void ChangeShake(bool shake)
         {
             _isShake = shake;

@@ -7,6 +7,7 @@ using Avalonia.Media.Imaging;
 using ShakyDoodle.Rendering;
 using ShakyDoodle.Models;
 using ShakyDoodle.Controllers;
+using System.Linq;
 
 namespace ShakyDoodle.Utils
 {
@@ -42,13 +43,15 @@ namespace ShakyDoodle.Utils
 
                     // Draw grid
                     _strokeRenderer.DrawGrid(context, new Rect(0, 0, width, height));
-
-                    // Draw strokes
-                    foreach (var stroke in frame.Strokes)
+                    //Add layer handling
+                    foreach (var layer in frame.Layers.Where(l => l.IsVisible))
                     {
-                        var shakeIntensity = stroke.Shake ? 1 : 0;
-                        var brush = new SolidColorBrush(_colorHelper.GetAvaloniaColor(stroke.Color, stroke.Alpha));
-                        _strokeRenderer.DrawStrokeWithColorOverride(stroke, shakeIntensity, brush, context);
+                        foreach (var stroke in layer.Strokes)
+                        {
+                            var shakeIntensity = stroke.Shake ? 1 : 0;
+                            var brush = new SolidColorBrush(_colorHelper.GetAvaloniaColor(stroke.Color, stroke.Alpha));
+                            _strokeRenderer.DrawStrokeWithColorOverride(stroke, shakeIntensity, brush, context);
+                        }
                     }
                 }
 

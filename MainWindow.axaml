@@ -28,8 +28,11 @@
 				<Border Width="200" Height="100" CornerRadius="15" ClipToBounds="True">
 					<local:DoodleCanvas Name="logoCanvas" IsLogo="True" />
 				</Border>
+				<UniformGrid Columns="2" Rows="1" Margin="5" HorizontalAlignment="Center">
 				<Button Content=" Shake ✏" Click="OnShake" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 				<Button Content="Ink 🖊" Click="OnUnshake" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+				</UniformGrid>
+				<UniformGrid Columns="2" Rows="1" Margin="5" HorizontalAlignment="Center">
 				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
 					<!-- Sizes -->
 					<Button Width="10" Height="10" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeSmall" BorderBrush="Black" BorderThickness="1" />
@@ -41,6 +44,7 @@
 					<Button Width="15" Height="15" CornerRadius="20" Background="DarkSlateBlue" Margin="5" Click="OnBrushRound" BorderBrush="Black" BorderThickness="1" />
 					<Button Width="15" Height="15" Background="DarkSlateBlue" Margin="5" Click="OnBrushSquare" BorderBrush="Black" BorderThickness="1" />
 					<Button Width="10" Height="15" CornerRadius="0" Background="DarkSlateBlue" Margin="5" Click="OnBrushFlat" BorderBrush="Black" BorderThickness="1" />
+				</UniformGrid>
 				</UniformGrid>
 				<!-- Alpha slider -->
 				<TextBlock Text="Alpha" HorizontalAlignment="Center" FontSize="10"/>
@@ -67,22 +71,28 @@
 				</UniformGrid>
 
 				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
-					<Button Content="&lt;" Click="OnPrevFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
-					<Button x:Name="PlayButton" Content="▶" Click="OnTogglePlay" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					<Button Content="&gt;" Click="OnNextFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+					<Button Content="🠈" Click="OnPrevFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
+					<UniformGrid Columns="1" Margin="5" HorizontalAlignment="Center">
+						<Button Content="🠉" Click="OnNextLayer" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
+						<Button x:Name="PlayButton" Content="▶" Click="OnTogglePlay" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+						<Button Content="🠋" Click="OnPrevLayer" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
+					</UniformGrid>
+					<Button Content="🠊" Click="OnNextFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 				</UniformGrid>
 
-				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
+				<UniformGrid Columns="4" Margin="5" HorizontalAlignment="Center">
 					<Button x:Name="CopyFrame" Content="📋" Click="OnDuplicateFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 					<Button x:Name="SaveFile" Content="💾" Click="OnSaveFile" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 					<Button Content="🗑" Click="OnClearClick" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+					<Button Content="💡" Click="ToggleLightbox" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 				</UniformGrid>
 
 				<UniformGrid Columns="1" Margin="5" HorizontalAlignment="Center">
-					<TextBlock Text="1/1" x:Name="FrameIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
+					<TextBlock Text="Frames: 1/1" x:Name="FrameIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
+					<TextBlock Text="Layers: 1/1" x:Name="LayerIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
 				</UniformGrid>
 
-				<CheckBox Content="LightBox" Checked="ToggleLightbox" Unchecked="UntoggleLightbox" HorizontalAlignment="Center"/>
+
 			</StackPanel>
 
 		</Border>

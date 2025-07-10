@@ -4,24 +4,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Media;
 using ShakyDoodle.Models;
 using ShakyDoodle.Rendering;
-using ShakyDoodle.Utils;
 
 namespace ShakyDoodle.Controllers
 {
     public class FrameController
     {
         StrokeRenderer _strokeRenderer;
-        AvaloniaExtras _helper;
         public int CurrentFrame;
         public int TotalFrames => _frames.Count;
-
+        public int TotalLayers => _frames[CurrentFrame].Layers.Count;
         private List<Frame> _frames = new();
-        private List<Stroke> _strokes = new();
-
+        private int _activeLayerIndex = 0;
+        public int ActiveLayerIndex
+        {
+            get => _activeLayerIndex;
+            set => _activeLayerIndex = value;
+        }
         public Action<int, int>? OnFrameChanged;
+        public Action<int, int>? OnLayerChanged;
 
         private bool _isPlaying = false;
         public FrameController(Rect bounds, StrokeRenderer strokeRenderer, int startingFrame = 0)
@@ -30,22 +32,36 @@ namespace ShakyDoodle.Controllers
             CurrentFrame = startingFrame;
         }
 
-        public List<Stroke> GetStrokes() => _strokes;
+        public List<Stroke> GetStrokes()
+        {
+            if (CurrentFrame < 0 || CurrentFrame >= _frames.Count) return new List<Stroke>();
+            var layers = _frames[CurrentFrame].Layers;
+            if (_activeLayerIndex < 0 || _activeLayerIndex >= layers.Count) return new List<Stroke>();
+            return layers[_activeLayerIndex].Strokes;
+        }
 
         public void SetStrokes(List<Stroke> strokes)
         {
-            _strokes = strokes.Select(s => s.Clone()).ToList();
+            if (CurrentFrame < 0 || CurrentFrame >= _frames.Count) return;
+
+            var layers = _frames[CurrentFrame].Layers;
+            if (_activeLayerIndex < 0 || _activeLayerIndex >= layers.Count) return;
+
+            layers[_activeLayerIndex].Strokes = strokes.Select(s => s.Clone()).ToList();
         }
 
         public void SaveCurrentFrame()
         {
-            var strokesCopy = _strokes.Select(s => s.Clone()).ToList();
+            var strokesCopy = GetStrokes().Select(s => s.Clone()).ToList();
 
-            if (CurrentFrame < _frames.Count)
-                _frames[CurrentFrame].Strokes = strokesCopy;
-            else
-                _frames.Add(new Frame { Strokes = strokesCopy });
+            if (CurrentFrame < 0 || CurrentFrame >= _frames.Count) return;
+
+            var layers = _frames[CurrentFrame].Layers;
+            if (_activeLayerIndex < 0 || _activeLayerIndex >= layers.Count) return;
+
+            layers[_activeLayerIndex].Strokes = strokesCopy;
         }
+
 
         public void LoadFrame(int index, Visual visual)
         {
@@ -60,53 +76,82 @@ namespace ShakyDoodle.Controllers
 
         public void SyncStrokesToFrame()
         {
-            if (CurrentFrame < 0 || CurrentFrame >= _frames.Count) return;
-
-            _frames[CurrentFrame].Strokes = _strokes.Select(s => s.Clone()).ToList();
+            var strokes = GetStrokes();
+            SetStrokes(strokes);
         }
 
         public void SyncFrameToStrokes()
         {
-            if (CurrentFrame < 0 || CurrentFrame >= _frames.Count) return;
-
-            _strokes = _frames[CurrentFrame].Strokes
-                .Select(s => s.Clone()).ToList();
+            var strokes = GetStrokes().Select(s => s.Clone()).ToList();
+            SetStrokes(strokes);
         }
 
         public void AddEmptyFrame()
         {
-            _frames.Add(new Frame());
+            _frames.Add(new Frame{Layers = new List<Layer>{new Layer { Name = "Layer 1", IsVisible = true, Strokes = new List<Stroke>() }}});
+        }
+        public void SetCurrentLayer(int index)
+        {
+            if (index < 0 || index > 9) return;
+            if (CurrentFrame < 0 || CurrentFrame >= _frames.Count) return;
+            var layers = _frames[CurrentFrame].Layers;
+            while (layers.Count <= index)
+            {
+                AddLayerToCurrentFrame($"Layer {layers.Count + 1}");
+            }
+            ActiveLayerIndex = index;
+            OnLayerChanged?.Invoke(ActiveLayerIndex + 1, layers.Count);
+        }
+        public void AddLayerToCurrentFrame(string name)
+        {
+            if (CurrentFrame < 0 || CurrentFrame >= _frames.Count) return;
+            _frames[CurrentFrame].Layers.Add(new Layer
+            {
+                Name = name,
+                IsVisible = true,
+                Strokes = new List<Stroke>()
+            });
         }
 
         public void ClearAll()
         {
             _frames.Clear();
-            _strokes.Clear();
-            SetStrokes(_strokes);
+            AddEmptyFrame();
             CurrentFrame = 0;
+            ActiveLayerIndex = 0;
         }
+
 
         public List<Frame> GetAllFrames() => _frames;
-
-        private void DrawFrameIfExists(int i, IBrush color, DrawingContext context)
+        public List<Stroke> GetAllVisibleStrokes()
         {
-            var frames = _frames;
-            if (i < 0 || i >= frames.Count) return;
+            if (CurrentFrame < 0 || CurrentFrame >= _frames.Count)
+                return new List<Stroke>();
 
-            var f = frames[i];
-            foreach (var stroke in f.Strokes)
-            {
-                _strokeRenderer.DrawStrokeWithColorOverride(stroke, 0, color, context);
-            }
+            return _frames[CurrentFrame].Layers
+                   .Where(l => l.IsVisible)
+                   .SelectMany(l => l.Strokes)
+                   .ToList();
         }
+
 
         public void DuplicateFrame(Control canvas)
         {
             int cur = CurrentFrame;
             if (cur < 0 || cur >= _frames.Count) return;
 
-            var cloned = _frames[cur].Strokes.Select(s => s.Clone()).ToList();
-            var newFrame = new Frame { Strokes = cloned };
+            var originalFrame = _frames[cur];
+            var newFrame = new Frame
+            {
+                Layers = originalFrame.Layers
+                    .Select(layer => new Layer
+                    {
+                        Name = layer.Name,
+                        IsVisible = layer.IsVisible,
+                        Strokes = layer.Strokes.Select(s => s.Clone()).ToList()
+                    }).ToList()
+            };
+
             _frames.Insert(cur + 1, newFrame);
             LoadFrame(cur + 1, canvas);
         }
@@ -117,18 +162,19 @@ namespace ShakyDoodle.Controllers
 
             if (next >= TotalFrames)
                 AddEmptyFrame();
-
+            SetCurrentLayer(0);
             LoadFrame(next, visual);
         }
         public void PreviousFrame(Visual visual)
         {
+            SetCurrentLayer(0);
             SaveCurrentFrame();
             if (CurrentFrame > 0) LoadFrame(CurrentFrame - 1, visual);
         }
         public async void Play(Visual visual)
         {
             if (TotalFrames == 0) return;
-
+            SetCurrentLayer(0);
             _isPlaying = true;
             while (_isPlaying)
             {

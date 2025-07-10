@@ -4,6 +4,6 @@ namespace ShakyDoodle.Models
 {
     public class Frame
     {
-        public List<Stroke> Strokes { get; set; } = new();
+        public List<Layer> Layers { get; set; } = new();
     }
 }
