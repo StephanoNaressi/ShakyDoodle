@@ -71,11 +71,12 @@
 					<Button Content="🠊" Click="OnNextFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 				</UniformGrid>
 
-				<UniformGrid Columns="4" Margin="5" HorizontalAlignment="Center">
+				<UniformGrid Columns="5" Margin="5" HorizontalAlignment="Center">
 					<Button x:Name="CopyFrame" Content="📋" Click="OnDuplicateFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 					<Button x:Name="SaveFile" Content="💾" Click="OnSaveFile" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 					<Button Content="💥" Click="OnClearClick" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 					<Button Content="💡" Click="ToggleLightbox" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+					<Button Content="🗑" Click="OnDeleteFrame" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 				</UniformGrid>
 
 				<UniformGrid Columns="1" Margin="5" HorizontalAlignment="Center">

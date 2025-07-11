@@ -74,6 +74,14 @@ namespace ShakyDoodle.Controllers
             _frames[CurrentFrame].CachedBitmap = null;
         }
 
+        public void DeleteCurrentFrame()
+        {
+            if (_frames.Count <= 1) return;
+            _frames.RemoveAt(CurrentFrame);
+            if (CurrentFrame >= _frames.Count) CurrentFrame = _frames.Count - 1;
+            OnFrameChanged?.Invoke(CurrentFrame + 1, _frames.Count);
+            IsDirty = true;
+        }
 
         public void LoadFrame(int index, Visual visual)
         {
