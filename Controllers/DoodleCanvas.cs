@@ -10,7 +10,6 @@ namespace ShakyDoodle.Controllers
     public class DoodleCanvas : Control
     {
         private ShakeController _shakeController = new();
-        private MathExtras _mathHelper = new();
         private LogoPreloader _logoPreloader = new();
         private StrokeRenderer _strokeRenderer;
         private AvaloniaExtras _helper;
@@ -21,7 +20,7 @@ namespace ShakyDoodle.Controllers
 
         private bool _lightbox = false;
         private bool _isLogo;
-
+        private bool _isEraser = false;
         public bool IsLogo
         {
             get => _isLogo;
@@ -51,7 +50,7 @@ namespace ShakyDoodle.Controllers
             _shortcutHelper = new(FrameController);
             _exportHelper = new(Bounds, FrameController, _strokeRenderer);
 
-            _inputHandler.Initialize(FrameController, _shortcutHelper, _mathHelper);
+            _inputHandler.Initialize(FrameController, _shortcutHelper);
 
             FrameController.AddEmptyFrame();
             Focusable = true;
@@ -97,6 +96,7 @@ namespace ShakyDoodle.Controllers
         public void ChangeBrushTip(PenLineCap cap) => _inputHandler.ChangeCap(cap);
         public void ShouldShake(bool shake)
         {
+            _inputHandler.IsErasing = false;
             _inputHandler.ChangeShake(shake);
             _helper.RequestInvalidateThrottled();
         }
@@ -124,6 +124,6 @@ namespace ShakyDoodle.Controllers
         public void ExportFramesAsPng(string folderPath, int width, int height) => _exportHelper.ExportFramesAsPng(folderPath, width, height);
         public void NextLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex + 1);
         public void PrevLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex - 1);
-
+        public void OnErase() => _inputHandler.IsErasing = _inputHandler.IsErasing ? false : true;
     }
 }

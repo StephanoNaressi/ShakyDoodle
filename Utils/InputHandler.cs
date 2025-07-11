@@ -2,8 +2,10 @@
 using System.Linq;
 using Avalonia;
 using Avalonia.Media;
+using Metsys.Bson;
 using ShakyDoodle.Controllers;
 using ShakyDoodle.Models;
+using ShakyDoodle.Rendering;
 
 namespace ShakyDoodle.Utils
 {
@@ -11,19 +13,21 @@ namespace ShakyDoodle.Utils
     {
         private FrameController _frameController;
         private ShortcutHelper _shortcutHelper;
-        private MathExtras _mathHelper;
         public Stroke? CurrentStroke;
+        public bool IsErasing { get; set; } = false;
+        public double EraserRadius { get; set; } = 5.0;
 
         private double _alpha;
         private Color _currentColor;
         private SizeType _currentSize;
         private PenLineCap _currentCap;
         private bool _isShake;
-        public void Initialize(FrameController frameController, ShortcutHelper shortcutHelper, MathExtras mathHelper)
+
+        private bool _isClicking = false;
+        public void Initialize(FrameController frameController, ShortcutHelper shortcutHelper)
         {
             _frameController = frameController;
             _shortcutHelper = shortcutHelper;
-            _mathHelper = mathHelper;
         }
         public void UpdateSettings(Color color, SizeType size, double alpha, PenLineCap cap, bool isShake)
         {
@@ -36,6 +40,7 @@ namespace ShakyDoodle.Utils
 
         public void PointerPressed(Point position, float pressure)
         {
+            _isClicking = true;
             var strokes = _frameController.GetStrokes();
             CurrentStroke = new Stroke(_currentColor, position, _currentSize, _alpha, _currentCap, pressure, _isShake);
             strokes.Add(CurrentStroke);
@@ -45,6 +50,24 @@ namespace ShakyDoodle.Utils
 
         public void PointerMoved(Point position, float pressure)
         {
+            if (IsErasing && _isClicking)
+            {
+                var strokes = _frameController.GetStrokes();
+                if (strokes == null) return;
+
+                _frameController.EraseStrokes(strokes, position, EraserRadius);
+
+                var frames = _frameController.GetAllFrames();
+                if (_frameController.CurrentFrame >= 0 && _frameController.CurrentFrame < frames.Count)
+                {
+                    frames[_frameController.CurrentFrame].IsDirty = true;
+                    frames[_frameController.CurrentFrame].CachedBitmap = null;
+                }
+
+                _frameController.MarkDirty();
+                return;
+            }
+
             if (CurrentStroke == null) return;
 
             float spacing = _isShake ? 5 : 1f;
@@ -57,7 +80,7 @@ namespace ShakyDoodle.Utils
             }
 
             var lastPoint = CurrentStroke.Points.Last();
-            double dist = _mathHelper.Distance(position, lastPoint);
+            double dist = MathExtras.Instance.Distance(position, lastPoint);
 
             if (dist == 0) return;
 
@@ -81,6 +104,7 @@ namespace ShakyDoodle.Utils
 
         public void PointerReleased()
         {
+            _isClicking = false;
             _frameController.SaveCurrentFrame();
             CurrentStroke = null;
         }

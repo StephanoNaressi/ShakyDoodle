@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using ShakyDoodle.Models;
 using ShakyDoodle.Rendering;
+using ShakyDoodle.Utils;
 
 namespace ShakyDoodle.Controllers
 {
@@ -34,6 +35,12 @@ namespace ShakyDoodle.Controllers
             CurrentFrame = startingFrame;
         }
 
+        public void EraseStrokes(List<Stroke> strokes, Point eraserCenter, double eraserRadius)
+        {
+            strokes.RemoveAll(stroke =>
+                stroke.Points.Any(p => MathExtras.Instance.Distance(p, eraserCenter) <= eraserRadius)
+            );
+        }
         public List<Stroke> GetStrokes()
         {
             if (CurrentFrame < 0 || CurrentFrame >= _frames.Count) return new List<Stroke>();

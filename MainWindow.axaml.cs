@@ -77,6 +77,10 @@ namespace ShakyDoodle
             doodleCanvas.SelectSize(SizeType.Small);
             logoCanvas.SelectSize(SizeType.Small);
         }
+        private void OnErase(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.OnErase();
+        }
         private void OnSizeMedium(object? sender, RoutedEventArgs events) {
             doodleCanvas.SelectSize(SizeType.Medium);
             logoCanvas.SelectSize(SizeType.Medium);

@@ -3,8 +3,14 @@ using Avalonia;
 
 namespace ShakyDoodle.Utils
 {
-    public class MathExtras
+    public sealed class MathExtras
     {
+        private MathExtras() { }
+
+        private static readonly MathExtras _instance = new MathExtras();
+
+        public static MathExtras Instance => _instance;
+
         public double Distance(Point p1, Point p2)
         {
             double dx = p2.X - p1.X;
