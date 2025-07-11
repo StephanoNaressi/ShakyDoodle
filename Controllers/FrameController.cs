@@ -110,8 +110,21 @@ namespace ShakyDoodle.Controllers
 
         public void AddEmptyFrame()
         {
-            _frames.Add(new Frame { Layers = new List<Layer> { new Layer { Name = "Layer 1", IsVisible = true, Strokes = new List<Stroke>() } } });
+            var layers = new List<Layer>();
+            for (int i = 0; i < 5; i++)
+            {
+                layers.Add(new Layer
+                {
+                    Name = $"Layer {i + 1}",
+                    IsVisible = true,
+                    Strokes = new List<Stroke>()
+                });
+            }
+            _frames.Add(new Frame { Layers = layers });
+            ActiveLayerIndex = 4;
+            OnLayerChanged?.Invoke(ActiveLayerIndex + 1, layers.Count);
         }
+
         public void SetCurrentLayer(int index)
         {
             if (index < 0 || index > 9) return;
@@ -197,12 +210,12 @@ namespace ShakyDoodle.Controllers
 
             if (next >= TotalFrames)
                 AddEmptyFrame();
-            SetCurrentLayer(0);
+            SetCurrentLayer(4);
             LoadFrame(next, visual);
         }
         public void PreviousFrame(Visual visual)
         {
-            SetCurrentLayer(0);
+            SetCurrentLayer(4);
             SaveCurrentFrame();
             if (CurrentFrame > 0) LoadFrame(CurrentFrame - 1, visual);
         }
