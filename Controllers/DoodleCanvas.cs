@@ -20,6 +20,7 @@ namespace ShakyDoodle.Controllers
 
         private bool _lightbox = false;
         private bool _isLogo;
+        private bool _isNoise = true;
         public bool IsLogo
         {
             get => _isLogo;
@@ -81,7 +82,7 @@ namespace ShakyDoodle.Controllers
             _strokeRenderer.StartRenderLoopAsync(() => FrameController.GetStrokes(), () => _shakeController.GetSpeed());
         }
 
-        public override void Render(DrawingContext context) => _strokeRenderer.Render(context, _lightbox, FrameController.CurrentFrame, FrameController.GetAllVisibleStrokes(), FrameController.GetAllFrames(), Bounds);
+        public override void Render(DrawingContext context) => _strokeRenderer.Render(context, _lightbox, FrameController.CurrentFrame, FrameController.GetAllVisibleStrokes(), FrameController.GetAllFrames(), Bounds, _isNoise);
 
         public void ClearCanvas()
         {
@@ -118,7 +119,7 @@ namespace ShakyDoodle.Controllers
         public void HandleUndo() => _shortcutHelper.Undo();
 
         public void HandleRedo() => _shortcutHelper.Redo();
-
+        public void ToggleNoise() => _isNoise = _isNoise ? false : true;
         public void DuplicateFrame() => FrameController.DuplicateFrame(this);
 
         public void ExportFramesAsPng(string folderPath, int width, int height) => _exportHelper.ExportFramesAsPng(folderPath, width, height);

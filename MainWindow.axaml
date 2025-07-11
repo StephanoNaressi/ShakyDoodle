@@ -78,13 +78,15 @@
 					<Button Content="💡" Click="ToggleLightbox" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 					<Button Content="🗑" Click="OnDeleteFrame" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 				</UniformGrid>
-
 				<UniformGrid Columns="1" Margin="5" HorizontalAlignment="Center">
+					<Button Content="Noise" Click="OnToggleNoise" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+				</UniformGrid>
+				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
 					<TextBlock Text="Frames: 1/1" x:Name="FrameIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
 					<TextBlock Text="Layers: 1/1" x:Name="LayerIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
+					<TextBlock Name="FpsCounter" FontWeight="Bold" Foreground="DarkRed" Margin="5" VerticalAlignment="Bottom"/>
 				</UniformGrid>
 
-				<TextBlock Name="FpsCounter" FontWeight="Bold" Foreground="DarkRed" Margin="5" VerticalAlignment="Bottom"/>
 			</StackPanel>
 
 		</Border>

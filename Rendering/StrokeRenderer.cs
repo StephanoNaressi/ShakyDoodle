@@ -27,14 +27,14 @@ namespace ShakyDoodle.Rendering
         private RenderTargetBitmap? _nextFrameCache;
         private int _nextFrameCacheIndex = -1;
         private Size _canvasSize = new Size(0, 0);
-
+        private RenderTargetBitmap? _noiseTexture;
 
         public StrokeRenderer(Rect bounds, AvaloniaExtras helper, InputHandler inputHandler)
         {
             _helper = helper;
             _inputHandler = inputHandler;
         }
-        public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds)
+        public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds, bool noise)
         {
             var newSize = new Size(
                 Math.Max(_canvasSize.Width, bounds.Width),
@@ -104,9 +104,32 @@ namespace ShakyDoodle.Rendering
                     DrawStroke(activeStroke, shakeIntensity, context);
                 }
             }
+            if(noise) DrawNoise(context, bounds);
         }
 
+        private void DrawNoise(DrawingContext context, Rect bounds)
+        {
+            if (_noiseTexture == null ||
+                _noiseTexture.PixelSize.Width < (int)bounds.Width ||
+                _noiseTexture.PixelSize.Height < (int)bounds.Height)
+            {
+                _noiseTexture = ColorTools.Instance.GenerateNoiseTexture((int)_canvasSize.Width, (int)_canvasSize.Height, 30);
+            }
 
+            var options = new RenderOptions()
+            {
+                BitmapBlendingMode = BitmapBlendingMode.Multiply
+            };
+
+            using (context.PushRenderOptions(options))
+            {
+                context.DrawImage(
+                    _noiseTexture,
+                    new Rect(0, 0, _noiseTexture.Size.Width, _noiseTexture.Size.Height),
+                    new Rect(bounds.X, bounds.Y, bounds.Width, bounds.Height)
+                );
+            }
+        }
         public void DrawGrid(DrawingContext context, Rect bounds)
         {
             for (int i = 0; i <= bounds.Width; i += _gridSize)

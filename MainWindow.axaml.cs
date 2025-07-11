@@ -114,6 +114,10 @@ namespace ShakyDoodle
         {
             doodleCanvas.OnErase();
         }
+        private void OnToggleNoise(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ToggleNoise();
+        }
         private void OnSizeMedium(object? sender, RoutedEventArgs events) {
             doodleCanvas.SelectSize(SizeType.Medium);
             logoCanvas.SelectSize(SizeType.Medium);
