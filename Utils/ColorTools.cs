@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Avalonia.Media;
 
 namespace ShakyDoodle.Utils
 {
     public class ColorTools
     {
+        public static ColorTools Instance { get; } = new ColorTools();
         public Color GetAvaloniaColor(ColorType colorType, double alpha = 1.0)
         {
             byte a = (byte)(alpha * 255);
@@ -34,6 +31,14 @@ namespace ShakyDoodle.Utils
             };
 
             return Color.FromArgb(a, baseColor.R, baseColor.G, baseColor.B);
+        }
+
+        public bool AreColorsSimilar(Color a, Color b, int tolerance = 25)
+        {
+            return Math.Abs(a.R - b.R) < tolerance &&
+                   Math.Abs(a.G - b.G) < tolerance &&
+                   Math.Abs(a.B - b.B) < tolerance &&
+                   Math.Abs(a.A - b.A) < tolerance;
         }
     }
 }

@@ -8,6 +8,7 @@ using Avalonia.Media;
 using System.Diagnostics;
 using System.Timers;
 using Avalonia.Threading;
+using Avalonia;
 namespace ShakyDoodle
 {
     public partial class MainWindow : Window
@@ -60,6 +61,30 @@ namespace ShakyDoodle
             {
                 doodleCanvas.HandleRedo();
                 e.Handled = true;
+            }
+        }
+        private void PopulateRecentColorSwatches()
+        {
+            RecentColorsPanel.Children.Clear();
+            foreach (var color in doodleCanvas.InputHandler.RecentColors)
+            {
+                var swatchColor = color;
+                var swatch = new Button
+                {
+                    Width = 24,
+                    Height = 24,
+                    Background = new SolidColorBrush(swatchColor),
+                    Margin = new Thickness(2),
+                    BorderBrush = new SolidColorBrush(Colors.Black),
+                    BorderThickness = new Thickness(1),
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                };
+                swatch.Click += (s, e) =>
+                {
+                    doodleCanvas.ChangeColor(swatchColor);
+                    colorPicker.Color = swatchColor;
+                };
+                RecentColorsPanel.Children.Add(swatch);
             }
         }
 
@@ -172,6 +197,7 @@ namespace ShakyDoodle
         {
             var newColor = events.NewColor;
             doodleCanvas.ChangeColor(newColor);
+            PopulateRecentColorSwatches();
         }
         private void OnChangeBlack(object? sender, RoutedEventArgs events)
         {

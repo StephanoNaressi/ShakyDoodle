@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Media;
@@ -22,10 +23,13 @@ namespace ShakyDoodle.Utils
         private SizeType _currentSize;
         private PenLineCap _currentCap;
         private bool _isShake;
-
+        private readonly List<Color> _recentColors = new();
+        public List<Color> RecentColors => _recentColors;
         private bool _isClicking = false;
         public void Initialize(FrameController frameController, ShortcutHelper shortcutHelper)
         {
+            for (int i = 0; i < 4; i++)
+                _recentColors.Add(Colors.White);
             _frameController = frameController;
             _shortcutHelper = shortcutHelper;
         }
@@ -114,7 +118,19 @@ namespace ShakyDoodle.Utils
             _isShake = shake;
         }
         public void ChangeAlpha(double val) => _alpha = val;
-        public void ChangeColor(Color col) => _currentColor = col;
+        public void ChangeColor(Color col)
+        {
+            _currentColor = col;
+            var isSimilar = ColorTools.Instance.AreColorsSimilar(_recentColors[0], col);
+            if (_recentColors.Count == 0 || !isSimilar)
+            {
+                _recentColors.Remove(col);
+                _recentColors.Insert(0, col);
+                if (_recentColors.Count > 3)
+                    _recentColors.RemoveAt(_recentColors.Count - 1);
+            }
+        }
+
         public void ChangeSize(SizeType size) => _currentSize = size;
         public void ChangeCap(PenLineCap cap) => _currentCap = cap;
     }

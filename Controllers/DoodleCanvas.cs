@@ -15,7 +15,7 @@ namespace ShakyDoodle.Controllers
         private AvaloniaExtras _helper;
         private ShortcutHelper _shortcutHelper;
         private Export _exportHelper;
-        private InputHandler _inputHandler;
+        public InputHandler InputHandler;
         public FrameController FrameController;
 
         private bool _lightbox = false;
@@ -43,35 +43,35 @@ namespace ShakyDoodle.Controllers
 
         public DoodleCanvas()
         {
-            _inputHandler = new InputHandler();
+            InputHandler = new InputHandler();
             _helper = new(this);
-            _strokeRenderer = new(Bounds, _helper, _inputHandler);
+            _strokeRenderer = new(Bounds, _helper, InputHandler);
             FrameController = new(Bounds, _strokeRenderer);
             _shortcutHelper = new(FrameController);
             _exportHelper = new(Bounds, FrameController, _strokeRenderer);
 
-            _inputHandler.Initialize(FrameController, _shortcutHelper);
+            InputHandler.Initialize(FrameController, _shortcutHelper);
 
             FrameController.AddEmptyFrame();
             Focusable = true;
             PointerPressed += (s, e) =>
             {
                 var point = e.GetPosition(this);
-                _inputHandler.PointerPressed(point, e.GetCurrentPoint(this).Properties.Pressure);
+                InputHandler.PointerPressed(point, e.GetCurrentPoint(this).Properties.Pressure);
                 InvalidateVisual();
             };
             PointerMoved += (s, e) =>
             {
                 var point = e.GetPosition(this);
-                _inputHandler.PointerMoved(point, e.GetCurrentPoint(this).Properties.Pressure);
+                InputHandler.PointerMoved(point, e.GetCurrentPoint(this).Properties.Pressure);
                 InvalidateVisual();
             };
             PointerReleased += (s, e) =>
             {
-                _inputHandler.PointerReleased();
+                InputHandler.PointerReleased();
                 InvalidateVisual();
             };
-            _inputHandler.UpdateSettings(new Color(255, 0, 0, 0), SizeType.Small, 1,PenLineCap.Round, false);
+            InputHandler.UpdateSettings(new Color(255, 0, 0, 0), SizeType.Small, 1,PenLineCap.Round, false);
             Cursor = new Cursor(StandardCursorType.Cross);
         }
 
@@ -90,14 +90,14 @@ namespace ShakyDoodle.Controllers
             _helper.RequestInvalidateThrottled();
         }
 
-        public void ChangeColor(Color color) => _inputHandler.ChangeColor(color);
-        public void SelectSize(SizeType size) => _inputHandler.ChangeSize(size);
-        public void ChangeAlpha(double val) => _inputHandler.ChangeAlpha(val);
-        public void ChangeBrushTip(PenLineCap cap) => _inputHandler.ChangeCap(cap);
+        public void ChangeColor(Color color) => InputHandler.ChangeColor(color);
+        public void SelectSize(SizeType size) => InputHandler.ChangeSize(size);
+        public void ChangeAlpha(double val) => InputHandler.ChangeAlpha(val);
+        public void ChangeBrushTip(PenLineCap cap) => InputHandler.ChangeCap(cap);
         public void ShouldShake(bool shake)
         {
-            _inputHandler.IsErasing = false;
-            _inputHandler.ChangeShake(shake);
+            InputHandler.IsErasing = false;
+            InputHandler.ChangeShake(shake);
             _helper.RequestInvalidateThrottled();
         }
 
@@ -124,6 +124,6 @@ namespace ShakyDoodle.Controllers
         public void ExportFramesAsPng(string folderPath, int width, int height) => _exportHelper.ExportFramesAsPng(folderPath, width, height);
         public void NextLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex + 1);
         public void PrevLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex - 1);
-        public void OnErase() => _inputHandler.IsErasing = _inputHandler.IsErasing ? false : true;
+        public void OnErase() => InputHandler.IsErasing = InputHandler.IsErasing ? false : true;
     }
 }
