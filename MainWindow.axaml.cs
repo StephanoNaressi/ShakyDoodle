@@ -106,7 +106,8 @@ namespace ShakyDoodle
             UpdateFrameLabel();
             UpdateLayerLabel();
         }
-        private void OnSizeSmall(object? sender, RoutedEventArgs events) {
+        private void OnSizeSmall(object? sender, RoutedEventArgs events)
+        {
             doodleCanvas.SelectSize(SizeType.Small);
             logoCanvas.SelectSize(SizeType.Small);
         }
@@ -118,11 +119,13 @@ namespace ShakyDoodle
         {
             doodleCanvas.ToggleNoise();
         }
-        private void OnSizeMedium(object? sender, RoutedEventArgs events) {
+        private void OnSizeMedium(object? sender, RoutedEventArgs events)
+        {
             doodleCanvas.SelectSize(SizeType.Medium);
             logoCanvas.SelectSize(SizeType.Medium);
         }
-        private void OnSizeLarge(object? sender, RoutedEventArgs events) {
+        private void OnSizeLarge(object? sender, RoutedEventArgs events)
+        {
             doodleCanvas.SelectSize(SizeType.Large);
             logoCanvas.SelectSize(SizeType.Large);
         }
@@ -243,14 +246,26 @@ namespace ShakyDoodle
         {
             doodleCanvas.ToggleLightbox();
         }
+        private void ToggleGrid(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ToggleBackground(BGType.Grid);
+        }
+        private void ToggleLines(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ToggleBackground(BGType.Lines);
 
+        }
+        private void ToggleBlank(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ToggleBackground(BGType.Blank);
+        }
         private void OnSaveFile(object? sender, RoutedEventArgs e)
         {
             string baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-            string folderName = "ShakyDoodle"; 
+            string folderName = "ShakyDoodle";
             string folderPath = Path.Combine(baseFolder, folderName);
 
-            Directory.CreateDirectory(folderPath); 
+            Directory.CreateDirectory(folderPath);
 
             int width = (int)doodleCanvas.Bounds.Width;
             int height = (int)doodleCanvas.Bounds.Height;

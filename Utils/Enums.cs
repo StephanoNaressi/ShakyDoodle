@@ -1,21 +1,8 @@
-﻿public enum ColorType
+﻿public enum BGType
 {
-    First,
-    Second,
-    Third,
-    Fourth,
-    Fifth,
-    Sixth,
-    Seventh,
-    Eighth,
-    Nineth,
-    Tenth,
-    Eleventh,
-    Twelveth,
-    Thirteenth,
-    Fourteenth,
-    Fifteenth,
-    Sixteenth
+    Lines,
+    Grid,
+    Blank
 }
 public enum SizeType
 {

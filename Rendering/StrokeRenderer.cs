@@ -34,7 +34,7 @@ namespace ShakyDoodle.Rendering
             _helper = helper;
             _inputHandler = inputHandler;
         }
-        public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds, bool noise)
+        public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds, bool noise, BGType bg)
         {
             var newSize = new Size(
                 Math.Max(_canvasSize.Width, bounds.Width),
@@ -57,7 +57,7 @@ namespace ShakyDoodle.Rendering
             }
             using var clip = context.PushClip(new Rect(bounds.Size));
             context.FillRectangle(Brushes.White, new Rect(bounds.Size));
-            DrawGrid(context, bounds);
+            DrawGrid(context, bounds, bg);
 
             if (!IsValidFrame(currentFrame, frames))
                 return;
@@ -130,16 +130,30 @@ namespace ShakyDoodle.Rendering
                 );
             }
         }
-        public void DrawGrid(DrawingContext context, Rect bounds)
+        public void DrawGrid(DrawingContext context, Rect bounds, BGType bg)
         {
-            for (int i = 0; i <= bounds.Width; i += _gridSize)
+            switch (bg)
             {
-                context.DrawLine(_gridPen, new Point(i, 0), new Point(i, bounds.Height));
+                case BGType.Lines:
+                    for (int j = 0; j <= bounds.Height; j += _gridSize)
+                    {
+                        context.DrawLine(_gridPen, new Point(0, j), new Point(bounds.Width, j));
+                    }
+                    break;
+                case BGType.Grid:
+                    for (int i = 0; i <= bounds.Width; i += _gridSize)
+                    {
+                        context.DrawLine(_gridPen, new Point(i, 0), new Point(i, bounds.Height));
+                    }
+                    for (int j = 0; j <= bounds.Height; j += _gridSize)
+                    {
+                        context.DrawLine(_gridPen, new Point(0, j), new Point(bounds.Width, j));
+                    }
+                    break;
+                case BGType.Blank:
+                    break;
             }
-            for (int j = 0; j <= bounds.Height; j += _gridSize)
-            {
-                context.DrawLine(_gridPen, new Point(0, j), new Point(bounds.Width, j));
-            }
+
         }
         private void DrawStroke(Stroke stroke, double shakeIntensity, DrawingContext context)
         {

@@ -21,6 +21,8 @@ namespace ShakyDoodle.Controllers
         private bool _lightbox = false;
         private bool _isLogo;
         private bool _isNoise = true;
+
+        private BGType _currentBG = BGType.Grid;
         public bool IsLogo
         {
             get => _isLogo;
@@ -82,7 +84,7 @@ namespace ShakyDoodle.Controllers
             _strokeRenderer.StartRenderLoopAsync(() => FrameController.GetStrokes(), () => _shakeController.GetSpeed());
         }
 
-        public override void Render(DrawingContext context) => _strokeRenderer.Render(context, _lightbox, FrameController.CurrentFrame, FrameController.GetAllVisibleStrokes(), FrameController.GetAllFrames(), Bounds, _isNoise);
+        public override void Render(DrawingContext context) => _strokeRenderer.Render(context, _lightbox, FrameController.CurrentFrame, FrameController.GetAllVisibleStrokes(), FrameController.GetAllFrames(), Bounds, _isNoise, _currentBG);
 
         public void ClearCanvas()
         {
@@ -122,7 +124,7 @@ namespace ShakyDoodle.Controllers
         public void ToggleNoise() => _isNoise = _isNoise ? false : true;
         public void DuplicateFrame() => FrameController.DuplicateFrame(this);
 
-        public void ExportFramesAsPng(string folderPath, int width, int height) => _exportHelper.ExportFramesAsPng(folderPath, width, height);
+        public void ExportFramesAsPng(string folderPath, int width, int height) => _exportHelper.ExportFramesAsPng(folderPath, width, height, _currentBG);
         public void NextLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex + 1);
         public void PrevLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex - 1);
         public void OnErase() => InputHandler.IsErasing = InputHandler.IsErasing ? false : true;
@@ -131,5 +133,8 @@ namespace ShakyDoodle.Controllers
             FrameController.DeleteCurrentFrame();
             _helper.RequestInvalidateThrottled();
         }
+           
+        public void ToggleBackground(BGType bg) => _currentBG = bg;
+
     }
 }
