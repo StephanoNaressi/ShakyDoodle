@@ -38,6 +38,12 @@ namespace ShakyDoodle
                 LayerIndicator.Text = $"Layers: {current}/{total}";
             };
             colorPicker.Color = Avalonia.Media.Colors.Black;
+            for (int i = 0; i < 4; i++)
+            {
+                doodleCanvas.NextLayer();
+                UpdateFrameLabel();
+                UpdateLayerLabel();
+            }
         }
         private void FpsTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {

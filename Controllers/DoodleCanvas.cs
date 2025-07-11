@@ -20,7 +20,6 @@ namespace ShakyDoodle.Controllers
 
         private bool _lightbox = false;
         private bool _isLogo;
-        private bool _isEraser = false;
         public bool IsLogo
         {
             get => _isLogo;
@@ -73,6 +72,7 @@ namespace ShakyDoodle.Controllers
             };
             InputHandler.UpdateSettings(new Color(255, 0, 0, 0), SizeType.Small, 1,PenLineCap.Round, false);
             Cursor = new Cursor(StandardCursorType.Cross);
+
         }
 
         protected override void OnInitialized()
