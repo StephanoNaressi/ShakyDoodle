@@ -106,6 +106,12 @@ namespace ShakyDoodle
             UpdateFrameLabel();
             UpdateLayerLabel();
         }
+        private void OnDeleteLayer(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.OnDeleteLayer();
+            UpdateFrameLabel();
+            UpdateLayerLabel();
+        }
         private void OnSizeSmall(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.SelectSize(SizeType.Small);

@@ -128,6 +128,12 @@ namespace ShakyDoodle.Controllers
         public void NextLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex + 1);
         public void PrevLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex - 1);
         public void OnErase() => InputHandler.IsErasing = InputHandler.IsErasing ? false : true;
+        public void OnDeleteLayer()
+        {
+            FrameController.DeleteCurrentLayer();
+            _helper.RequestInvalidateThrottled();
+        }
+
         public void DeleteCurrentFrame()
         {
             FrameController.DeleteCurrentFrame();

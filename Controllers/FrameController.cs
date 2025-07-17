@@ -82,6 +82,23 @@ namespace ShakyDoodle.Controllers
             OnFrameChanged?.Invoke(CurrentFrame + 1, _frames.Count);
             IsDirty = true;
         }
+        public void DeleteCurrentLayer()
+        {
+            if (CurrentFrame < 0) return;
+
+            var layers = _frames[CurrentFrame].Layers;
+
+            if (ActiveLayerIndex < 0 || ActiveLayerIndex >= layers.Count) return;
+            if (layers.Count <= 1) return;
+
+            layers.RemoveAt(ActiveLayerIndex);
+
+            if (ActiveLayerIndex >= layers.Count)
+                ActiveLayerIndex = layers.Count - 1;
+
+            _frames[CurrentFrame].IsDirty = true;
+            OnLayerChanged?.Invoke(ActiveLayerIndex + 1, layers.Count);
+        }
 
         public void LoadFrame(int index, Visual visual)
         {
