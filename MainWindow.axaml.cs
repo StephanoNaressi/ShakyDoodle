@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Timers;
 using Avalonia.Threading;
 using Avalonia;
+using Avalonia.Layout;
 namespace ShakyDoodle
 {
     public partial class MainWindow : Window
@@ -69,27 +70,47 @@ namespace ShakyDoodle
         private void PopulateRecentColorSwatches()
         {
             RecentColorsPanel.Children.Clear();
+
+            const int colorsPerRow = 6;
+            int index = 0;
+            StackPanel currentRow = null;
+
             foreach (var color in doodleCanvas.InputHandler.RecentColors)
             {
-                var swatchColor = color;
+                if (index % colorsPerRow == 0)
+                {
+                    currentRow = new StackPanel
+                    {
+                        Orientation = Orientation.Horizontal,
+                        Margin = new Thickness(0, 2, 0, 2),
+                        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left
+                    };
+                    RecentColorsPanel.Children.Add(currentRow);
+                }
+
+                var swatchColor = color; // needed to avoid closure issue
                 var swatch = new Button
                 {
-                    Width = 24,
-                    Height = 24,
+                    Width = 16,
+                    Height = 16,
                     Background = new SolidColorBrush(swatchColor),
                     Margin = new Thickness(2),
                     BorderBrush = new SolidColorBrush(Colors.Black),
                     BorderThickness = new Thickness(1),
-                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 };
+
                 swatch.Click += (s, e) =>
                 {
                     doodleCanvas.ChangeColor(swatchColor);
                     colorPicker.Color = swatchColor;
                 };
-                RecentColorsPanel.Children.Add(swatch);
+
+                currentRow.Children.Add(swatch);
+                index++;
             }
         }
+
+
 
         private void UpdateFrameLabel() => FrameIndicator.Text = $"Frames: {doodleCanvas.FrameController.CurrentFrame + 1}/{doodleCanvas.FrameController.TotalFrames}";
         private void UpdateLayerLabel() => LayerIndicator.Text = $"Layers: {doodleCanvas.FrameController.ActiveLayerIndex + 1}/{doodleCanvas.FrameController.TotalLayers}";

@@ -59,7 +59,8 @@
 					<Button Background="Red" Click="OnChangeRed" Margin="2" BorderBrush="Black" BorderThickness="1" Width="24" Height="24"/>
 					<Button Background="Green" Click="OnChangeGreen" Margin="2" BorderBrush="Black" BorderThickness="1" Width="24" Height="24"/>
 				</UniformGrid>
-				<StackPanel Orientation="Horizontal" x:Name="RecentColorsPanel" Margin="8" HorizontalAlignment="Center"/>
+				<StackPanel x:Name="RecentColorsPanel" Orientation="Vertical" Margin="8" HorizontalAlignment="Center"/>
+
 
 				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
 					<Button Content="🠈" Click="OnPrevFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />

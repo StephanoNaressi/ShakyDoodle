@@ -28,7 +28,7 @@ namespace ShakyDoodle.Utils
         private bool _isClicking = false;
         public void Initialize(FrameController frameController, ShortcutHelper shortcutHelper)
         {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 24; i++)
                 _recentColors.Add(Colors.White);
             _frameController = frameController;
             _shortcutHelper = shortcutHelper;
@@ -126,7 +126,7 @@ namespace ShakyDoodle.Utils
             {
                 _recentColors.Remove(col);
                 _recentColors.Insert(0, col);
-                if (_recentColors.Count > 3)
+                if (_recentColors.Count > 24)
                     _recentColors.RemoveAt(_recentColors.Count - 1);
             }
         }
