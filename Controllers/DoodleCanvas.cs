@@ -18,6 +18,7 @@ namespace ShakyDoodle.Controllers
         public InputHandler InputHandler;
         public FrameController FrameController;
 
+
         private bool _lightbox = false;
         private bool _isLogo;
         private bool _isNoise = true;
@@ -60,19 +61,20 @@ namespace ShakyDoodle.Controllers
             {
                 var point = e.GetPosition(this);
                 InputHandler.PointerPressed(point, e.GetCurrentPoint(this).Properties.Pressure);
-                InvalidateVisual();
+                _helper.RequestInvalidateThrottled();
             };
             PointerMoved += (s, e) =>
             {
                 var point = e.GetPosition(this);
                 InputHandler.PointerMoved(point, e.GetCurrentPoint(this).Properties.Pressure);
-                InvalidateVisual();
+                _helper.RequestInvalidateThrottled();
             };
             PointerReleased += (s, e) =>
             {
                 InputHandler.PointerReleased();
-                InvalidateVisual();
+                _helper.RequestInvalidateThrottled();
             };
+            FrameController.OnInvalidateRequested += () => _helper.RequestInvalidateThrottled();
             InputHandler.UpdateSettings(new Color(255, 0, 0, 0), SizeType.Small, 1,PenLineCap.Round, false);
             Cursor = new Cursor(StandardCursorType.Cross);
 
@@ -141,6 +143,11 @@ namespace ShakyDoodle.Controllers
         }
            
         public void ToggleBackground(BGType bg) => _currentBG = bg;
-
+        public void OnUpdateOpacity(double val)
+        {
+            FrameController.UpdateLayerOpacity(val);
+            FrameController.MarkDirty();
+        }
+        public double CurrentLayerOpacity() => FrameController.GetCurrentLayer()?.Opacity ?? 1.0;
     }
 }

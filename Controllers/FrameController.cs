@@ -26,6 +26,7 @@ namespace ShakyDoodle.Controllers
         }
         public Action<int, int>? OnFrameChanged;
         public Action<int, int>? OnLayerChanged;
+        public Action? OnInvalidateRequested;
         public RenderTargetBitmap? CachedBitmap;
         public bool IsDirty = true;
         private bool _isPlaying = false;
@@ -79,9 +80,21 @@ namespace ShakyDoodle.Controllers
             if (_frames.Count <= 1) return;
             _frames.RemoveAt(CurrentFrame);
             if (CurrentFrame >= _frames.Count) CurrentFrame = _frames.Count - 1;
+            MarkDirty();
             OnFrameChanged?.Invoke(CurrentFrame + 1, _frames.Count);
             IsDirty = true;
         }
+        public void UpdateLayerOpacity(double val)
+        {
+            if (CurrentFrame < 0 || ActiveLayerIndex < 0) return;
+            var layer = _frames[CurrentFrame].Layers[ActiveLayerIndex];
+            layer.Opacity = val;
+            _frames[CurrentFrame].IsDirty = true;
+            _frames[CurrentFrame].CachedBitmap = null;
+
+            OnInvalidateRequested?.Invoke();
+        }
+
         public void DeleteCurrentLayer()
         {
             if (CurrentFrame < 0) return;
@@ -97,6 +110,7 @@ namespace ShakyDoodle.Controllers
                 ActiveLayerIndex = layers.Count - 1;
 
             _frames[CurrentFrame].IsDirty = true;
+            MarkDirty();
             OnLayerChanged?.Invoke(ActiveLayerIndex + 1, layers.Count);
         }
 
@@ -164,6 +178,7 @@ namespace ShakyDoodle.Controllers
                 Strokes = new List<Stroke>()
             });
             _frames[CurrentFrame].IsDirty = true;
+            MarkDirty();
         }
 
         public void ClearAll()
@@ -261,5 +276,18 @@ namespace ShakyDoodle.Controllers
                 _frames[CurrentFrame].IsDirty = true;
             }
         }
+        public Layer? GetCurrentLayer()
+        {
+            if (CurrentFrame < 0 || CurrentFrame >= _frames.Count)
+                return null;
+
+            var layers = _frames[CurrentFrame].Layers;
+
+            if (_activeLayerIndex < 0 || _activeLayerIndex >= layers.Count)
+                return null; 
+
+            return layers[_activeLayerIndex];
+        }
+
     }
 }

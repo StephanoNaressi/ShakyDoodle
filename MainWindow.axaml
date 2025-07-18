@@ -6,8 +6,8 @@
 		xmlns:ui="clr-namespace:ShakyDoodle.UIVisuals"
 		xmlns:avalonia="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls"
 
-        Width="850" Height="850"
-        mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="850"
+        Width="1000" Height="1000"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="1000"
         x:Class="ShakyDoodle.MainWindow"
         Title="ShakyDoodle" Background="PeachPuff">
 	<Grid>
@@ -60,6 +60,8 @@
 					<Button Background="Green" Click="OnChangeGreen" Margin="2" BorderBrush="Black" BorderThickness="1" Width="24" Height="24"/>
 				</UniformGrid>
 				<StackPanel x:Name="RecentColorsPanel" Orientation="Vertical" Margin="8" HorizontalAlignment="Center"/>
+				<TextBlock Text="Layer Alpha" HorizontalAlignment="Center"/>
+				<Slider x:Name="layerOpacitySlider" Minimum="0" Maximum="100" Value="100" Width="100" ValueChanged="UpdateLayerOpacity" />
 
 
 				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">

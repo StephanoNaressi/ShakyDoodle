@@ -19,7 +19,6 @@ namespace ShakyDoodle.Rendering
         private AvaloniaExtras _helper;
         private int _gridSize = 50;
         private Pen _gridPen = new(Brushes.LightBlue, 1);
-        int _maxStrokes = 150;
 
         private RenderTargetBitmap? _prevFrameCache;
         private int _prevFrameCacheIndex = -1;
@@ -70,31 +69,47 @@ namespace ShakyDoodle.Rendering
                 DrawFrameCache(context, frames, currentFrame + 1, Brushes.Pink, ref _nextFrameCache, ref _nextFrameCacheIndex, bounds);
             }
 
-            if (frame.CachedBitmap == null || frame.IsDirty)
+            if (frame.IsDirty || frame.CachedBitmap == null)
             {
-                var strokesToRasterize = frame.Layers.Where(l => l.IsVisible).SelectMany(l => l.Strokes).Where(s => !s.Shake).ToList();
-                frame.CachedBitmap = RasterizeStrokes(strokesToRasterize, _canvasSize);
+                frame.CachedBitmap = null; 
                 frame.IsDirty = false;
             }
 
-            if (frame.CachedBitmap != null)
+            using (context.PushTransform(Matrix.CreateTranslation(bounds.X, bounds.Y)))
             {
-                context.DrawImage(
-                    frame.CachedBitmap,
-                    new Rect(0, 0, frame.CachedBitmap.Size.Width, frame.CachedBitmap.Size.Height),
-                    new Rect(bounds.X, bounds.Y, frame.CachedBitmap.Size.Width, frame.CachedBitmap.Size.Height)
-                );
+                foreach (var layer in frame.Layers.Where(l => l.IsVisible))
+                {
+                    if (layer.IsDirty || layer.CachedBitmap == null)
+                    {
+                        layer.CachedBitmap = RasterizeStrokes(layer.Strokes.Where(s => !s.Shake).ToList(), _canvasSize);
+                        layer.IsDirty = false;
+                    }
+
+                    if (layer.CachedBitmap != null)
+                    {
+                        using (context.PushOpacity(layer.Opacity))
+                        {
+                            context.DrawImage(
+                                layer.CachedBitmap,
+                                new Rect(0, 0, layer.CachedBitmap.Size.Width, layer.CachedBitmap.Size.Height),
+                                new Rect(0, 0, layer.CachedBitmap.Size.Width, layer.CachedBitmap.Size.Height));
+                        }
+                    }
+
+                }
             }
+
             var activeStroke = _inputHandler.CurrentStroke;
             using (context.PushTransform(Matrix.CreateTranslation(bounds.X, bounds.Y)))
             {
                 foreach (var layer in frame.Layers.Where(l => l.IsVisible))
                 {
+                    double layerOpacity = layer.Opacity;
                     foreach (var stroke in layer.Strokes.Where(s => s.Shake))
                     {
                         if (stroke == activeStroke) continue;
                         double shakeIntensity = _shakeController.GetShakeIntensity(0, new() { stroke }, 1);
-                        DrawStroke(stroke, shakeIntensity, context);
+                        DrawStroke(stroke, shakeIntensity, context, layerOpacity);
                     }
                 }
 
@@ -155,7 +170,7 @@ namespace ShakyDoodle.Rendering
             }
 
         }
-        private void DrawStroke(Stroke stroke, double shakeIntensity, DrawingContext context)
+        private void DrawStroke(Stroke stroke, double shakeIntensity, DrawingContext context, double layerOpacity = 1.0)
         {
             if (stroke.Shake)
             {
@@ -169,7 +184,8 @@ namespace ShakyDoodle.Rendering
             }
             else
             {
-                var strokeBrush = _brushHelper.GetSolidBrush(stroke.Color, stroke.Alpha);
+                var strokeAlpha = stroke.Alpha * layerOpacity;
+                var strokeBrush = _brushHelper.GetSolidBrush(stroke.Color, strokeAlpha);
 
                 for (int i = 1; i < stroke.Points.Count; i++)
                 {
@@ -262,8 +278,11 @@ namespace ShakyDoodle.Rendering
                     new Rect(bounds.X, bounds.Y, cache.Size.Width, cache.Size.Height));
             }
         }
-        private RenderTargetBitmap RasterizeStrokes(List<Stroke> strokes, Size size)
+        private RenderTargetBitmap RasterizeStrokes(List<Stroke> strokes, Size size, double layerOpacity = 1.0)
         {
+            if (strokes.Count == 0)
+                return null;
+
             var pixelSize = new PixelSize((int)size.Width, (int)size.Height);
             var target = new RenderTargetBitmap(pixelSize);
 
@@ -271,11 +290,12 @@ namespace ShakyDoodle.Rendering
             {
                 foreach (var stroke in strokes)
                 {
-                    DrawStroke(stroke, 0, ctx);
+                    DrawStroke(stroke, 0, ctx, layerOpacity);
                 }
             }
             return target;
         }
+
         public void ClearCaches()
         {
             _prevFrameCache = null;

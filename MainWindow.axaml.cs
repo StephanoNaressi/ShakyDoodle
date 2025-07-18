@@ -41,6 +41,10 @@ namespace ShakyDoodle
             colorPicker.Color = Avalonia.Media.Colors.Black;
             UpdateLayerLabel();
             UpdateFrameLabel();
+            this.SizeChanged += (s, e) =>
+            {
+                doodleCanvas.InvalidateVisual();
+            };
         }
 
         private void FpsTimer_Elapsed(object? sender, ElapsedEventArgs e)
@@ -133,6 +137,11 @@ namespace ShakyDoodle
             UpdateFrameLabel();
             UpdateLayerLabel();
         }
+        private void UpdateLayerOpacity(object? sender, RoutedEventArgs events)
+        {
+            double newOpacity = layerOpacitySlider.Value / 100.0;
+            doodleCanvas.OnUpdateOpacity(newOpacity);
+        }
         private void OnSizeSmall(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.SelectSize(SizeType.Small);
@@ -219,7 +228,7 @@ namespace ShakyDoodle
             doodleCanvas.NextLayer();
             UpdateFrameLabel();
             UpdateLayerLabel();
-
+            layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
         }
 
         private void OnPrevLayer(object? sender, RoutedEventArgs events)
@@ -227,7 +236,7 @@ namespace ShakyDoodle
             doodleCanvas.PrevLayer();
             UpdateFrameLabel();
             UpdateLayerLabel();
-
+            layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
         }
         private void OnTogglePlay(object? sender, RoutedEventArgs events)
         {

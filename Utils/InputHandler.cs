@@ -48,6 +48,8 @@ namespace ShakyDoodle.Utils
             var strokes = _frameController.GetStrokes();
             CurrentStroke = new Stroke(_currentColor, position, _currentSize, _alpha, _currentCap, pressure, _isShake);
             strokes.Add(CurrentStroke);
+            var layer = _frameController.GetCurrentLayer();
+            if (layer != null) layer.IsDirty = true;
             _shortcutHelper.PushUndoState(strokes.Select(s => s.Clone()).ToList());
 
         }
@@ -65,6 +67,8 @@ namespace ShakyDoodle.Utils
                 if (_frameController.CurrentFrame >= 0 && _frameController.CurrentFrame < frames.Count)
                 {
                     frames[_frameController.CurrentFrame].IsDirty = true;
+                    var layer = _frameController.GetCurrentLayer();
+                    if (layer != null) layer.IsDirty = true;
                     frames[_frameController.CurrentFrame].CachedBitmap = null;
                 }
 
@@ -110,6 +114,8 @@ namespace ShakyDoodle.Utils
         {
             _isClicking = false;
             _frameController.SaveCurrentFrame();
+            var layer = _frameController.GetCurrentLayer();
+            if (layer != null) layer.IsDirty = true;
             CurrentStroke = null;
         }
 
