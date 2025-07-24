@@ -11,7 +11,7 @@ namespace ShakyDoodle.Views.Controls
         private Point _origin;
         private Point _start;
         private Control? _child;
-        private double _zoom = 1.0;
+        private double _zoom = 0.5;
         private DoodleCanvas? DoodleChild => this.Child as DoodleCanvas;
 
         public ZoomBorder()
@@ -23,7 +23,7 @@ namespace ShakyDoodle.Views.Controls
             this.KeyDown += OnKeyDown;
             this.KeyUp += OnKeyUp;
             this.Focusable = true;
-            
+
             this.AttachedToVisualTree += (s, e) =>
             {
                 _child = this.Child;
@@ -33,12 +33,13 @@ namespace ShakyDoodle.Views.Controls
                     {
                         Children = new Transforms
                         {
-                            new ScaleTransform(),
+                            new ScaleTransform { ScaleX = _zoom, ScaleY = _zoom },
                             new TranslateTransform()
                         }
                     };
                 }
             };
+
         }
 
         private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -62,7 +63,7 @@ namespace ShakyDoodle.Views.Controls
         private void OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
         {
             if (_child == null) return;
-            
+
             var point = e.GetPosition(_child);
             var scale = e.Delta.Y > 0 ? 1.2 : 0.8;
             _zoom *= scale;
@@ -70,12 +71,12 @@ namespace ShakyDoodle.Views.Controls
             var transformGroup = _child.RenderTransform as TransformGroup;
             var scaleTransform = transformGroup?.Children[0] as ScaleTransform;
             var translateTransform = transformGroup?.Children[1] as TranslateTransform;
-            
+
             if (scaleTransform != null && translateTransform != null)
             {
                 scaleTransform.ScaleX *= scale;
                 scaleTransform.ScaleY *= scale;
-                
+
                 translateTransform.X = point.X - (point.X * scale);
                 translateTransform.Y = point.Y - (point.Y * scale);
             }

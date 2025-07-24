@@ -113,8 +113,8 @@
 			<views:ZoomBorder ClipToBounds="True" Background="LightGray">
 				<controllers:DoodleCanvas
 					Name="doodleCanvas"
-					Width="800"
-					Height="1000"
+					Width="1600"
+					Height="2000"
 					HorizontalAlignment="Center"
 					VerticalAlignment="Center"/>
 			</views:ZoomBorder>
