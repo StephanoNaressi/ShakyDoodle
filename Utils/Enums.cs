@@ -4,9 +4,9 @@
     Grid,
     Blank
 }
-public enum SizeType
-{
+public enum SizeType { 
     Small,
     Medium,
-    Large
+    Large,
+    ExtraLarge
 }

@@ -175,6 +175,11 @@ namespace ShakyDoodle
             doodleCanvas.SelectSize(SizeType.Large);
             logoCanvas.SelectSize(SizeType.Large);
         }
+        private void OnSizeXLarge(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.SelectSize(SizeType.ExtraLarge);
+            logoCanvas.SelectSize(SizeType.ExtraLarge);
+        }
         private void OnAlphaChanged(object? sender, RangeBaseValueChangedEventArgs events)
         {
             doodleCanvas.ChangeAlpha((double)events.NewValue);

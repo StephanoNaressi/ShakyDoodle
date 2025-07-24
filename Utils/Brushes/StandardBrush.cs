@@ -41,9 +41,10 @@ namespace ShakyDoodle.Utils.Brushes
         {
             return stroke.Size switch
             {
-                SizeType.Small => 2,
-                SizeType.Medium => 8,
-                SizeType.Large => 20,
+                SizeType.Small => 5,
+                SizeType.Medium => 25,
+                SizeType.Large => 60,
+                SizeType.ExtraLarge => 150,  
                 _ => 5
             };
         }

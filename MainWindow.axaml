@@ -45,11 +45,12 @@
 				</UniformGrid>
 
 				<UniformGrid Columns="2" Rows="1" Margin="5" HorizontalAlignment="Center">
-					<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
+					<UniformGrid Columns="4" Margin="5" HorizontalAlignment="Center">
 						<!-- Sizes -->
 						<Button Width="10" Height="10" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeSmall" BorderBrush="Black" BorderThickness="1" />
 						<Button Width="15" Height="15" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeMedium" BorderBrush="Black" BorderThickness="1" />
 						<Button Width="20" Height="20" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeLarge" BorderBrush="Black" BorderThickness="1" />
+						<Button Width="25" Height="25" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeXLarge" BorderBrush="Black" BorderThickness="1" />
 					</UniformGrid>
 					<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
 						<!-- Shapes -->
