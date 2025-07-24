@@ -123,5 +123,25 @@ namespace ShakyDoodle.Views.Controls
                 }
             }
         }
+        public void Recenter()
+        {
+            _zoom = 0.5;
+            if (_child?.RenderTransform is TransformGroup group)
+            {
+                if (group.Children[0] is ScaleTransform scale)
+                {
+                    scale.ScaleX = _zoom;
+                    scale.ScaleY = _zoom;
+                }
+                if (group.Children[1] is TranslateTransform translate)
+                {
+                    translate.X = 0;
+                    translate.Y = 0;
+                }
+                _child.InvalidateVisual();
+            }
+        }
+
+
     }
 }

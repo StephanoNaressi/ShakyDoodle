@@ -8,8 +8,8 @@
 		xmlns:views="clr-namespace:ShakyDoodle.Views.Controls"
 		xmlns:controllers="clr-namespace:ShakyDoodle.Controllers"
 
-        Width="1000" Height="1000"
-        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="1000"
+        Width="1200" Height="1000"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1000"
         x:Class="ShakyDoodle.MainWindow"
         Title="ShakyDoodle" Background="PeachPuff">
 	<Grid>
@@ -87,8 +87,9 @@
 					<Button Content="💥" Click="OnClearClick" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 					<Button Content="💡" Click="ToggleLightbox" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 				</UniformGrid>
-				<UniformGrid Columns="2" Margin="5" HorizontalAlignment="Center">
+				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
 					<Button Content="Delete Frame" Click="OnDeleteFrame" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+					<Button Content="Re-Center" Click="OnRecenterClicked" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 					<Button Content="Delete Layer" Click="OnDeleteLayer" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 				</UniformGrid>
 				<UniformGrid Columns="4" Margin="5" HorizontalAlignment="Center">
@@ -110,7 +111,7 @@
 		<!-- Canvas Area takes remaining space -->
 		<Border Grid.Column="2" BorderBrush="Chocolate"  BorderThickness="3,0,0,0">
 
-			<views:ZoomBorder ClipToBounds="True" Background="LightGray">
+			<views:ZoomBorder x:Name="zoomBorder" ClipToBounds="True" Background="LightGray">
 				<controllers:DoodleCanvas
 					Name="doodleCanvas"
 					Width="1600"

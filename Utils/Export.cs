@@ -57,16 +57,27 @@ namespace ShakyDoodle.Utils
 
                         foreach (var layer in frames[i].Layers.Where(l => l.IsVisible))
                         {
-                            foreach (var stroke in layer.Strokes)
+                            // First, render non-shaking strokes to a bitmap
+                            var nonShakingStrokes = layer.Strokes.Where(s => !s.Shake).ToList();
+                            if (nonShakingStrokes.Count > 0)
                             {
-                                if (stroke.Shake)
+                                var layerBitmap = _strokeRenderer.RasterizeStrokes(nonShakingStrokes, new Size(width, height));
+                                if (layerBitmap != null)
                                 {
-                                    _strokeRenderer.DrawStroke(stroke, 1.0, context, layer.Opacity);
+                                    using (context.PushOpacity(layer.Opacity))
+                                    {
+                                        context.DrawImage(
+                                            layerBitmap,
+                                            new Rect(0, 0, width, height),
+                                            new Rect(0, 0, width, height));
+                                    }
                                 }
-                                else
-                                {
-                                    _strokeRenderer.DrawStroke(stroke, 0, context, layer.Opacity);
-                                }
+                            }
+                            
+                            foreach (var stroke in layer.Strokes.Where(s => s.Shake))
+                            {
+                                double shakeIntensity = isForGif ? 1.0 : 0;
+                                _strokeRenderer.DrawStroke(stroke, shakeIntensity, context, layer.Opacity);
                             }
                         }
                     }

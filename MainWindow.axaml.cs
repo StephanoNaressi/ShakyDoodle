@@ -10,6 +10,7 @@ using System.Timers;
 using Avalonia.Threading;
 using Avalonia;
 using Avalonia.Layout;
+using ShakyDoodle.Views.Controls;
 namespace ShakyDoodle
 {
     public partial class MainWindow : Window
@@ -19,7 +20,6 @@ namespace ShakyDoodle
         public MainWindow()
         {
             InitializeComponent();
-
             var frameSimTimer = new Timer(16); // ~60Hz
             frameSimTimer.Elapsed += (s, e) => _frameCount++;
             frameSimTimer.Start();
@@ -141,6 +141,12 @@ namespace ShakyDoodle
             UpdateFrameLabel();
             UpdateLayerLabel();
         }
+        private void OnRecenterClicked(object? sender, RoutedEventArgs events)
+        {
+            var zoomBorder = this.FindControl<ZoomBorder>("zoomBorder");
+            zoomBorder?.Recenter();
+        }
+
         private void UpdateLayerOpacity(object? sender, RoutedEventArgs events)
         {
             double newOpacity = layerOpacitySlider.Value / 100.0;
@@ -317,7 +323,7 @@ namespace ShakyDoodle
             string baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             string folderName = "ShakyDoodle";
             string folderPath = Path.Combine(baseFolder, folderName);
-            
+
             Directory.CreateDirectory(folderPath);
 
             // Add a filename to the path
