@@ -15,6 +15,16 @@
 		<ApplicationIcon>Assets\icon.ico</ApplicationIcon>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Assets\Pen.png" />
+	  <None Remove="Assets\shakyPen.png" />
+	  <None Remove="Assets\vEraser.png" />
+	</ItemGroup>
+	<ItemGroup>
+	  <AvaloniaResource Include="Assets\Pen.png" />
+	  <AvaloniaResource Include="Assets\shakyPen.png" />
+	  <AvaloniaResource Include="Assets\vEraser.png" />
+	</ItemGroup>
+	<ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.2" />
     <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.2" />
     <PackageReference Include="Avalonia.Controls.Skia" Version="11.3.0" />
