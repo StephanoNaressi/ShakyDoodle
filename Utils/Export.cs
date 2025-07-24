@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using ShakyDoodle.Rendering;
-using ShakyDoodle.Models;
 using ShakyDoodle.Controllers;
 using System.Linq;
+using Size = Avalonia.Size;
 
 namespace ShakyDoodle.Utils
 {
@@ -23,7 +22,6 @@ namespace ShakyDoodle.Utils
             _frameController = frameController;
             _strokeRenderer = strokeRenderer;
             _bounds = bounds;
-
         }
 
         public void ExportFramesAsPng(string folderPath, int width, int height, BGType bg)
@@ -31,10 +29,10 @@ namespace ShakyDoodle.Utils
             var pixelSize = new PixelSize(width, height);
             string sessionId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var frames = _frameController.GetAllFrames();
+            var size = new Size(width, height);
 
             for (int i = 0; i < frames.Count; i++)
             {
-                var frame = frames[i];
                 using var renderTarget = new RenderTargetBitmap(pixelSize);
                 using (var context = renderTarget.CreateDrawingContext(true))
                 {
@@ -43,23 +41,37 @@ namespace ShakyDoodle.Utils
 
                     // Draw grid
                     _strokeRenderer.DrawGrid(context, new Rect(0, 0, width, height), bg);
-                    //Add layer handling
-                    foreach (var layer in frame.Layers.Where(l => l.IsVisible))
+
+                    foreach (var layer in frames[i].Layers.Where(l => l.IsVisible))
                     {
-                        foreach (var stroke in layer.Strokes)
+                        var nonShakingStrokes = layer.Strokes.Where(s => !s.Shake).ToList();
+                        if (nonShakingStrokes.Any())
+                        {
+                            using var layerBitmap = _strokeRenderer.RasterizeStrokes(nonShakingStrokes, size, layer.Opacity);
+                            if (layerBitmap != null)
+                            {
+                                using (context.PushOpacity(layer.Opacity))
+                                {
+                                    context.DrawImage(
+                                        layerBitmap,
+                                        new Rect(0, 0, layerBitmap.Size.Width, layerBitmap.Size.Height),
+                                        new Rect(0, 0, layerBitmap.Size.Width, layerBitmap.Size.Height));
+                                }
+                            }
+                        }
+
+                        // Then draw shaking strokes directly with layer opacity
+                        foreach (var stroke in layer.Strokes.Where(s => s.Shake))
                         {
                             var shakeIntensity = stroke.Shake ? 1 : 0;
-                            var brush = new SolidColorBrush(stroke.Color);
-                            _strokeRenderer.DrawStrokeWithColorOverride(stroke, shakeIntensity, brush, context);
+                            _strokeRenderer.DrawStroke(stroke, shakeIntensity, context, layer.Opacity);
                         }
                     }
                 }
 
-                // Save image
                 string fileName = $"frame_{sessionId}_{i:D3}.png";
                 string filePath = Path.Combine(folderPath, fileName);
-                using var fileStream = File.OpenWrite(filePath);
-                renderTarget.Save(fileStream);
+                renderTarget.Save(filePath);
             }
         }
     }

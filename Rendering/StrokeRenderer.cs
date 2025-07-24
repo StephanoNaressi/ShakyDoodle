@@ -170,7 +170,7 @@ namespace ShakyDoodle.Rendering
             }
 
         }
-        private void DrawStroke(Stroke stroke, double shakeIntensity, DrawingContext context, double layerOpacity = 1.0)
+        public void DrawStroke(Stroke stroke, double shakeIntensity, DrawingContext context, double layerOpacity = 1.0)
         {
             if (stroke.Shake)
             {
@@ -278,7 +278,7 @@ namespace ShakyDoodle.Rendering
                     new Rect(bounds.X, bounds.Y, cache.Size.Width, cache.Size.Height));
             }
         }
-        private RenderTargetBitmap RasterizeStrokes(List<Stroke> strokes, Size size, double layerOpacity = 1.0)
+        public RenderTargetBitmap RasterizeStrokes(List<Stroke> strokes, Size size, double layerOpacity = 1.0)
         {
             if (strokes.Count == 0)
                 return null;
