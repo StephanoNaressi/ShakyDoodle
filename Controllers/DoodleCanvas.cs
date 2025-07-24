@@ -135,6 +135,7 @@ namespace ShakyDoodle.Controllers
         public void DuplicateFrame() => FrameController.DuplicateFrame(this);
 
         public void ExportFramesAsPng(string folderPath, int width, int height) => _exportHelper.ExportFramesAsPng(folderPath, width, height, _currentBG);
+        public void ExportFramesAsGif(string folderPath, int width, int height) => _exportHelper.ExportAsGif(folderPath, width, height, _currentBG);
         public void NextLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex + 1);
         public void PrevLayer() => FrameController.SetCurrentLayer(FrameController.ActiveLayerIndex - 1);
         public void OnErase() => InputHandler.IsErasing = InputHandler.IsErasing ? false : true;

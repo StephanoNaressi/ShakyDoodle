@@ -7,6 +7,9 @@ using ShakyDoodle.Rendering;
 using ShakyDoodle.Controllers;
 using System.Linq;
 using Size = Avalonia.Size;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace ShakyDoodle.Utils
 {
@@ -72,6 +75,48 @@ namespace ShakyDoodle.Utils
                 string fileName = $"frame_{sessionId}_{i:D3}.png";
                 string filePath = Path.Combine(folderPath, fileName);
                 renderTarget.Save(filePath);
+            }
+        }
+
+        public void ExportAsGif(string filePath, int width, int height, BGType bg, int frameDelay = 150)
+        {
+            var pixelSize = new PixelSize(width, height);
+            var frames = _frameController.GetAllFrames();
+            var size = new Size(width, height);
+
+            // Create a temporary folder for our frame PNGs
+            var tempDir = Path.Combine(Path.GetTempPath(), "ShakyDoodle_" + DateTime.Now.ToString("yyyyMMdd_HHmmss"));
+            Directory.CreateDirectory(tempDir);
+
+            try
+            {
+                ExportFramesAsPng(tempDir, width, height, bg);
+
+                var frameFiles = Directory.GetFiles(tempDir, "*.png").OrderBy(f => f).ToList();
+                
+                using var gif = Image.Load<Rgba32>(frameFiles[0]);
+                
+                gif.Metadata.GetGifMetadata().RepeatCount = 0; // Loop forever
+                gif.Frames[0].Metadata.GetGifMetadata().FrameDelay = frameDelay / 10;
+
+                foreach (var frameFile in frameFiles.Skip(1))
+                {
+                    using var frameImage = Image.Load<Rgba32>(frameFile);
+                    frameImage.Frames[0].Metadata.GetGifMetadata().FrameDelay = frameDelay / 10;
+                    gif.Frames.AddFrame(frameImage.Frames[0]);
+                }
+
+                gif.SaveAsGif(filePath, new GifEncoder 
+                { 
+                    ColorTableMode = GifColorTableMode.Local
+                });
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                {
+                    Directory.Delete(tempDir, true);
+                }
             }
         }
     }

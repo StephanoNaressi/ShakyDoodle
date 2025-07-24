@@ -312,6 +312,22 @@ namespace ShakyDoodle
 
             doodleCanvas.ExportFramesAsPng(folderPath, width, height);
         }
+        private void OnSaveGif(object? sender, RoutedEventArgs e)
+        {
+            string baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            string folderName = "ShakyDoodle";
+            string folderPath = Path.Combine(baseFolder, folderName);
+            
+            Directory.CreateDirectory(folderPath);
 
+            // Add a filename to the path
+            string fileName = $"animation_{DateTime.Now:yyyyMMdd_HHmmss}.gif";
+            string filePath = Path.Combine(folderPath, fileName);
+
+            int width = (int)doodleCanvas.Bounds.Width;
+            int height = (int)doodleCanvas.Bounds.Height;
+
+            doodleCanvas.ExportFramesAsGif(filePath, width, height);
+        }
     }
 }
