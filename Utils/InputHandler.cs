@@ -46,11 +46,11 @@ namespace ShakyDoodle.Utils
         {
             _isClicking = true;
             var strokes = _frameController.GetStrokes();
+            _shortcutHelper.PushUndoState(strokes.Select(s => s.Clone()).ToList());
             CurrentStroke = new Stroke(_currentColor, position, _currentSize, _alpha, _currentCap, pressure, _isShake);
             strokes.Add(CurrentStroke);
             var layer = _frameController.GetCurrentLayer();
             if (layer != null) layer.IsDirty = true;
-            _shortcutHelper.PushUndoState(strokes.Select(s => s.Clone()).ToList());
 
         }
 

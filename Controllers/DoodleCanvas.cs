@@ -120,9 +120,17 @@ namespace ShakyDoodle.Controllers
             _helper.RequestInvalidateThrottled();
         }
 
-        public void HandleUndo() => _shortcutHelper.Undo();
+        public void HandleUndo()
+        {
+            _shortcutHelper.Undo();
+            _helper.RequestInvalidateThrottled();
+        }
 
-        public void HandleRedo() => _shortcutHelper.Redo();
+        public void HandleRedo()
+        {
+            _shortcutHelper.Redo();
+            _helper.RequestInvalidateThrottled();
+        }
         public void ToggleNoise() => _isNoise = _isNoise ? false : true;
         public void DuplicateFrame() => FrameController.DuplicateFrame(this);
 

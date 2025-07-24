@@ -56,7 +56,7 @@ namespace ShakyDoodle.Controllers
 
             var layers = _frames[CurrentFrame].Layers;
             if (_activeLayerIndex < 0 || _activeLayerIndex >= layers.Count) return;
-
+            layers[_activeLayerIndex].IsDirty = true;
             layers[_activeLayerIndex].Strokes = strokes.Select(s => s.Clone()).ToList();
             _frames[CurrentFrame].IsDirty = true;
         }
@@ -199,8 +199,6 @@ namespace ShakyDoodle.Controllers
                 frame.IsDirty = true;
             }
         }
-
-
         public List<Frame> GetAllFrames() => _frames;
         public List<Stroke> GetAllVisibleStrokes()
         {
@@ -212,8 +210,6 @@ namespace ShakyDoodle.Controllers
                    .SelectMany(l => l.Strokes)
                    .ToList();
         }
-
-
         public void DuplicateFrame(Control canvas)
         {
             int cur = CurrentFrame;
@@ -274,6 +270,8 @@ namespace ShakyDoodle.Controllers
             if (CurrentFrame >= 0 && CurrentFrame < _frames.Count)
             {
                 _frames[CurrentFrame].IsDirty = true;
+                CachedBitmap = null;
+                OnInvalidateRequested?.Invoke();
             }
         }
         public Layer? GetCurrentLayer()
