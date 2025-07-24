@@ -136,6 +136,11 @@ namespace ShakyDoodle.Utils
                     _recentColors.RemoveAt(_recentColors.Count - 1);
             }
         }
+        public void CancelStroke()
+        {
+            _isClicking = false;
+            CurrentStroke = null;
+        }
 
         public void ChangeSize(SizeType size) => _currentSize = size;
         public void ChangeCap(PenLineCap cap) => _currentCap = cap;

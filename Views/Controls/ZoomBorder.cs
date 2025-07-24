@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using ShakyDoodle.Controllers;
 
 namespace ShakyDoodle.Views.Controls
 {
@@ -9,11 +10,10 @@ namespace ShakyDoodle.Views.Controls
     {
         private Point _origin;
         private Point _start;
-        private bool _isPanning;
         private Control? _child;
         private double _zoom = 1.0;
-        private bool _isSpacePressed;
-        
+        private DoodleCanvas? DoodleChild => this.Child as DoodleCanvas;
+
         public ZoomBorder()
         {
             this.PointerWheelChanged += OnPointerWheelChanged;
@@ -43,20 +43,19 @@ namespace ShakyDoodle.Views.Controls
 
         private void OnKeyDown(object? sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space)
+            if (e.Key == Key.Space && DoodleChild != null)
             {
-                _isSpacePressed = true;
-                this.Cursor = new Cursor(StandardCursorType.Hand);
+                DoodleChild.IsSpacePressed = true;
             }
         }
 
         private void OnKeyUp(object? sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space)
+            if (e.Key == Key.Space && DoodleChild != null)
             {
-                _isSpacePressed = false;
-                _isPanning = false;
-                this.Cursor = Cursor.Default;
+                DoodleChild.IsSpacePressed = false;
+                DoodleChild.IsPanning = false;
+                DoodleChild.InputHandler.CancelStroke();
             }
         }
 
@@ -84,33 +83,36 @@ namespace ShakyDoodle.Views.Controls
 
         private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
-            if (_isSpacePressed || e.GetCurrentPoint(this).Properties.IsMiddleButtonPressed)
+            if ((DoodleChild?.IsSpacePressed ?? false) || e.GetCurrentPoint(this).Properties.IsMiddleButtonPressed)
             {
-                _isPanning = true;
+                if (DoodleChild != null)
+                    DoodleChild.IsPanning = true;
                 _start = e.GetPosition(this);
                 _origin = new Point(
                     (_child?.RenderTransform as TransformGroup)?.Children[1] is TranslateTransform t ? t.X : 0,
                     (_child?.RenderTransform as TransformGroup)?.Children[1] is TranslateTransform t2 ? t2.Y : 0);
-                this.Cursor = new Cursor(StandardCursorType.Hand);
             }
         }
 
         private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
-            if (!_isSpacePressed)
+            if (!(DoodleChild?.IsSpacePressed ?? false))
             {
-                _isPanning = false;
-                this.Cursor = Cursor.Default;
+                if (DoodleChild != null)
+                {
+                    DoodleChild.IsPanning = false;
+                    DoodleChild.InputHandler.CancelStroke();
+                }
             }
         }
 
         private void OnPointerMoved(object? sender, PointerEventArgs e)
         {
-            if (!_isPanning) return;
-            
+            if (!(DoodleChild?.IsPanning ?? false)) return;
+
             var position = e.GetPosition(this);
             var delta = position - _start;
-            
+
             if (_child?.RenderTransform is TransformGroup transformGroup)
             {
                 if (transformGroup.Children[1] is TranslateTransform translateTransform)

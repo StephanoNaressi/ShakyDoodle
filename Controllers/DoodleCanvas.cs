@@ -27,6 +27,8 @@ namespace ShakyDoodle.Controllers
             get => GetValue(CanvasHeightProperty);
             set => SetValue(CanvasHeightProperty, value);
         }
+        public bool IsPanning { get; set; }
+        public bool IsSpacePressed { get; set; }
 
         private ShakeController _shakeController = new();
         private LogoPreloader _logoPreloader = new();
@@ -78,6 +80,7 @@ namespace ShakyDoodle.Controllers
             Focusable = true;
             PointerPressed += (s, e) =>
             {
+                if (IsPanning) return;
                 var point = e.GetPosition(this);
                 InputHandler.PointerPressed(point, e.GetCurrentPoint(this).Properties.Pressure);
                 _helper.RequestInvalidateThrottled();
@@ -85,12 +88,14 @@ namespace ShakyDoodle.Controllers
 
             PointerMoved += (s, e) =>
             {
+                if (IsPanning) return;
                 var point = e.GetPosition(this);
                 InputHandler.PointerMoved(point, e.GetCurrentPoint(this).Properties.Pressure);
                 _helper.RequestInvalidateThrottled();
             };
             PointerReleased += (s, e) =>
             {
+                if (IsPanning) return;
                 InputHandler.PointerReleased();
                 _helper.RequestInvalidateThrottled();
             };
