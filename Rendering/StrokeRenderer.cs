@@ -8,6 +8,7 @@ using System.Linq;
 using System;
 using ShakyDoodle.Controllers;
 using Avalonia.Media.Imaging;
+using ShakyDoodle.Utils.Brushes;
 
 namespace ShakyDoodle.Rendering
 {
@@ -18,7 +19,7 @@ namespace ShakyDoodle.Rendering
         private BrushHelper _brushHelper = new();
         private AvaloniaExtras _helper;
         private int _gridSize = 50;
-        private Pen _gridPen = new(Brushes.LightBlue, 1);
+        private Pen _gridPen = new(new SolidColorBrush(Colors.LightBlue), 1);
 
         private RenderTargetBitmap? _prevFrameCache;
         private int _prevFrameCacheIndex = -1;
@@ -28,10 +29,14 @@ namespace ShakyDoodle.Rendering
         private Size _canvasSize = new Size(0, 0);
         private RenderTargetBitmap? _noiseTexture;
 
+        private StandardBrush _standardBrush = new();
+        private ShakingBrush _shakingBrush;
+
         public StrokeRenderer(Rect bounds, AvaloniaExtras helper, InputHandler inputHandler)
         {
             _helper = helper;
             _inputHandler = inputHandler;
+            _shakingBrush = new ShakingBrush(_shakeController); 
         }
         public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds, bool noise, BGType bg)
         {
@@ -174,50 +179,15 @@ namespace ShakyDoodle.Rendering
         {
             if (stroke.Shake)
             {
-                for (int i = 1; i < stroke.Points.Count; i++)
-                {
-                    var pen = _brushHelper.SetupMainPen(stroke, i, shakeIntensity);
-                    var p1 = _shakeController.GetShakenPoint(stroke.Points[i - 1], shakeIntensity);
-                    var p2 = _shakeController.GetShakenPoint(stroke.Points[i], shakeIntensity);
-                    context.DrawLine(pen, p1, p2);
-                }
+                _shakingBrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
             }
             else
             {
-                var strokeAlpha = stroke.Alpha * layerOpacity;
-                var strokeBrush = _brushHelper.GetSolidBrush(stroke.Color, strokeAlpha);
-
-                for (int i = 1; i < stroke.Points.Count; i++)
-                {
-                    var pt = stroke.Points[i - 1];
-                    float pressure = i < stroke.Pressures.Count ? stroke.Pressures[i] : 1f;
-
-                    double size = _brushHelper.GetStrokeSize(stroke) * pressure;
-
-                    switch (stroke.PenLineCap)
-                    {
-                        case PenLineCap.Round:
-                            context.DrawEllipse(strokeBrush, null, pt, size / 2, size / 2);
-                            break;
-
-                        case PenLineCap.Square:
-                            context.DrawRectangle(strokeBrush, null,
-                            new Rect(pt.X - size / 2, pt.Y - size / 2, size, size));
-                            break;
-                        case PenLineCap.Flat:
-                            context.DrawRectangle(strokeBrush, null,
-                                new Rect(pt.X - size / 2, pt.Y - size / 2, size / 2, size));
-                            break;
-
-                        default:
-                            context.DrawEllipse(strokeBrush, null, pt, size / 2, size / 2);
-                            break;
-                    }
-                }
+                _standardBrush.DrawStroke(stroke, context, layerOpacity);
             }
         }
 
-        public void DrawStrokeWithColorOverride(Stroke stroke, double shakeIntensity, IBrush overrideColor, DrawingContext context)
+        public void DrawStrokeWithColorOverride(Stroke stroke, double shakeIntensity, Avalonia.Media.IBrush overrideColor, DrawingContext context)
         {
             if (!stroke.Shake) shakeIntensity = 0;
 
@@ -241,7 +211,7 @@ namespace ShakyDoodle.Rendering
                 await Task.Delay(16);
             }
         }
-        private RenderTargetBitmap RenderFrameToBitmap(Frame frame, IBrush overrideColor, Size size)
+        private RenderTargetBitmap RenderFrameToBitmap(Frame frame, Avalonia.Media.IBrush overrideColor, Size size)
         {
             var pixelSize = new PixelSize((int)size.Width, (int)size.Height);
             var renderTarget = new RenderTargetBitmap(pixelSize);
@@ -256,11 +226,10 @@ namespace ShakyDoodle.Rendering
                         DrawStrokeWithColorOverride(stroke, 0, overrideColor, ctx);
                     }
                 }
-
             }
             return renderTarget;
         }
-        private void DrawFrameCache(DrawingContext context, List<Frame> frames, int frameIndex, IBrush color, ref RenderTargetBitmap? cache, ref int cacheIndex, Rect bounds)
+        private void DrawFrameCache(DrawingContext context, List<Frame> frames, int frameIndex, Avalonia.Media.IBrush color, ref RenderTargetBitmap? cache, ref int cacheIndex, Rect bounds)
         {
             if (!IsValidFrame(frameIndex, frames))
                 return;
@@ -295,7 +264,10 @@ namespace ShakyDoodle.Rendering
             }
             return target;
         }
-
+        public void UpdateShakeTime(double time)
+        {
+            _shakeController.SetTime(time);
+        }
         public void ClearCaches()
         {
             _prevFrameCache = null;
@@ -305,4 +277,5 @@ namespace ShakyDoodle.Rendering
         }
         private bool IsValidFrame(int index, List<Frame> frames) => index >= 0 && index < frames.Count;
     }
+
 }

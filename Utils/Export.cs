@@ -27,54 +27,56 @@ namespace ShakyDoodle.Utils
             _bounds = bounds;
         }
 
-        public void ExportFramesAsPng(string folderPath, int width, int height, BGType bg)
+        public void ExportFramesAsPng(string folderPath, int width, int height, BGType bg, bool isForGif = false)
         {
             var pixelSize = new PixelSize(width, height);
             string sessionId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var frames = _frameController.GetAllFrames();
             var size = new Size(width, height);
 
+            int shakingFramesPerFrame = isForGif ? 12 : 1; 
+            double timeStep = Math.PI / 6; 
+
             for (int i = 0; i < frames.Count; i++)
             {
-                using var renderTarget = new RenderTargetBitmap(pixelSize);
-                using (var context = renderTarget.CreateDrawingContext(true))
+                for (int shakeFrame = 0; shakeFrame < (isForGif && frames.Count == 1 ? shakingFramesPerFrame : 1); shakeFrame++)
                 {
-                    // Fill background
-                    context.FillRectangle(Brushes.White, new Rect(0, 0, width, height));
-
-                    // Draw grid
-                    _strokeRenderer.DrawGrid(context, new Rect(0, 0, width, height), bg);
-
-                    foreach (var layer in frames[i].Layers.Where(l => l.IsVisible))
+                    using var renderTarget = new RenderTargetBitmap(pixelSize);
+                    using (var context = renderTarget.CreateDrawingContext(true))
                     {
-                        var nonShakingStrokes = layer.Strokes.Where(s => !s.Shake).ToList();
-                        if (nonShakingStrokes.Any())
+                        // Fill background
+                        context.FillRectangle(new SolidColorBrush(Colors.White), new Rect(0, 0, width, height));
+
+                        // Draw grid
+                        _strokeRenderer.DrawGrid(context, new Rect(0, 0, width, height), bg);
+
+                        if (isForGif)
                         {
-                            using var layerBitmap = _strokeRenderer.RasterizeStrokes(nonShakingStrokes, size, layer.Opacity);
-                            if (layerBitmap != null)
+                            _strokeRenderer.UpdateShakeTime(shakeFrame * timeStep);
+                        }
+
+                        foreach (var layer in frames[i].Layers.Where(l => l.IsVisible))
+                        {
+                            foreach (var stroke in layer.Strokes)
                             {
-                                using (context.PushOpacity(layer.Opacity))
+                                if (stroke.Shake)
                                 {
-                                    context.DrawImage(
-                                        layerBitmap,
-                                        new Rect(0, 0, layerBitmap.Size.Width, layerBitmap.Size.Height),
-                                        new Rect(0, 0, layerBitmap.Size.Width, layerBitmap.Size.Height));
+                                    _strokeRenderer.DrawStroke(stroke, 1.0, context, layer.Opacity);
+                                }
+                                else
+                                {
+                                    _strokeRenderer.DrawStroke(stroke, 0, context, layer.Opacity);
                                 }
                             }
                         }
-
-                        // Then draw shaking strokes directly with layer opacity
-                        foreach (var stroke in layer.Strokes.Where(s => s.Shake))
-                        {
-                            var shakeIntensity = stroke.Shake ? 1 : 0;
-                            _strokeRenderer.DrawStroke(stroke, shakeIntensity, context, layer.Opacity);
-                        }
                     }
-                }
 
-                string fileName = $"frame_{sessionId}_{i:D3}.png";
-                string filePath = Path.Combine(folderPath, fileName);
-                renderTarget.Save(filePath);
+                    string fileName = isForGif ? 
+                        $"frame_{sessionId}_{i:D3}_{shakeFrame:D3}.png" : 
+                        $"frame_{sessionId}_{i:D3}.png";
+                    string filePath = Path.Combine(folderPath, fileName);
+                    renderTarget.Save(filePath);
+                }
             }
         }
 
@@ -84,25 +86,25 @@ namespace ShakyDoodle.Utils
             var frames = _frameController.GetAllFrames();
             var size = new Size(width, height);
 
-            // Create a temporary folder for our frame PNGs
+            int adjustedFrameDelay = frames.Count == 1 ? 50 : frameDelay;
+
             var tempDir = Path.Combine(Path.GetTempPath(), "ShakyDoodle_" + DateTime.Now.ToString("yyyyMMdd_HHmmss"));
             Directory.CreateDirectory(tempDir);
 
             try
             {
-                ExportFramesAsPng(tempDir, width, height, bg);
+                ExportFramesAsPng(tempDir, width, height, bg, true);
 
                 var frameFiles = Directory.GetFiles(tempDir, "*.png").OrderBy(f => f).ToList();
                 
                 using var gif = Image.Load<Rgba32>(frameFiles[0]);
-                
-                gif.Metadata.GetGifMetadata().RepeatCount = 0; // Loop forever
-                gif.Frames[0].Metadata.GetGifMetadata().FrameDelay = frameDelay / 10;
+                gif.Metadata.GetGifMetadata().RepeatCount = 0;
+                gif.Frames[0].Metadata.GetGifMetadata().FrameDelay = adjustedFrameDelay / 10;
 
                 foreach (var frameFile in frameFiles.Skip(1))
                 {
                     using var frameImage = Image.Load<Rgba32>(frameFile);
-                    frameImage.Frames[0].Metadata.GetGifMetadata().FrameDelay = frameDelay / 10;
+                    frameImage.Frames[0].Metadata.GetGifMetadata().FrameDelay = adjustedFrameDelay / 10;
                     gif.Frames.AddFrame(frameImage.Frames[0]);
                 }
 

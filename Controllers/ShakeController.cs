@@ -8,6 +8,7 @@ namespace ShakyDoodle.Controllers
     public class ShakeController
     {
         private double _time;
+        private double _shakeTime;
         private float _amp = 2f;
         private float _speed = 0.3f;
 
@@ -38,5 +39,9 @@ namespace ShakyDoodle.Controllers
         public double GetShakeAmp() => _amp;
         public float GetSpeed() => _speed;
         public void UpdateTime(double val) => _time += val;
+        public void SetTime(double time)
+        {
+            _time = time;
+        }
     }
 }
