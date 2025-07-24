@@ -124,15 +124,19 @@ namespace ShakyDoodle
             doodleCanvas.ClearCanvas();
             UpdateFrameLabel();
             UpdateLayerLabel();
+            layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
         }
         private void OnDeleteFrame(object? sender, RoutedEventArgs events)
         {
+
+            layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
             doodleCanvas.DeleteCurrentFrame();
             UpdateFrameLabel();
             UpdateLayerLabel();
         }
         private void OnDeleteLayer(object? sender, RoutedEventArgs events)
         {
+            layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
             doodleCanvas.OnDeleteLayer();
             UpdateFrameLabel();
             UpdateLayerLabel();

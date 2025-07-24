@@ -86,14 +86,21 @@ namespace ShakyDoodle.Controllers
         }
         public void UpdateLayerOpacity(double val)
         {
-            if (CurrentFrame < 0 || ActiveLayerIndex < 0) return;
-            var layer = _frames[CurrentFrame].Layers[ActiveLayerIndex];
+            if (CurrentFrame < 0 || CurrentFrame >= _frames.Count)
+                return;
+
+            var layers = _frames[CurrentFrame].Layers;
+            if (ActiveLayerIndex < 0 || ActiveLayerIndex >= layers.Count)
+                return;
+
+            var layer = layers[ActiveLayerIndex];
             layer.Opacity = val;
             _frames[CurrentFrame].IsDirty = true;
             _frames[CurrentFrame].CachedBitmap = null;
 
             OnInvalidateRequested?.Invoke();
         }
+
 
         public void DeleteCurrentLayer()
         {
@@ -188,7 +195,7 @@ namespace ShakyDoodle.Controllers
             AddEmptyFrame();
 
             CurrentFrame = 0;
-            ActiveLayerIndex = 0;
+            ActiveLayerIndex = 4; 
 
             IsDirty = true;
             CachedBitmap = null;
