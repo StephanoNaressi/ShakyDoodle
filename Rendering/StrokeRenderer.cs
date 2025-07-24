@@ -14,54 +14,39 @@ namespace ShakyDoodle.Rendering
 {
     public class StrokeRenderer
     {
+        private readonly double _canvasWidth;
+        private readonly double _canvasHeight;
         private InputHandler _inputHandler;
         private ShakeController _shakeController = new();
         private BrushHelper _brushHelper = new();
         private AvaloniaExtras _helper;
         private int _gridSize = 50;
         private Pen _gridPen = new(new SolidColorBrush(Colors.LightBlue), 1);
+        private Size _canvasSize;
 
         private RenderTargetBitmap? _prevFrameCache;
         private int _prevFrameCacheIndex = -1;
-
         private RenderTargetBitmap? _nextFrameCache;
         private int _nextFrameCacheIndex = -1;
-        private Size _canvasSize = new Size(0, 0);
         private RenderTargetBitmap? _noiseTexture;
 
         private StandardBrush _standardBrush = new();
         private ShakingBrush _shakingBrush;
 
-        public StrokeRenderer(Rect bounds, AvaloniaExtras helper, InputHandler inputHandler)
+        public StrokeRenderer(Rect bounds, AvaloniaExtras helper, InputHandler inputHandler, double canvasWidth, double canvasHeight)
         {
             _helper = helper;
             _inputHandler = inputHandler;
-            _shakingBrush = new ShakingBrush(_shakeController); 
+            _shakingBrush = new ShakingBrush(_shakeController);
+            _canvasWidth = canvasWidth;
+            _canvasHeight = canvasHeight;
+            _canvasSize = new Size(canvasWidth, canvasHeight);
         }
         public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds, bool noise, BGType bg)
         {
-            var newSize = new Size(
-                Math.Max(_canvasSize.Width, bounds.Width),
-                Math.Max(_canvasSize.Height, bounds.Height)
-            );
-            if (_canvasSize != newSize)
-            {
-                _canvasSize = newSize;
-
-                if (IsValidFrame(currentFrame, frames))
-                {
-                    frames[currentFrame].CachedBitmap = null;
-                    frames[currentFrame].IsDirty = true;
-                }
-
-                _prevFrameCache = null;
-                _nextFrameCache = null;
-                _prevFrameCacheIndex = -1;
-                _nextFrameCacheIndex = -1;
-            }
             using var clip = context.PushClip(new Rect(bounds.Size));
             context.FillRectangle(Brushes.White, new Rect(bounds.Size));
-            DrawGrid(context, bounds, bg);
+            DrawGrid(context, new Rect(bounds.Size), bg);
 
             if (!IsValidFrame(currentFrame, frames))
                 return;
@@ -74,56 +59,44 @@ namespace ShakyDoodle.Rendering
                 DrawFrameCache(context, frames, currentFrame + 1, Brushes.Pink, ref _nextFrameCache, ref _nextFrameCacheIndex, bounds);
             }
 
-            if (frame.IsDirty || frame.CachedBitmap == null)
+            foreach (var layer in frame.Layers.Where(l => l.IsVisible))
             {
-                frame.CachedBitmap = null; 
-                frame.IsDirty = false;
-            }
-
-            using (context.PushTransform(Matrix.CreateTranslation(bounds.X, bounds.Y)))
-            {
-                foreach (var layer in frame.Layers.Where(l => l.IsVisible))
+                if (layer.IsDirty || layer.CachedBitmap == null)
                 {
-                    if (layer.IsDirty || layer.CachedBitmap == null)
-                    {
-                        layer.CachedBitmap = RasterizeStrokes(layer.Strokes.Where(s => !s.Shake).ToList(), _canvasSize);
-                        layer.IsDirty = false;
-                    }
+                    layer.CachedBitmap = RasterizeStrokes(layer.Strokes.Where(s => !s.Shake).ToList(), _canvasSize);
+                    layer.IsDirty = false;
+                }
 
-                    if (layer.CachedBitmap != null)
+                if (layer.CachedBitmap != null)
+                {
+                    using (context.PushOpacity(layer.Opacity))
                     {
-                        using (context.PushOpacity(layer.Opacity))
-                        {
-                            context.DrawImage(
-                                layer.CachedBitmap,
-                                new Rect(0, 0, layer.CachedBitmap.Size.Width, layer.CachedBitmap.Size.Height),
-                                new Rect(0, 0, layer.CachedBitmap.Size.Width, layer.CachedBitmap.Size.Height));
-                        }
+                        context.DrawImage(
+                            layer.CachedBitmap,
+                            new Rect(0, 0, _canvasWidth, _canvasHeight),
+                            new Rect(0, 0, _canvasWidth, _canvasHeight));
                     }
-
                 }
             }
 
             var activeStroke = _inputHandler.CurrentStroke;
-            using (context.PushTransform(Matrix.CreateTranslation(bounds.X, bounds.Y)))
+            foreach (var layer in frame.Layers.Where(l => l.IsVisible))
             {
-                foreach (var layer in frame.Layers.Where(l => l.IsVisible))
+                double layerOpacity = layer.Opacity;
+                foreach (var stroke in layer.Strokes.Where(s => s.Shake))
                 {
-                    double layerOpacity = layer.Opacity;
-                    foreach (var stroke in layer.Strokes.Where(s => s.Shake))
-                    {
-                        if (stroke == activeStroke) continue;
-                        double shakeIntensity = _shakeController.GetShakeIntensity(0, new() { stroke }, 1);
-                        DrawStroke(stroke, shakeIntensity, context, layerOpacity);
-                    }
-                }
-
-                if (activeStroke != null)
-                {
-                    double shakeIntensity = activeStroke.Shake ? _shakeController.GetShakeIntensity(0, new() { activeStroke }, 1) : 0;
-                    DrawStroke(activeStroke, shakeIntensity, context);
+                    if (stroke == activeStroke) continue;
+                    double shakeIntensity = _shakeController.GetShakeIntensity(0, new() { stroke }, 1);
+                    DrawStroke(stroke, shakeIntensity, context, layerOpacity);
                 }
             }
+
+            if (activeStroke != null)
+            {
+                double shakeIntensity = activeStroke.Shake ? _shakeController.GetShakeIntensity(0, new() { activeStroke }, 1) : 0;
+                DrawStroke(activeStroke, shakeIntensity, context);
+            }
+
             if(noise) DrawNoise(context, bounds);
         }
 

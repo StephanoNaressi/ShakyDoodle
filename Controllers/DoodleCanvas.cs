@@ -1,14 +1,33 @@
-﻿
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using ShakyDoodle.Rendering;
 using ShakyDoodle.Utils;
+using ShakyDoodle.Views.Controls;
 
 namespace ShakyDoodle.Controllers
 {
     public class DoodleCanvas : Control
     {
+        public static StyledProperty<double> CanvasWidthProperty = 
+            AvaloniaProperty.Register<DoodleCanvas, double>(nameof(CanvasWidth), 800);
+            
+        public static StyledProperty<double> CanvasHeightProperty = 
+            AvaloniaProperty.Register<DoodleCanvas, double>(nameof(CanvasHeight), 1000);
+            
+        public double CanvasWidth
+        {
+            get => GetValue(CanvasWidthProperty);
+            set => SetValue(CanvasWidthProperty, value);
+        }
+        
+        public double CanvasHeight
+        {
+            get => GetValue(CanvasHeightProperty);
+            set => SetValue(CanvasHeightProperty, value);
+        }
+
         private ShakeController _shakeController = new();
         private LogoPreloader _logoPreloader = new();
         private StrokeRenderer _strokeRenderer;
@@ -48,7 +67,7 @@ namespace ShakyDoodle.Controllers
         {
             InputHandler = new InputHandler();
             _helper = new(this);
-            _strokeRenderer = new(Bounds, _helper, InputHandler);
+            _strokeRenderer = new(Bounds, _helper, InputHandler, CanvasWidth, CanvasHeight);
             FrameController = new(Bounds, _strokeRenderer);
             _shortcutHelper = new(FrameController);
             _exportHelper = new(Bounds, FrameController, _strokeRenderer);
@@ -63,6 +82,7 @@ namespace ShakyDoodle.Controllers
                 InputHandler.PointerPressed(point, e.GetCurrentPoint(this).Properties.Pressure);
                 _helper.RequestInvalidateThrottled();
             };
+
             PointerMoved += (s, e) =>
             {
                 var point = e.GetPosition(this);
@@ -86,7 +106,13 @@ namespace ShakyDoodle.Controllers
             _strokeRenderer.StartRenderLoopAsync(() => FrameController.GetStrokes(), () => _shakeController.GetSpeed());
         }
 
-        public override void Render(DrawingContext context) => _strokeRenderer.Render(context, _lightbox, FrameController.CurrentFrame, FrameController.GetAllVisibleStrokes(), FrameController.GetAllFrames(), Bounds, _isNoise, _currentBG);
+        public override void Render(DrawingContext context)
+        {
+            var canvasBounds = new Rect(0, 0, CanvasWidth, CanvasHeight);
+            _strokeRenderer.Render(context, _lightbox, FrameController.CurrentFrame, 
+                FrameController.GetAllVisibleStrokes(), FrameController.GetAllFrames(), 
+                canvasBounds, _isNoise, _currentBG);
+        }
 
         public void ClearCanvas()
         {
