@@ -176,11 +176,22 @@ namespace ShakyDoodle.Rendering
                 case BrushType.Standard:
                     _standardBrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
                     break;
-                    case BrushType.Shaking:
+                case BrushType.Shaking:
                     _shakingBrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
                     break;
-                    case BrushType.Acrylic:
+                case BrushType.Acrylic:
                     _acrylicBrush.DrawStroke(stroke, context, layerOpacity);
+                    break;
+                case BrushType.Lasso:
+                    if (stroke.Points.Count > 2)
+                    {
+                        var fillBrush = new SolidColorBrush(stroke.Color, stroke.Alpha * layerOpacity);
+                        var geometry = new PathGeometry();
+                        var figure = new PathFigure { IsClosed = true, StartPoint = stroke.Points[0] };
+                        figure.Segments.Add(new PolyLineSegment(stroke.Points.Skip(1)));
+                        geometry.Figures.Add(figure);
+                        context.DrawGeometry(fillBrush, null, geometry);
+                    }
                     break;
             }
         }

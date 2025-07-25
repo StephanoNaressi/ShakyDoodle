@@ -14,5 +14,6 @@ public enum BrushType
 {
     Standard,
     Acrylic,
-    Shaking
+    Shaking,
+    Lasso
 }

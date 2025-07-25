@@ -336,5 +336,11 @@ namespace ShakyDoodle
             doodleCanvas.ChangeBrushType(BrushType.Acrylic);
             logoCanvas.ChangeBrushType(BrushType.Acrylic);
         }
+
+        private void OnLassoFill(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ChangeBrushType(BrushType.Lasso);
+            logoCanvas.ChangeBrushType(BrushType.Lasso);
+        }
     }
 }
