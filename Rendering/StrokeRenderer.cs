@@ -67,34 +67,40 @@ namespace ShakyDoodle.Rendering
 
             foreach (var layer in frame.Layers.Where(l => l.IsVisible))
             {
-                var nonShakingStrokes = layer.Strokes.Where(s => !s.Shake).ToList();
-                if (layer.IsDirty || layer.CachedBitmap == null)
-                {
-                    layer.CachedBitmap = RasterizeStrokes(nonShakingStrokes, _canvasSize);
-                    layer.IsDirty = false;
-                }
-                if (layer.CachedBitmap != null)
+                bool hasShakingStrokes = layer.Strokes.Any(s => s.Shake);
+
+                if (hasShakingStrokes)
                 {
                     using (context.PushOpacity(layer.Opacity))
                     {
-                        context.DrawImage(
-                            layer.CachedBitmap,
-                            new Rect(0, 0, _canvasWidth, _canvasHeight),
-                            new Rect(0, 0, _canvasWidth, _canvasHeight));
+                        foreach (var stroke in layer.Strokes)
+                        {
+                            if (stroke == _inputHandler.CurrentStroke)
+                                continue;
+
+                            double shakeIntensity = stroke.Shake ? _shakeController.GetShakeIntensity(0, new() { stroke }, 1) : 0;
+                            DrawStroke(stroke, shakeIntensity, context, 1.0);
+                        }
                     }
                 }
-            }
-
-            foreach (var layer in frame.Layers.Where(l => l.IsVisible))
-            {
-                double layerOpacity = layer.Opacity;
-                foreach (var stroke in layer.Strokes.Where(s => s.Shake))
+                else
                 {
-                    if (stroke == _inputHandler.CurrentStroke)
-                        continue;
-
-                    double shakeIntensity = _shakeController.GetShakeIntensity(0, new() { stroke }, 1);
-                    DrawStroke(stroke, shakeIntensity, context, layerOpacity);
+                    // Use cached bitmap for layers with only non-shaking strokes.
+                    if (layer.IsDirty || layer.CachedBitmap == null)
+                    {
+                        layer.CachedBitmap = RasterizeStrokes(layer.Strokes, _canvasSize);
+                        layer.IsDirty = false;
+                    }
+                    if (layer.CachedBitmap != null)
+                    {
+                        using (context.PushOpacity(layer.Opacity))
+                        {
+                            context.DrawImage(
+                                layer.CachedBitmap,
+                                new Rect(0, 0, _canvasWidth, _canvasHeight),
+                                new Rect(0, 0, _canvasWidth, _canvasHeight));
+                        }
+                    }
                 }
             }
 
