@@ -55,6 +55,8 @@ namespace ShakyDoodle.Utils
             var strokes = _frameController.GetStrokes();
             _shortcutHelper.PushUndoState(strokes.Select(s => s.Clone()).ToList());
 
+            bool isShakeForStroke = _currentBrushType == BrushType.Shaking && _isShake;
+
             CurrentStroke = new Stroke(
                 _currentColor,
                 position,
@@ -62,7 +64,7 @@ namespace ShakyDoodle.Utils
                 _alpha,
                 _currentCap,
                 pressure,
-                _isShake,
+                isShakeForStroke,
                 _currentBrushType
             );
             strokes.Add(CurrentStroke);
@@ -99,8 +101,7 @@ namespace ShakyDoodle.Utils
 
             if (_currentBrushType == BrushType.Acrylic)
             {
-                float spacing = _isShake ? 5 : 1f;
-                spacing *= 3;
+                float spacing = GetSpacingForSize(_currentSize);
                 if (CurrentStroke.Points.Count < 1)
                 {
                     CurrentStroke.Points.Add(position);
@@ -126,7 +127,7 @@ namespace ShakyDoodle.Utils
             }
             else
             {
-                float spacing = _isShake ? 5 : 1f;
+                float spacing = _isShake ? 5 : 2f;
                 if (CurrentStroke.Points.Count < 1)
                 {
                     CurrentStroke.Points.Add(position);
@@ -150,6 +151,18 @@ namespace ShakyDoodle.Utils
                 CurrentStroke.Points.Add(position);
                 CurrentStroke.Pressures.Add(clampedPressure);
             }
+        }
+
+        private float GetSpacingForSize(SizeType size)
+        {
+            return size switch
+            {
+                SizeType.Small => 4f,
+                SizeType.Medium => 25f,
+                SizeType.Large => 50f,
+                SizeType.ExtraLarge => 150f,
+                _ => 4f
+            };
         }
 
         public void PointerReleased()

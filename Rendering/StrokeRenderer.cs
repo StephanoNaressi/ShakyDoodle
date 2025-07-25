@@ -108,6 +108,7 @@ namespace ShakyDoodle.Rendering
                 }
                 using (var ctx = _activeStrokeCache.CreateDrawingContext(true))
                 {
+                    ctx.FillRectangle(Brushes.Transparent, new Rect(0, 0, _activeStrokeCache.Size.Width, _activeStrokeCache.Size.Height));
                     DrawStroke(activeStroke, activeStroke.Shake ? _shakeController.GetShakeIntensity(0, new() { activeStroke }, 1) : 0, ctx, 1.0);
                 }
                 context.DrawImage(
