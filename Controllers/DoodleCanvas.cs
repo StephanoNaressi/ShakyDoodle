@@ -29,6 +29,7 @@ namespace ShakyDoodle.Controllers
         }
         public bool IsPanning { get; set; }
         public bool IsSpacePressed { get; set; }
+        public bool IsMirrored { get; set; }
 
         private ShakeController _shakeController = new();
         private LogoPreloader _logoPreloader = new();

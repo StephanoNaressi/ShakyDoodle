@@ -56,6 +56,15 @@ namespace ShakyDoodle.Views.Controls
             {
                 ApplyZoom(1.1, new Point(Bounds.Width / 2, Bounds.Height / 2));
             }
+            else if (e.Key == Key.F && DoodleChild != null)
+            {
+                DoodleChild.IsMirrored = !DoodleChild.IsMirrored;
+                if (_child?.RenderTransform is TransformGroup transformGroup &&
+                    transformGroup.Children[0] is ScaleTransform scaleTransform)
+                {
+                    scaleTransform.ScaleX = DoodleChild.IsMirrored ? -_zoom : _zoom;
+                }
+            }
         }
 
         private void OnKeyUp(object? sender, KeyEventArgs e)
@@ -91,7 +100,7 @@ namespace ShakyDoodle.Views.Controls
             var newScale = currentScale * scaleFactor;
             _zoom = newScale;
 
-            scaleTransform.ScaleX = newScale;
+            scaleTransform.ScaleX = DoodleChild.IsMirrored ? -newScale : newScale;
             scaleTransform.ScaleY = newScale;
 
             var currentTranslation = new Point(translateTransform.X, translateTransform.Y);
