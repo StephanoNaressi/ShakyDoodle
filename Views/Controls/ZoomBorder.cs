@@ -12,6 +12,7 @@ namespace ShakyDoodle.Views.Controls
         private Point _start;
         private Control? _child;
         private double _zoom = 0.7;
+        private double _rotation = 0;
         private DoodleCanvas? DoodleChild => this.Child as DoodleCanvas;
 
         public ZoomBorder()
@@ -29,11 +30,13 @@ namespace ShakyDoodle.Views.Controls
                 _child = this.Child;
                 if (_child != null)
                 {
+                    _child.RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative);
                     _child.RenderTransform = new TransformGroup
                     {
                         Children = new Transforms
                         {
                             new ScaleTransform { ScaleX = _zoom, ScaleY = _zoom },
+                            new RotateTransform { Angle = _rotation },
                             new TranslateTransform()
                         }
                     };
@@ -55,6 +58,14 @@ namespace ShakyDoodle.Views.Controls
             else if (e.Key == Key.D2) // Zoom in
             {
                 ApplyZoom(1.1, new Point(Bounds.Width / 2, Bounds.Height / 2));
+            }
+            else if (e.Key == Key.D3) // Rotate left
+            {
+                ApplyRotation(-5);
+            }
+            else if (e.Key == Key.D4) // Rotate right
+            {
+                ApplyRotation(5);
             }
             else if (e.Key == Key.F && DoodleChild != null)
             {
@@ -91,7 +102,7 @@ namespace ShakyDoodle.Views.Controls
 
             var transformGroup = _child.RenderTransform as TransformGroup;
             if (transformGroup?.Children[0] is not ScaleTransform scaleTransform ||
-                transformGroup.Children[1] is not TranslateTransform translateTransform)
+                transformGroup.Children[2] is not TranslateTransform translateTransform)
             {
                 return;
             }
@@ -111,6 +122,20 @@ namespace ShakyDoodle.Views.Controls
             translateTransform.Y = newTranslationY;
         }
 
+        private void ApplyRotation(double angle)
+        {
+            if (DoodleChild == null) return;
+
+            var transformGroup = DoodleChild.RenderTransform as TransformGroup;
+            if (transformGroup?.Children[1] is not RotateTransform rotateTransform)
+            {
+                return;
+            }
+
+            _rotation += angle;
+            rotateTransform.Angle = _rotation;
+        }
+
         private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
             if ((DoodleChild?.IsSpacePressed ?? false) || e.GetCurrentPoint(this).Properties.IsMiddleButtonPressed)
@@ -119,8 +144,8 @@ namespace ShakyDoodle.Views.Controls
                     DoodleChild.IsPanning = true;
                 _start = e.GetPosition(this);
                 _origin = new Point(
-                    (_child?.RenderTransform as TransformGroup)?.Children[1] is TranslateTransform t ? t.X : 0,
-                    (_child?.RenderTransform as TransformGroup)?.Children[1] is TranslateTransform t2 ? t2.Y : 0);
+                    (_child?.RenderTransform as TransformGroup)?.Children[2] is TranslateTransform t ? t.X : 0,
+                    (_child?.RenderTransform as TransformGroup)?.Children[2] is TranslateTransform t2 ? t2.Y : 0);
             }
         }
 
@@ -145,7 +170,7 @@ namespace ShakyDoodle.Views.Controls
 
             if (_child?.RenderTransform is TransformGroup transformGroup)
             {
-                if (transformGroup.Children[1] is TranslateTransform translateTransform)
+                if (transformGroup.Children[2] is TranslateTransform translateTransform)
                 {
                     translateTransform.X = _origin.X + delta.X;
                     translateTransform.Y = _origin.Y + delta.Y;
@@ -155,6 +180,9 @@ namespace ShakyDoodle.Views.Controls
         public void Recenter()
         {
             _zoom = 0.7;
+            _rotation = 0;
+            if (DoodleChild != null) DoodleChild.IsMirrored = false;
+
             if (_child?.RenderTransform is TransformGroup group)
             {
                 if (group.Children[0] is ScaleTransform scale)
@@ -162,7 +190,11 @@ namespace ShakyDoodle.Views.Controls
                     scale.ScaleX = _zoom;
                     scale.ScaleY = _zoom;
                 }
-                if (group.Children[1] is TranslateTransform translate)
+                if (group.Children[1] is RotateTransform rotate)
+                {
+                    rotate.Angle = _rotation;
+                }
+                if (group.Children[2] is TranslateTransform translate)
                 {
                     translate.X = 0;
                     translate.Y = 0;
