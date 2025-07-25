@@ -12,6 +12,32 @@
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1000"
         x:Class="ShakyDoodle.MainWindow"
         Title="ShakyDoodle" Background="PeachPuff">
+	<DockPanel>
+		<Menu DockPanel.Dock="Top">
+			<MenuItem Header="File">
+				<MenuItem Header="Save PNG" Click="OnSaveFile"/>
+				<MenuItem Header="Save GIF" Click="OnSaveGif"/>
+			</MenuItem>
+			<MenuItem Header="Canvas">
+				<MenuItem Header="Re-Center Canvas" Click="OnRecenterClicked"/>
+				<MenuItem Header="Clear Canvas" Click="OnClearClick"/>
+				<MenuItem Header="Toggle Noise" Click="OnToggleNoise"/>
+				<MenuItem Header="Background">
+					<MenuItem Header="Grid" Click="ToggleGrid"/>
+					<MenuItem Header="Lines" Click="ToggleLines"/>
+					<MenuItem Header="Blank" Click="ToggleBlank"/>
+				</MenuItem>
+				</MenuItem>
+			<MenuItem Header="Layers">
+				<MenuItem Header="Delete Layer" Click="OnDeleteLayer"/>
+			</MenuItem>
+			<MenuItem Header="Animation">
+				<MenuItem Header="Copy Frame" Click="OnDuplicateFrame"/>
+				<MenuItem Header="Delete Frame" Click="OnDeleteFrame"/>
+				<MenuItem Header="Lightbox" Click="ToggleLightbox"/>
+			</MenuItem>
+		</Menu>
+
 	<Grid>
 		<!-- Grid setup: left to right -->
 		<Grid.ColumnDefinitions>
@@ -44,7 +70,7 @@
 					</Button>
 				</UniformGrid>
 
-				<UniformGrid Columns="2" Rows="1" Margin="5" HorizontalAlignment="Center">
+				<UniformGrid Columns="1" Rows="2" Margin="5" HorizontalAlignment="Center">
 					<UniformGrid Columns="4" Margin="5" HorizontalAlignment="Center">
 						<!-- Sizes -->
 						<Button Width="10" Height="10" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeSmall" BorderBrush="Black" BorderThickness="1" />
@@ -81,24 +107,6 @@
 					<Button Content="🠊" Click="OnNextFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 				</UniformGrid>
 
-				<UniformGrid Columns="5" Margin="5" HorizontalAlignment="Center">
-					<Button x:Name="CopyFrame" Content="📋" Click="OnDuplicateFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					<Button x:Name="SaveFile" Content="PNG" Click="OnSaveFile" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					<Button x:Name="SaveGif" Content="GIF" Click="OnSaveGif" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					<Button Content="💥" Click="OnClearClick" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					<Button Content="💡" Click="ToggleLightbox" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-				</UniformGrid>
-				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
-					<Button Content="Delete Frame" Click="OnDeleteFrame" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					<Button Content="Re-Center" Click="OnRecenterClicked" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					<Button Content="Delete Layer" Click="OnDeleteLayer" Margin="5" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-				</UniformGrid>
-				<UniformGrid Columns="4" Margin="5" HorizontalAlignment="Center">
-					<Button Content="Noise" Click="OnToggleNoise" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					<Button Content="Lines" Click="ToggleLines" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					<Button Content="Grid" Click="ToggleGrid" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					<Button Content="Blank" Click="ToggleBlank" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-				</UniformGrid>
 				<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
 					<TextBlock Text="Frames: 1/1" x:Name="FrameIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
 					<TextBlock Text="Layers: 1/1" x:Name="LayerIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
@@ -122,4 +130,5 @@
 			</views:ZoomBorder>
 		</Border>
 	</Grid>
+	</DockPanel>
 </Window>
