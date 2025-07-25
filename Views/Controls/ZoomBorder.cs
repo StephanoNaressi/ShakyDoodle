@@ -64,9 +64,7 @@ namespace ShakyDoodle.Views.Controls
         {
             if (_child == null) return;
 
-            var point = e.GetPosition(_child);
-            var scale = e.Delta.Y > 0 ? 1.2 : 0.8;
-            _zoom *= scale;
+            var scaleFactor = e.Delta.Y > 0 ? 1.2 : 1 / 1.2;
 
             var transformGroup = _child.RenderTransform as TransformGroup;
             var scaleTransform = transformGroup?.Children[0] as ScaleTransform;
@@ -74,11 +72,20 @@ namespace ShakyDoodle.Views.Controls
 
             if (scaleTransform != null && translateTransform != null)
             {
-                scaleTransform.ScaleX *= scale;
-                scaleTransform.ScaleY *= scale;
+                var mousePosition = e.GetPosition(_child);
+                var currentScale = scaleTransform.ScaleX;
+                var newScale = currentScale * scaleFactor;
+                _zoom = newScale;
 
-                translateTransform.X = point.X - (point.X * scale);
-                translateTransform.Y = point.Y - (point.Y * scale);
+                scaleTransform.ScaleX = newScale;
+                scaleTransform.ScaleY = newScale;
+
+                var currentTranslation = new Point(translateTransform.X, translateTransform.Y);
+                var newTranslationX = currentTranslation.X - (mousePosition.X * newScale - mousePosition.X * currentScale);
+                var newTranslationY = currentTranslation.Y - (mousePosition.Y * newScale - mousePosition.Y * currentScale);
+
+                translateTransform.X = newTranslationX;
+                translateTransform.Y = newTranslationY;
             }
         }
 
