@@ -14,8 +14,8 @@ namespace ShakyDoodle.Models
         public double Alpha { get; }
         public PenLineCap PenLineCap { get; }
         public bool Shake { get; }
-
-        public Stroke(Color color, Point startPoint, SizeType size, double alpha, PenLineCap cap, float startPressure, bool shake)
+        public BrushType BrushType { get; }
+        public Stroke(Color color, Point startPoint, SizeType size, double alpha, PenLineCap cap, float startPressure, bool shake, BrushType brushType = BrushType.Standard)
         {
             Color = color;
             Points.Add(startPoint);
@@ -24,9 +24,10 @@ namespace ShakyDoodle.Models
             PenLineCap = cap;
             Pressures.Add(startPressure);
             Shake = shake;
+            BrushType = brushType;
         }
 
-        public Stroke(Color color, List<Point> points, SizeType size, double alpha, PenLineCap cap, List<float> pressures, bool shake)
+        public Stroke(Color color, List<Point> points, SizeType size, double alpha, PenLineCap cap, List<float> pressures, bool shake, BrushType brushType = BrushType.Standard)
         {
             Color = color;
             Points = new List<Point>(points);
@@ -35,11 +36,12 @@ namespace ShakyDoodle.Models
             PenLineCap = cap;
             Pressures = new List<float>(pressures);
             Shake = shake;
+            BrushType = brushType;
         }
 
         public Stroke Clone()
         {
-            return new Stroke(Color, Points, Size, Alpha, PenLineCap, Pressures, Shake);
+            return new Stroke(Color, Points, Size, Alpha, PenLineCap, Pressures, Shake, BrushType);
         }
     }
 

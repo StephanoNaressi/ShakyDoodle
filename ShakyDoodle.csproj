@@ -15,11 +15,15 @@
 		<ApplicationIcon>Assets\icon.ico</ApplicationIcon>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Assets\acrPen.png" />
+	  <None Remove="Assets\acr_tip.png" />
 	  <None Remove="Assets\Pen.png" />
 	  <None Remove="Assets\shakyPen.png" />
 	  <None Remove="Assets\vEraser.png" />
 	</ItemGroup>
 	<ItemGroup>
+	  <AvaloniaResource Include="Assets\acrPen.png" />
+	  <AvaloniaResource Include="Assets\acr_tip.png" />
 	  <AvaloniaResource Include="Assets\Pen.png" />
 	  <AvaloniaResource Include="Assets\shakyPen.png" />
 	  <AvaloniaResource Include="Assets\vEraser.png" />

@@ -60,7 +60,7 @@ namespace ShakyDoodle.Utils
         public static List<Stroke> Get()
         {
             var logoStrokes = new List<Stroke>();
-            var stroke = new Stroke(new Color(255, 0,0,0), new Point(37.067171891147154, 10.949689000866101), 0, 1, PenLineCap.Square, 0.01f, true);
+            var stroke = new Stroke(new Color(255, 0,0,0), new Point(37.067171891147154, 10.949689000866101), 0, 1, PenLineCap.Square, 0.01f, true, BrushType.Shaking);
             stroke.Points.Add(new Point(32.21701687909058, 12.310211794346912));
             stroke.Pressures.Add(1f);
             stroke.Points.Add(new Point(27.14640027557698, 15.59814187859223));
@@ -93,7 +93,7 @@ namespace ShakyDoodle.Utils
             stroke.Pressures.Add(1f);
             logoStrokes.Add(stroke);
 
-            var stroke1 = new Stroke(new Color(255, 0, 0, 0), new Point(52.499483293144976, 36.7996220770018), 0, 1, PenLineCap.Square, 0.03f, true);
+            var stroke1 = new Stroke(new Color(255, 0, 0, 0), new Point(52.499483293144976, 36.7996220770018), 0, 1, PenLineCap.Square, 0.03f, true, BrushType.Shaking);
             stroke1.Points.Add(new Point(51.61763692731665, 31.811038500905454));
             stroke1.Pressures.Add(1f);
             stroke1.Points.Add(new Point(51.61763692731665, 26.255570427525413));
@@ -106,7 +106,7 @@ namespace ShakyDoodle.Utils
             stroke1.Pressures.Add(1f);
             logoStrokes.Add(stroke1);
 
-            var stroke2 = new Stroke(new Color(255, 0, 0, 0), new Point(53.160868067516276, 37.479883473742234), 0, 1, PenLineCap.Square, 0f, true);
+            var stroke2 = new Stroke(new Color(255, 0, 0, 0), new Point(53.160868067516276, 37.479883473742234), 0, 1, PenLineCap.Square, 0f, true, BrushType.Shaking);
             stroke2.Points.Add(new Point(52.499483293144976, 32.37792299818909));
             stroke2.Pressures.Add(1f);
             stroke2.Points.Add(new Point(53.60179125043055, 27.162585623179268));
@@ -121,7 +121,7 @@ namespace ShakyDoodle.Utils
             stroke2.Pressures.Add(1f);
             logoStrokes.Add(stroke2);
 
-            var stroke3 = new Stroke(new Color(255, 0, 0, 0), new Point(78.07302790217022, 27.275962522636007), 0, 1, PenLineCap.Square, 0.01f, true);
+            var stroke3 = new Stroke(new Color(255, 0, 0, 0), new Point(78.07302790217022, 27.275962522636007), 0, 1, PenLineCap.Square, 0.01f, true, BrushType.Shaking);
             stroke3.Points.Add(new Point(73.22287289011365, 25.915439729155196));
             stroke3.Pressures.Add(1f);
             stroke3.Points.Add(new Point(68.59317946951433, 28.29635461774666));
@@ -170,7 +170,7 @@ namespace ShakyDoodle.Utils
             stroke3.Pressures.Add(1f);
             logoStrokes.Add(stroke3);
 
-            var stroke4 = new Stroke(new Color(255, 0, 0, 0), new Point(111.5831898036513, 24.895047634044545), 0, 1, PenLineCap.Square, 0.02f, true);
+            var stroke4 = new Stroke(new Color(255, 0, 0, 0), new Point(111.5831898036513, 24.895047634044545), 0, 1, PenLineCap.Square, 0.02f, true, BrushType.Shaking);
             stroke4.Points.Add(new Point(111.36272821219427, 30.110385009054426));
             stroke4.Pressures.Add(0.93f);
             stroke4.Points.Add(new Point(114.0082673096797, 34.645460987323816));
@@ -219,7 +219,7 @@ namespace ShakyDoodle.Utils
             stroke4.Pressures.Add(1f);
             logoStrokes.Add(stroke4);
 
-            var stroke5 = new Stroke(new Color(255, 0, 0, 0), new Point(19.43024457457807, 91.33391071569167), 0, 1, PenLineCap.Square, 0.01f, true);
+            var stroke5 = new Stroke(new Color(255, 0, 0, 0), new Point(19.43024457457807, 91.33391071569167), 0, 1, PenLineCap.Square, 0.01f, true, BrushType.Shaking);
             stroke5.Points.Add(new Point(20.753014123320668, 86.11857334068179));
             stroke5.Pressures.Add(1f);
             stroke5.Points.Add(new Point(20.532552531863644, 81.01661286512876));
@@ -258,7 +258,7 @@ namespace ShakyDoodle.Utils
             stroke5.Pressures.Add(1f);
             logoStrokes.Add(stroke5);
 
-            var stroke6 = new Stroke(new Color(255, 0,0,0), new Point(57.570099896658576, 73.53373750098422), 0, 1, PenLineCap.Square, 0.01f, true);
+            var stroke6 = new Stroke(new Color(255, 0,0,0), new Point(57.570099896658576, 73.53373750098422), 0, 1, PenLineCap.Square, 0.01f, true, BrushType.Shaking);
             stroke6.Points.Add(new Point(52.499483293144976, 74.1006219982678));
             stroke6.Pressures.Add(1f);
             stroke6.Points.Add(new Point(48.31071305545993, 77.16179828359975));
@@ -299,7 +299,7 @@ namespace ShakyDoodle.Utils
             stroke6.Pressures.Add(1f);
             logoStrokes.Add(stroke6);
 
-            var stroke7 = new Stroke(new Color(255, 0, 0, 0), new Point(91.3007233895969, 70.24580741673878), 0, 1, PenLineCap.Square, 0.02f, true);
+            var stroke7 = new Stroke(new Color(255, 0, 0, 0), new Point(91.3007233895969, 70.24580741673878), 0, 1, PenLineCap.Square, 0.02f, true, BrushType.Shaking);
             stroke7.Points.Add(new Point(86.2301067860833, 68.77190772380129));
             stroke7.Pressures.Add(1f);
             stroke7.Points.Add(new Point(81.1594901825697, 68.99866152271477));
@@ -344,7 +344,7 @@ namespace ShakyDoodle.Utils
             stroke7.Pressures.Add(1f);
             logoStrokes.Add(stroke7);
 
-            var stroke8 = new Stroke(new Color(255, 0, 0, 0), new Point(105.63072683430937, 84.19116604991734), 0, 1, PenLineCap.Square, 0.02f, true);
+            var stroke8 = new Stroke(new Color(255, 0, 0, 0), new Point(105.63072683430937, 84.19116604991734), 0, 1, PenLineCap.Square, 0.02f, true, BrushType.Shaking);
             stroke8.Points.Add(new Point(105.41026524285212, 79.0892055743642));
             stroke8.Pressures.Add(1f);
             stroke8.Points.Add(new Point(104.5284188770238, 73.87386819935443));
@@ -357,7 +357,7 @@ namespace ShakyDoodle.Utils
             stroke8.Pressures.Add(1f);
             logoStrokes.Add(stroke8);
 
-            var stroke9 = new Stroke(new Color(255, 0, 0, 0), new Point(116.21288322425085, 79.54271317219116), 0, 1, PenLineCap.Square, 0.02f, true);
+            var stroke9 = new Stroke(new Color(255, 0, 0, 0), new Point(116.21288322425085, 79.54271317219116), 0, 1, PenLineCap.Square, 0.02f, true, BrushType.Shaking);
             stroke9.Points.Add(new Point(121.0630382363072, 77.84205968034018));
             stroke9.Pressures.Add(1f);
             stroke9.Points.Add(new Point(125.4722700654495, 75.23439099283519));
@@ -382,7 +382,7 @@ namespace ShakyDoodle.Utils
             stroke9.Pressures.Add(1f);
             logoStrokes.Add(stroke9);
 
-            var stroke10 = new Stroke(new Color(255, 255, 0, 0), new Point(156.11643127798834, 85.09818124557125), 0, 1, PenLineCap.Round, 0.01f, true);
+            var stroke10 = new Stroke(new Color(255, 255, 0, 0), new Point(156.11643127798834, 85.09818124557125), 0, 1, PenLineCap.Round, 0.01f, true, BrushType.Shaking);
             stroke10.Points.Add(new Point(151.92766104030306, 82.0370049602393));
             stroke10.Pressures.Add(1f);
             stroke10.Points.Add(new Point(148.40027557698932, 78.06881347925355));

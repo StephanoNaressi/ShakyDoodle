@@ -130,6 +130,11 @@ namespace ShakyDoodle.Controllers
         public void SelectSize(SizeType size) => InputHandler.ChangeSize(size);
         public void ChangeAlpha(double val) => InputHandler.ChangeAlpha(val);
         public void ChangeBrushTip(PenLineCap cap) => InputHandler.ChangeCap(cap);
+        public void ChangeBrushType(BrushType brushType)
+        {
+            InputHandler.ChangeBrushType(brushType);
+            _helper.RequestInvalidateThrottled();
+        }
         public void ShouldShake(bool shake)
         {
             InputHandler.IsErasing = false;

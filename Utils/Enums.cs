@@ -10,3 +10,9 @@ public enum SizeType {
     Large,
     ExtraLarge
 }
+public enum BrushType
+{
+    Standard,
+    Acrylic,
+    Shaking
+}

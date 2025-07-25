@@ -215,12 +215,16 @@ namespace ShakyDoodle
         {
             doodleCanvas.ShouldShake(true);
             logoCanvas.ShouldShake(true);
+            doodleCanvas.ChangeBrushType(BrushType.Shaking);
+            logoCanvas.ChangeBrushType(BrushType.Shaking);
         }
 
         private void OnUnshake(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.ShouldShake(false);
             logoCanvas.ShouldShake(false);
+            doodleCanvas.ChangeBrushType(BrushType.Standard);
+            logoCanvas.ChangeBrushType(BrushType.Standard);
         }
 
         private void OnNextFrame(object? sender, RoutedEventArgs events)
@@ -263,12 +267,14 @@ namespace ShakyDoodle
         {
             var newColor = events.NewColor;
             doodleCanvas.ChangeColor(newColor);
+            logoCanvas.ChangeColor(newColor);
             PopulateRecentColorSwatches();
         }
         private void OnChangeBlack(object? sender, RoutedEventArgs events)
         {
             var col = new Color(255, 0, 0, 0);
             doodleCanvas.ChangeColor(col);
+            logoCanvas.ChangeColor(col);
             colorPicker.Color = col;
         }
 
@@ -276,6 +282,7 @@ namespace ShakyDoodle
         {
             var col = new Color(255, 255, 0, 0);
             doodleCanvas.ChangeColor(col);
+            logoCanvas.ChangeColor(col);
             colorPicker.Color = col;
         }
 
@@ -283,6 +290,7 @@ namespace ShakyDoodle
         {
             var col = new Color(255, 0, 0, 255);
             doodleCanvas.ChangeColor(col);
+            logoCanvas.ChangeColor(col);
             colorPicker.Color = col;
         }
 
@@ -290,6 +298,7 @@ namespace ShakyDoodle
         {
             var col = new Color(255, 0, 255, 0);
             doodleCanvas.ChangeColor(col);
+            logoCanvas.ChangeColor(col);
             colorPicker.Color = col;
         }
 
@@ -339,6 +348,12 @@ namespace ShakyDoodle
             int height = (int)doodleCanvas.Bounds.Height;
 
             doodleCanvas.ExportFramesAsGif(filePath, width, height);
+        }
+
+        private void OnAcr(object? sender, RoutedEventArgs events)
+        {
+            doodleCanvas.ChangeBrushType(BrushType.Acrylic);
+            logoCanvas.ChangeBrushType(BrushType.Acrylic);
         }
     }
 }
