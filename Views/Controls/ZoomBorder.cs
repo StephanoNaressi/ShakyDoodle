@@ -48,6 +48,14 @@ namespace ShakyDoodle.Views.Controls
             {
                 DoodleChild.IsSpacePressed = true;
             }
+            else if (e.Key == Key.D1) // Zoom out
+            {
+                ApplyZoom(1 / 1.1, new Point(Bounds.Width / 2, Bounds.Height / 2));
+            }
+            else if (e.Key == Key.D2) // Zoom in
+            {
+                ApplyZoom(1.1, new Point(Bounds.Width / 2, Bounds.Height / 2));
+            }
         }
 
         private void OnKeyUp(object? sender, KeyEventArgs e)
@@ -65,28 +73,33 @@ namespace ShakyDoodle.Views.Controls
             if (_child == null) return;
 
             var scaleFactor = e.Delta.Y > 0 ? 1.2 : 1 / 1.2;
+            ApplyZoom(scaleFactor, e.GetPosition(_child));
+        }
+
+        private void ApplyZoom(double scaleFactor, Point center)
+        {
+            if (_child == null) return;
 
             var transformGroup = _child.RenderTransform as TransformGroup;
-            var scaleTransform = transformGroup?.Children[0] as ScaleTransform;
-            var translateTransform = transformGroup?.Children[1] as TranslateTransform;
-
-            if (scaleTransform != null && translateTransform != null)
+            if (transformGroup?.Children[0] is not ScaleTransform scaleTransform ||
+                transformGroup.Children[1] is not TranslateTransform translateTransform)
             {
-                var mousePosition = e.GetPosition(_child);
-                var currentScale = scaleTransform.ScaleX;
-                var newScale = currentScale * scaleFactor;
-                _zoom = newScale;
-
-                scaleTransform.ScaleX = newScale;
-                scaleTransform.ScaleY = newScale;
-
-                var currentTranslation = new Point(translateTransform.X, translateTransform.Y);
-                var newTranslationX = currentTranslation.X - (mousePosition.X * newScale - mousePosition.X * currentScale);
-                var newTranslationY = currentTranslation.Y - (mousePosition.Y * newScale - mousePosition.Y * currentScale);
-
-                translateTransform.X = newTranslationX;
-                translateTransform.Y = newTranslationY;
+                return;
             }
+
+            var currentScale = scaleTransform.ScaleX;
+            var newScale = currentScale * scaleFactor;
+            _zoom = newScale;
+
+            scaleTransform.ScaleX = newScale;
+            scaleTransform.ScaleY = newScale;
+
+            var currentTranslation = new Point(translateTransform.X, translateTransform.Y);
+            var newTranslationX = currentTranslation.X - (center.X * newScale - center.X * currentScale);
+            var newTranslationY = currentTranslation.Y - (center.Y * newScale - center.Y * currentScale);
+
+            translateTransform.X = newTranslationX;
+            translateTransform.Y = newTranslationY;
         }
 
         private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
