@@ -17,6 +17,9 @@
 	<ItemGroup>
 	  <None Remove="Assets\acrPen.png" />
 	  <None Remove="Assets\acr_tip.png" />
+	  <None Remove="Assets\AirBrush.png" />
+	  <None Remove="Assets\air_tip.png" />
+	  <None Remove="Assets\Lasso.png" />
 	  <None Remove="Assets\Pen.png" />
 	  <None Remove="Assets\shakyPen.png" />
 	  <None Remove="Assets\vEraser.png" />
@@ -24,6 +27,9 @@
 	<ItemGroup>
 	  <AvaloniaResource Include="Assets\acrPen.png" />
 	  <AvaloniaResource Include="Assets\acr_tip.png" />
+	  <AvaloniaResource Include="Assets\AirBrush.png" />
+	  <AvaloniaResource Include="Assets\air_tip.png" />
+	  <AvaloniaResource Include="Assets\Lasso.png" />
 	  <AvaloniaResource Include="Assets\Pen.png" />
 	  <AvaloniaResource Include="Assets\shakyPen.png" />
 	  <AvaloniaResource Include="Assets\vEraser.png" />

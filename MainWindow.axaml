@@ -58,7 +58,7 @@
 				<Border Width="200" Height="100" CornerRadius="15" ClipToBounds="True">
 					<local:DoodleCanvas Name="logoCanvas" IsLogo="True" />
 				</Border>
-				<UniformGrid Columns="5" Rows="1" Margin="5" HorizontalAlignment="Center">
+				<UniformGrid Columns="6" Rows="1" Margin="5" HorizontalAlignment="Center">
 					<Button Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnUnshake">
 						<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/Pen.png" Stretch="Uniform"/>
 					</Button>
@@ -68,8 +68,11 @@
 					<Button Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnAcr">
 						<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/acrPen.png" Stretch="Uniform"/>
 					</Button>
+					<Button Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnAirbrush">
+						<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/AirBrush.png" Stretch="Uniform"/>
+					</Button>
 					<Button Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnLassoFill">
-						<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/Pen.png" Stretch="Uniform"/>
+						<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/Lasso.png" Stretch="Uniform"/>
 					</Button>
 					<Button Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnErase">
 						<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/vEraser.png" Stretch="Uniform"/>
