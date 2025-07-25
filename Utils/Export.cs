@@ -76,7 +76,7 @@ namespace ShakyDoodle.Utils
                             
                             foreach (var stroke in layer.Strokes.Where(s => s.Shake))
                             {
-                                double shakeIntensity = isForGif ? 1.0 : 0;
+                                double shakeIntensity = 1.0;
                                 _strokeRenderer.DrawStroke(stroke, shakeIntensity, context, layer.Opacity);
                             }
                         }
