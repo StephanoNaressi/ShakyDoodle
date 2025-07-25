@@ -99,57 +99,30 @@ namespace ShakyDoodle.Utils
 
             float clampedPressure = Math.Max(pressure, 0.1f);
 
-            if (_currentBrushType == BrushType.Acrylic)
+            float spacing = _currentBrushType == BrushType.Acrylic ? GetSpacingForSize(_currentSize) : (_isShake ? 5f : 2f);
+
+            if (CurrentStroke.Points.Count < 1)
             {
-                float spacing = GetSpacingForSize(_currentSize);
-                if (CurrentStroke.Points.Count < 1)
-                {
-                    CurrentStroke.Points.Add(position);
-                    CurrentStroke.Pressures.Add(clampedPressure);
-                    return;
-                }
-                var lastPoint = CurrentStroke.Points.Last();
-                double gap = MathExtras.Instance.Distance(position, lastPoint);
-                if (gap == 0)
-                    return;
-                int amountToFill = Math.Max(1, (int)(gap / spacing));
-                for (int i = 1; i < amountToFill; i++)
-                {
-                    double t = (double)i / amountToFill;
-                    var interpolation = new Point(
-                        lastPoint.X + (position.X - lastPoint.X) * t,
-                        lastPoint.Y + (position.Y - lastPoint.Y) * t);
-                    CurrentStroke.Points.Add(interpolation);
-                    CurrentStroke.Pressures.Add(clampedPressure);
-                }
                 CurrentStroke.Points.Add(position);
                 CurrentStroke.Pressures.Add(clampedPressure);
+                return;
             }
-            else
+
+            var lastPoint = CurrentStroke.Points.Last();
+            double gap = MathExtras.Instance.Distance(position, lastPoint);
+
+            if (gap >= spacing)
             {
-                float spacing = _isShake ? 5 : 2f;
-                if (CurrentStroke.Points.Count < 1)
+                var direction = position - lastPoint;
+                var normalizedDirection = direction / gap;
+
+                int pointsToadd = (int)(gap / spacing);
+                for (int i = 1; i <= pointsToadd; i++)
                 {
-                    CurrentStroke.Points.Add(position);
-                    CurrentStroke.Pressures.Add(clampedPressure);
-                    return;
-                }
-                var lastPoint = CurrentStroke.Points.Last();
-                double gap = MathExtras.Instance.Distance(position, lastPoint);
-                if (gap == 0)
-                    return;
-                int amountToFill = Math.Max(1, (int)(gap / spacing));
-                for (int i = 1; i < amountToFill; i++)
-                {
-                    double t = (double)i / amountToFill;
-                    var interpolation = new Point(
-                        lastPoint.X + (position.X - lastPoint.X) * t,
-                        lastPoint.Y + (position.Y - lastPoint.Y) * t);
-                    CurrentStroke.Points.Add(interpolation);
+                    var interpolatedPoint = lastPoint + normalizedDirection * (i * spacing);
+                    CurrentStroke.Points.Add(interpolatedPoint);
                     CurrentStroke.Pressures.Add(clampedPressure);
                 }
-                CurrentStroke.Points.Add(position);
-                CurrentStroke.Pressures.Add(clampedPressure);
             }
         }
 
@@ -158,9 +131,9 @@ namespace ShakyDoodle.Utils
             return size switch
             {
                 SizeType.Small => 4f,
-                SizeType.Medium => 25f,
-                SizeType.Large => 50f,
-                SizeType.ExtraLarge => 150f,
+                SizeType.Medium => 6f,
+                SizeType.Large => 10f,
+                SizeType.ExtraLarge => 15f,
                 _ => 4f
             };
         }

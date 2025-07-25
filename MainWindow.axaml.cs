@@ -5,9 +5,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using System.Diagnostics;
 using System.Timers;
-using Avalonia.Threading;
 using Avalonia;
 using Avalonia.Layout;
 using ShakyDoodle.Views.Controls;
@@ -20,13 +18,6 @@ namespace ShakyDoodle
         public MainWindow()
         {
             InitializeComponent();
-            var frameSimTimer = new Timer(16); // ~60Hz
-            frameSimTimer.Elapsed += (s, e) => _frameCount++;
-            frameSimTimer.Start();
-
-            _fpsTimer = new Timer(1000);
-            _fpsTimer.Elapsed += FpsTimer_Elapsed;
-            _fpsTimer.Start();
 
             this.KeyDown += OnGlobalKeyDown;
 
@@ -38,7 +29,7 @@ namespace ShakyDoodle
             {
                 LayerIndicator.Text = $"Layers: {current}/{total}";
             };
-            colorPicker.Color = Avalonia.Media.Colors.Black;
+            colorPicker.Color = Colors.Black;
             UpdateLayerLabel();
             UpdateFrameLabel();
             this.SizeChanged += (s, e) =>
@@ -47,16 +38,6 @@ namespace ShakyDoodle
             };
         }
 
-        private void FpsTimer_Elapsed(object? sender, ElapsedEventArgs e)
-        {
-            int fps = _frameCount;
-            _frameCount = 0;
-
-            Dispatcher.UIThread.Post(() =>
-            {
-                FpsCounter.Text = $"FPS: {fps}";
-            });
-        }
         private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
         {
             var isCtrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);

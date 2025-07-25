@@ -11,10 +11,10 @@ namespace ShakyDoodle.Controllers
     public class DoodleCanvas : Control
     {
         public static StyledProperty<double> CanvasWidthProperty = 
-            AvaloniaProperty.Register<DoodleCanvas, double>(nameof(CanvasWidth), 1600);
+            AvaloniaProperty.Register<DoodleCanvas, double>(nameof(CanvasWidth), 1100);
             
         public static StyledProperty<double> CanvasHeightProperty = 
-            AvaloniaProperty.Register<DoodleCanvas, double>(nameof(CanvasHeight), 2000);
+            AvaloniaProperty.Register<DoodleCanvas, double>(nameof(CanvasHeight), 1500);
             
         public double CanvasWidth
         {

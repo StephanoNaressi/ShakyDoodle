@@ -11,7 +11,7 @@ namespace ShakyDoodle.Views.Controls
         private Point _origin;
         private Point _start;
         private Control? _child;
-        private double _zoom = 0.5;
+        private double _zoom = 0.7;
         private DoodleCanvas? DoodleChild => this.Child as DoodleCanvas;
 
         public ZoomBorder()
@@ -125,7 +125,7 @@ namespace ShakyDoodle.Views.Controls
         }
         public void Recenter()
         {
-            _zoom = 0.5;
+            _zoom = 0.7;
             if (_child?.RenderTransform is TransformGroup group)
             {
                 if (group.Children[0] is ScaleTransform scale)
