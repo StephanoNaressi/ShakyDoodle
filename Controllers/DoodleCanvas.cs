@@ -132,6 +132,7 @@ namespace ShakyDoodle.Controllers
         public void ChangeBrushTip(PenLineCap cap) => InputHandler.ChangeCap(cap);
         public void ChangeBrushType(BrushType brushType)
         {
+            InputHandler.IsErasing = false;
             InputHandler.ChangeBrushType(brushType);
             _helper.RequestInvalidateThrottled();
         }
