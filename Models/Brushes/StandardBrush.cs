@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Media;
 using ShakyDoodle.Models;
 
-namespace ShakyDoodle.Utils.Brushes
+namespace ShakyDoodle.Models.Brushes
 {
     public class StandardBrush : IBrush
     {

@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using System.Collections.Generic;
 
-namespace ShakyDoodle
+namespace ShakyDoodle.Utils
 {
     public class UIManager
     {

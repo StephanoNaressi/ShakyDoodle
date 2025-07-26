@@ -1,10 +1,8 @@
-using Avalonia;
 using Avalonia.Media;
 using ShakyDoodle.Controllers;
-using ShakyDoodle.Models;
 using System;
 
-namespace ShakyDoodle.Utils.Brushes
+namespace ShakyDoodle.Models.Brushes
 {
     public class ShakingBrush : IBrush
     {
@@ -44,9 +42,9 @@ namespace ShakyDoodle.Utils.Brushes
         {
             return stroke.Size switch
             {
-                SizeType.Small => 2,
-                SizeType.Medium => 8,
-                SizeType.Large => 20,
+                SizeType.Small => 5,
+                SizeType.Medium => 25,
+                SizeType.Large => 60,
                 _ => 5
             };
         }

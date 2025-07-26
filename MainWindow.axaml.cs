@@ -9,6 +9,7 @@ using System.Timers;
 using Avalonia;
 using Avalonia.Layout;
 using ShakyDoodle.Views.Controls;
+using ShakyDoodle.Utils;
 namespace ShakyDoodle
 {
     public partial class MainWindow : Window

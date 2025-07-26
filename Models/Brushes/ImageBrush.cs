@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using Avalonia.Platform;
 
-namespace ShakyDoodle.Utils.Brushes
+namespace ShakyDoodle.Models.Brushes
 {
     public class ImageBrush : IBrush
     {
@@ -52,7 +52,7 @@ namespace ShakyDoodle.Utils.Brushes
 
         private RenderTargetBitmap GetTintedBrush(Color color)
         {
-            uint key = ((uint)color.A << 24) | ((uint)color.R << 16) | ((uint)color.G << 8) | color.B;
+            uint key = (uint)color.A << 24 | (uint)color.R << 16 | (uint)color.G << 8 | color.B;
             if (_tintedCache.TryGetValue(key, out var cached))
                 return cached;
             

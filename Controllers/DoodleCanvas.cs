@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using ShakyDoodle.Rendering;
+using ShakyDoodle.Services;
 using ShakyDoodle.Utils;
 using ShakyDoodle.Views.Controls;
 
@@ -31,14 +32,14 @@ namespace ShakyDoodle.Controllers
         public bool IsSpacePressed { get; set; }
         public bool IsMirrored { get; set; }
 
-        private ShakeController _shakeController = new();
-        private LogoPreloader _logoPreloader = new();
-        private StrokeRenderer _strokeRenderer;
-        private AvaloniaExtras _helper;
-        private ShortcutHelper _shortcutHelper;
-        private Export _exportHelper;
-        public InputHandler InputHandler;
-        public FrameController FrameController;
+        private readonly ShakeController _shakeController = new();
+        private readonly LogoPreloader _logoPreloader = new();
+        private readonly StrokeRenderer _strokeRenderer;
+        private readonly AvaloniaExtras _helper;
+        private readonly ShortcutHelper _shortcutHelper;
+        private readonly Export _exportHelper;
+        public readonly InputHandler InputHandler;
+        public readonly FrameController FrameController;
 
 
         private bool _lightbox = false;
@@ -68,12 +69,14 @@ namespace ShakyDoodle.Controllers
 
         public DoodleCanvas()
         {
-            InputHandler = new InputHandler();
             _helper = new(this);
-            _strokeRenderer = new(Bounds, _helper, InputHandler, CanvasWidth, CanvasHeight);
-            FrameController = new(Bounds, _strokeRenderer);
-            _shortcutHelper = new(FrameController);
-            _exportHelper = new(Bounds, FrameController, _strokeRenderer);
+            var dependencies = new DoodleDependencies(this, _helper);
+
+            InputHandler = dependencies.InputHandler;
+            _strokeRenderer = dependencies.StrokeRenderer;
+            FrameController = dependencies.FrameController;
+            _shortcutHelper = dependencies.ShortcutHelper;
+            _exportHelper = dependencies.ExportHelper;
 
             InputHandler.Initialize(FrameController, _shortcutHelper);
 
