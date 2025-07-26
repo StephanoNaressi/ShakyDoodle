@@ -10,13 +10,16 @@ using Avalonia;
 using Avalonia.Layout;
 using ShakyDoodle.Views.Controls;
 using ShakyDoodle.Utils;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+
 namespace ShakyDoodle
 {
     public partial class MainWindow : Window
     {
         private readonly UIManager _uiManager = new UIManager();
         private bool _framesLocked = false;
-
+        private bool _isEyeDropperActive = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -47,7 +50,7 @@ namespace ShakyDoodle
             };
 
             // Register button groups with the UIManager
-            _uiManager.RegisterButtonGroup("brushes", new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton, ditherButton });
+            _uiManager.RegisterButtonGroup("brushes", new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton, ditherButton, eyedropperButton});
             _uiManager.RegisterButtonGroup("sizes", new[] { sizeSmallButton, sizeMediumButton, sizeLargeButton, sizeXLargeButton });
             _uiManager.RegisterButtonGroup("tips", new[] { brushRoundButton, brushSquareButton, brushFlatButton });
 
@@ -173,6 +176,7 @@ namespace ShakyDoodle
 
         private void ChangeBrushType(BrushType type, bool enableTips, Button sender)
         {
+            _isEyeDropperActive = false;
             doodleCanvas.ChangeBrushType(type);
             logoCanvas.ChangeBrushType(type);
             if (type == BrushType.Standard || type == BrushType.Shaking)
@@ -341,6 +345,56 @@ namespace ShakyDoodle
         private void OnTipsOff(object? sender, PointerPressedEventArgs e)
         {
             TooltipsPopup.IsOpen = false;
+        }
+
+        private void OnEyeDropperClick(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Button button)
+            {
+                _uiManager.UpdateSelection("brushes", button);
+            }
+
+            bool enableTips = false;
+            _uiManager.UpdateButtonsState(new[] { brushRoundButton, brushSquareButton, brushFlatButton }, enableTips);
+
+            _isEyeDropperActive = true;
+            this.Cursor = new Cursor(StandardCursorType.Cross);
+            this.PointerPressed += OnEyeDropperPointerPressed;
+        }
+
+        private void OnEyeDropperPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (!_isEyeDropperActive) return;
+            var position = e.GetPosition(this);
+
+            var renderTarget = new RenderTargetBitmap(new PixelSize((int)Bounds.Width, (int)Bounds.Height));
+            renderTarget.Render(this);
+
+            var pixelColor = GetPixelColor(renderTarget, position);
+
+            ChangeColor(pixelColor);
+
+            this.Cursor = new Cursor(StandardCursorType.Arrow);
+            this.PointerPressed -= OnEyeDropperPointerPressed;
+        }
+
+        private Color GetPixelColor(RenderTargetBitmap bitmap, Point position)
+        {
+            using var memoryStream = new MemoryStream();
+            bitmap.Save(memoryStream);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            using var image = SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(memoryStream);
+
+            int x = (int)position.X;
+            int y = (int)position.Y;
+
+            if (x < 0 || y < 0 || x >= image.Width || y >= image.Height)
+                return Colors.Transparent;
+
+            var pixel = image[x, y];
+            ChangeBrushType(BrushType.Standard, false, unshakeButton);
+            return Color.FromArgb(pixel.A, pixel.R, pixel.G, pixel.B);
         }
     }
 }
