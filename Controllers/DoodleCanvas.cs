@@ -155,6 +155,8 @@ namespace ShakyDoodle.Controllers
         public void Stop() => FrameController.Stop();
         public void TogglePlay() => FrameController.TogglePlay();
 
+        public void ToggleFramesLock() => FrameController.ToggleLock();
+
         public void ToggleLightbox()
         {
             _lightbox = _lightbox ? false : true;

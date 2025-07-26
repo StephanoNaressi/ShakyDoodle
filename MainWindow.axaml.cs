@@ -15,6 +15,7 @@ namespace ShakyDoodle
     public partial class MainWindow : Window
     {
         private readonly UIManager _uiManager = new UIManager();
+        private bool _framesLocked = false;
 
         public MainWindow()
         {
@@ -54,6 +55,8 @@ namespace ShakyDoodle
             _uiManager.UpdateSelection("brushes", unshakeButton);
             _uiManager.UpdateSelection("sizes", sizeSmallButton);
             _uiManager.UpdateSelection("tips", brushRoundButton);
+
+            LockFramesButton.IsEnabled = true;
         }
 
         private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
@@ -249,6 +252,25 @@ namespace ShakyDoodle
             UpdateLayerLabel();
         }
         
+        private void OnLockFramesClick(object? sender, RoutedEventArgs e)
+        {
+            _framesLocked = !_framesLocked;
+            doodleCanvas.ToggleFramesLock();
+
+            if (_framesLocked)
+            {
+                LockFramesButton.Content = "🔒";
+                DuplicateFrameButton.IsEnabled = false;
+                DeleteFrameButton.IsEnabled = false;
+            }
+            else
+            {
+                LockFramesButton.Content = "🔓";
+                DuplicateFrameButton.IsEnabled = true;
+                DeleteFrameButton.IsEnabled = true;
+            }
+        }
+
         private void ChangeColor(Color newColor)
         {
             doodleCanvas.ChangeColor(newColor);

@@ -41,12 +41,12 @@ namespace ShakyDoodle.Utils
                 {
                     case Key.X:
                     case Key.Left:
-                        _frameController.PreviousFrame();
+                        if (!_frameController.IsLocked) _frameController.PreviousFrame();
                         e.Handled = true;
                         break;
                     case Key.C:
                     case Key.Right:
-                        _frameController.NextFrame();
+                        if (!_frameController.IsLocked) _frameController.NextFrame();
                         e.Handled = true;
                         break;
                     case Key.Up:

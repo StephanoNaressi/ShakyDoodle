@@ -32,8 +32,8 @@
 				<MenuItem Header="Delete Layer" Click="OnDeleteLayer"/>
 			</MenuItem>
 			<MenuItem Header="Animation">
-				<MenuItem Header="Copy Frame" Click="OnDuplicateFrame"/>
-				<MenuItem Header="Delete Frame" Click="OnDeleteFrame"/>
+				<MenuItem x:Name="DuplicateFrameButton" Header="Copy Frame" Click="OnDuplicateFrame"/>
+				<MenuItem x:Name="DeleteFrameButton" Header="Delete Frame" Click="OnDeleteFrame"/>
 				<MenuItem Header="Lightbox" Click="ToggleLightbox"/>
 			</MenuItem>
 			<MenuItem Header="Help">
@@ -104,9 +104,6 @@
 						<Button Background="Green" Click="OnChangeGreen" Margin="2" BorderBrush="Black" BorderThickness="1" Width="24" Height="24"/>
 					</UniformGrid>
 					<StackPanel x:Name="RecentColorsPanel" Orientation="Vertical" Margin="8" HorizontalAlignment="Center"/>
-					<TextBlock Text="Layer Alpha" HorizontalAlignment="Center"/>
-					<Slider x:Name="layerOpacitySlider" Minimum="0" Maximum="100" Value="100" Width="100" ValueChanged="UpdateLayerOpacity" />
-
 
 					<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
 						<Button Content="🠈" Click="OnPrevFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
@@ -117,6 +114,14 @@
 						</UniformGrid>
 						<Button Content="🠊" Click="OnNextFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
 					</UniformGrid>
+
+					<TextBlock Text="Layer Alpha" HorizontalAlignment="Center"/>
+					<Slider x:Name="layerOpacitySlider" Minimum="0" Maximum="100" Value="100" Width="100" ValueChanged="UpdateLayerOpacity" />
+					<UniformGrid Columns="1" Margin="5" HorizontalAlignment="Center">
+						<TextBlock Text="Lock Frames" HorizontalAlignment="Center"/>
+						<Button x:Name="LockFramesButton" Content="🔓" HorizontalAlignment="Center" Click="OnLockFramesClick"  Background="DarkOrchid" BorderBrush="Black" BorderThickness="1"/>
+					</UniformGrid>
+
 
 					<UniformGrid Columns="1" Margin="5" HorizontalAlignment="Center">
 						<TextBlock Text="Frames: 1/1" x:Name="FrameIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>

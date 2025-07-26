@@ -30,10 +30,17 @@ namespace ShakyDoodle.Controllers
         public RenderTargetBitmap? CachedBitmap;
         public bool IsDirty = true;
         private bool _isPlaying = false;
+        public bool IsLocked { get; private set; }
+
         public FrameController(Rect bounds, StrokeRenderer strokeRenderer, int startingFrame = 0)
         {
             _strokeRenderer = strokeRenderer;
             CurrentFrame = startingFrame;
+        }
+
+        public void ToggleLock()
+        {
+            IsLocked = !IsLocked;
         }
 
         public void EraseStrokes(List<Stroke> strokes, Point eraserCenter, double eraserRadius)
@@ -77,7 +84,7 @@ namespace ShakyDoodle.Controllers
 
         public void DeleteCurrentFrame()
         {
-            if (_frames.Count <= 1) return;
+            if (IsLocked || _frames.Count <= 1) return;
             _frames.RemoveAt(CurrentFrame);
             if (CurrentFrame >= _frames.Count) CurrentFrame = _frames.Count - 1;
             MarkDirty();
@@ -148,6 +155,7 @@ namespace ShakyDoodle.Controllers
 
         public void AddEmptyFrame()
         {
+            if (IsLocked) return;
             var layers = new List<Layer>();
             for (int i = 0; i < 5; i++)
             {
@@ -190,6 +198,7 @@ namespace ShakyDoodle.Controllers
 
         public void ClearAll()
         {
+            if (IsLocked) return;
             _frames.Clear();
 
             AddEmptyFrame();
@@ -219,6 +228,7 @@ namespace ShakyDoodle.Controllers
         }
         public void DuplicateFrame()
         {
+            if (IsLocked) return;
             int cur = CurrentFrame;
             if (cur < 0 || cur >= _frames.Count) return;
 
@@ -244,7 +254,17 @@ namespace ShakyDoodle.Controllers
             int next = CurrentFrame + 1;
 
             if (next >= TotalFrames)
-                AddEmptyFrame();
+            {
+                if (IsLocked)
+                {
+                    // loop back to the beginning if locked
+                    next = 0;
+                }
+                else
+                {
+                    AddEmptyFrame();
+                }
+            }
             LoadFrame(next);
         }
         public void PreviousFrame()
