@@ -91,7 +91,7 @@ namespace ShakyDoodle.Rendering
 
             if (_activeStrokeCache == null || _activeStrokeCache.PixelSize.Width != (int)_canvasSize.Width || _activeStrokeCache.PixelSize.Height != (int)_canvasSize.Height)
             {
-                _activeStrokeCache = new RenderTargetBitmap(new PixelSize((int)_canvasSize.Width, (int)_canvasHeight));
+                _activeStrokeCache = new RenderTargetBitmap(new PixelSize((int)_canvasSize.Width, (int)_canvasSize.Height));
             }
 
             using (var ctx = _activeStrokeCache.CreateDrawingContext(true))
@@ -169,10 +169,10 @@ namespace ShakyDoodle.Rendering
                     _shakingBrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
                     break;
                 case BrushType.Acrylic:
-                    _acrylicBrush.DrawStroke(stroke, context, layerOpacity);
+                    _acrylicBrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
                     break;
                 case BrushType.Airbrush:
-                    _airbrush.DrawStroke(stroke, context, layerOpacity);
+                    _airbrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
                     break;
                 case BrushType.Lasso:
                     if (stroke.Points.Count > 2)

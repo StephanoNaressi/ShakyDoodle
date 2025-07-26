@@ -1,6 +1,7 @@
 using Avalonia.Media;
 using ShakyDoodle.Controllers;
 using System;
+using System.Linq;
 
 namespace ShakyDoodle.Models.Brushes
 {
@@ -15,27 +16,31 @@ namespace ShakyDoodle.Models.Brushes
 
         public void DrawStroke(Stroke stroke, DrawingContext context, double layerOpacity = 1.0, double shakeIntensity = 1.0)
         {
-            for (int i = 1; i < stroke.Points.Count; i++)
-            {
-                var pen = SetupPen(stroke, i, layerOpacity);
-                var p1 = _shakeController.GetShakenPoint(stroke.Points[i - 1], shakeIntensity);
-                var p2 = _shakeController.GetShakenPoint(stroke.Points[i], shakeIntensity);
-                context.DrawLine(pen, p1, p2);
-            }
-        }
+            if (stroke.Points.Count < 2)
+                return;
 
-        private Pen SetupPen(Stroke stroke, int i, double layerOpacity)
-        {
-            float pressure = stroke.Pressures[i];
-            double scaledPressure = Math.Min(pressure * 2, 1);
-            var size = GetStrokeSize(stroke);
-            
-            return new Pen(
-                new SolidColorBrush(stroke.Color, stroke.Alpha * scaledPressure * layerOpacity), 
-                size * pressure)
+            var strokeAlpha = stroke.Alpha * layerOpacity;
+            var strokeBrush = new SolidColorBrush(stroke.Color, strokeAlpha);
+            var pen = new Pen(
+                strokeBrush,
+                GetStrokeSize(stroke),
+                lineCap: stroke.PenLineCap,
+                lineJoin: PenLineJoin.Round
+            );
+
+            var geometry = new StreamGeometry();
+            using (var geometryContext = geometry.Open())
             {
-                LineCap = stroke.PenLineCap
-            };
+                var shakenPoints = stroke.Points.Select(p => _shakeController.GetShakenPoint(p, shakeIntensity)).ToList();
+                geometryContext.BeginFigure(shakenPoints[0], false);
+                for (int i = 1; i < shakenPoints.Count; i++)
+                {
+                    geometryContext.LineTo(shakenPoints[i]);
+                }
+                geometryContext.EndFigure(false);
+            }
+
+            context.DrawGeometry(strokeBrush, pen, geometry);
         }
 
         private double GetStrokeSize(Stroke stroke)

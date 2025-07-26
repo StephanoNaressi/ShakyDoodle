@@ -8,33 +8,30 @@ namespace ShakyDoodle.Models.Brushes
     {
         public void DrawStroke(Stroke stroke, DrawingContext context, double layerOpacity = 1.0, double shakeIntensity = 0.0)
         {
-            var strokeAlpha = stroke.Alpha * layerOpacity;
-            var strokeBrush = new SolidColorBrush(stroke.Color, strokeAlpha);
+            if (stroke.Points.Count < 2)
+                return;
 
-            for (int i = 1; i < stroke.Points.Count; i++)
+            // Apply both stroke.Alpha and layerOpacity
+            var strokeBrush = new SolidColorBrush(stroke.Color, stroke.Alpha * layerOpacity);
+            var pen = new Pen(
+                strokeBrush,
+                stroke.Size switch { SizeType.Small => 5, SizeType.Medium => 25, SizeType.Large => 60, SizeType.ExtraLarge => 150, _ => 5 },
+                lineCap: stroke.PenLineCap,
+                lineJoin: PenLineJoin.Round
+            );
+
+            var geometry = new StreamGeometry();
+            using (var geometryContext = geometry.Open())
             {
-                var pt = stroke.Points[i - 1];
-                float pressure = i < stroke.Pressures.Count ? stroke.Pressures[i] : 1f;
-                double size = GetStrokeSize(stroke) * pressure;
-
-                switch (stroke.PenLineCap)
+                geometryContext.BeginFigure(stroke.Points[0], false);
+                for (int i = 1; i < stroke.Points.Count; i++)
                 {
-                    case PenLineCap.Round:
-                        context.DrawEllipse(strokeBrush, null, pt, size / 2, size / 2);
-                        break;
-                    case PenLineCap.Square:
-                        context.DrawRectangle(strokeBrush, null,
-                            new Rect(pt.X - size / 2, pt.Y - size / 2, size, size));
-                        break;
-                    case PenLineCap.Flat:
-                        context.DrawRectangle(strokeBrush, null,
-                            new Rect(pt.X - size / 2, pt.Y - size / 2, size / 2, size));
-                        break;
-                    default:
-                        context.DrawEllipse(strokeBrush, null, pt, size / 2, size / 2);
-                        break;
+                    geometryContext.LineTo(stroke.Points[i]);
                 }
+                geometryContext.EndFigure(false);
             }
+
+            context.DrawGeometry(strokeBrush, pen, geometry);
         }
 
         private double GetStrokeSize(Stroke stroke)
