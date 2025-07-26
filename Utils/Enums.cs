@@ -16,5 +16,6 @@ public enum BrushType
     Acrylic,
     Shaking,
     Lasso,
-    Airbrush
+    Airbrush,
+    Dither
 }

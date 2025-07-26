@@ -47,7 +47,7 @@ namespace ShakyDoodle
             };
 
             // Register button groups with the UIManager
-            _uiManager.RegisterButtonGroup("brushes", new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton });
+            _uiManager.RegisterButtonGroup("brushes", new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton, ditherButton });
             _uiManager.RegisterButtonGroup("sizes", new[] { sizeSmallButton, sizeMediumButton, sizeLargeButton, sizeXLargeButton });
             _uiManager.RegisterButtonGroup("tips", new[] { brushRoundButton, brushSquareButton, brushFlatButton });
 
@@ -192,6 +192,7 @@ namespace ShakyDoodle
         }
 
         private void OnUnshake(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Standard, true, (Button)sender);
+        private void OnDither(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Dither, true, (Button)sender);
         private void OnShake(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Shaking, true, (Button)sender);
         private void OnAcr(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Acrylic, false, (Button)sender);
         private void OnAirbrush(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Airbrush, false, (Button)sender);

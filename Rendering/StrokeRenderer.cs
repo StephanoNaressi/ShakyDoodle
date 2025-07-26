@@ -34,9 +34,9 @@ namespace ShakyDoodle.Rendering
 
         private readonly StandardBrush _standardBrush = new();
         private readonly ShakingBrush _shakingBrush;
-
         private readonly Models.Brushes.ImageBrush _acrylicBrush = new("Assets/acr_tip.png");
         private readonly Models.Brushes.ImageBrush _airbrush = new("Assets/air_tip.png");
+        private readonly DitherBrush _ditherBrush = new("Assets/dither_tip.png");
 
         private RenderTargetBitmap? _activeStrokeCache;
 
@@ -173,6 +173,9 @@ namespace ShakyDoodle.Rendering
                     break;
                 case BrushType.Airbrush:
                     _airbrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
+                    break;
+                case BrushType.Dither:
+                    _ditherBrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
                     break;
                 case BrushType.Lasso:
                     if (stroke.Points.Count > 2)
