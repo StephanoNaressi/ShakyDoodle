@@ -106,6 +106,29 @@ namespace ShakyDoodle.Controllers
 
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            switch (e.Key)
+            {
+                case Key.X:
+                case Key.Left:
+                    PreviousFrame();
+                    break;
+                case Key.C:
+                case Key.Right:
+                    NextFrame();
+                    break;
+                case Key.Up:
+                    NextLayer();
+                    break;
+                case Key.Down:
+                    PrevLayer();
+                    break;
+            }
+            _helper.RequestInvalidateThrottled();
+        }
+
         protected override void OnInitialized()
         {
             base.OnInitialized();

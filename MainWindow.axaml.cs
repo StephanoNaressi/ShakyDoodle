@@ -36,7 +36,13 @@ namespace ShakyDoodle
             {
                 doodleCanvas.InvalidateVisual();
             };
-
+            this.PointerPressed += (s, e) =>
+            {
+                if (TooltipsPopup.IsOpen && !TooltipsPopup.Bounds.Contains(e.GetPosition(this)))
+                {
+                    TooltipsPopup.IsOpen = false;
+                }
+            };
             // Set initial selection
             UpdateBrushSelection(unshakeButton);
             UpdateSizeSelection(sizeSmallButton);
@@ -372,7 +378,14 @@ namespace ShakyDoodle
             UpdateBrushSelection(sender as Button);
             UpdateTipButtonsState(false);
         }
-
+        private void OnTips(object? sender, RoutedEventArgs events)
+        {
+            TooltipsPopup.IsOpen = true;
+        }
+        private void OnTipsOff(object? sender, PointerPressedEventArgs e)
+        {
+            TooltipsPopup.IsOpen = false;
+        }
         void UpdateBrushSelection(Button? selectedButton)
         {
             var buttons = new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton };
