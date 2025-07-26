@@ -107,16 +107,20 @@ namespace ShakyDoodle.Views.Controls
                 return;
             }
 
-            var currentScale = scaleTransform.ScaleX;
-            var newScale = currentScale * scaleFactor;
-            _zoom = newScale;
+            var currentScaleX = scaleTransform.ScaleX;
+            var currentScaleY = scaleTransform.ScaleY;
 
-            scaleTransform.ScaleX = DoodleChild.IsMirrored ? -newScale : newScale;
-            scaleTransform.ScaleY = newScale;
+            _zoom *= scaleFactor;
+
+            var newScaleX = DoodleChild.IsMirrored ? -_zoom : _zoom;
+            var newScaleY = _zoom;
+
+            scaleTransform.ScaleX = newScaleX;
+            scaleTransform.ScaleY = newScaleY;
 
             var currentTranslation = new Point(translateTransform.X, translateTransform.Y);
-            var newTranslationX = currentTranslation.X - (center.X * newScale - center.X * currentScale);
-            var newTranslationY = currentTranslation.Y - (center.Y * newScale - center.Y * currentScale);
+            var newTranslationX = currentTranslation.X - (center.X * newScaleX - center.X * currentScaleX);
+            var newTranslationY = currentTranslation.Y - (center.Y * newScaleY - center.Y * currentScaleY);
 
             translateTransform.X = newTranslationX;
             translateTransform.Y = newTranslationY;
