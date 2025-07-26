@@ -13,8 +13,8 @@ namespace ShakyDoodle
 {
     public partial class MainWindow : Window
     {
-        private Timer _fpsTimer;
-        private int _frameCount = 0;
+        private readonly UIManager _uiManager = new UIManager();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -43,10 +43,16 @@ namespace ShakyDoodle
                     TooltipsPopup.IsOpen = false;
                 }
             };
+
+            // Register button groups with the UIManager
+            _uiManager.RegisterButtonGroup("brushes", new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton });
+            _uiManager.RegisterButtonGroup("sizes", new[] { sizeSmallButton, sizeMediumButton, sizeLargeButton, sizeXLargeButton });
+            _uiManager.RegisterButtonGroup("tips", new[] { brushRoundButton, brushSquareButton, brushFlatButton });
+
             // Set initial selection
-            UpdateBrushSelection(unshakeButton);
-            UpdateSizeSelection(sizeSmallButton);
-            UpdateTipSelection(brushRoundButton);
+            _uiManager.UpdateSelection("brushes", unshakeButton);
+            _uiManager.UpdateSelection("sizes", sizeSmallButton);
+            _uiManager.UpdateSelection("tips", brushRoundButton);
         }
 
         private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
@@ -97,8 +103,7 @@ namespace ShakyDoodle
 
                 swatch.Click += (s, e) =>
                 {
-                    doodleCanvas.ChangeColor(swatchColor);
-                    colorPicker.Color = swatchColor;
+                    ChangeColor(swatchColor);
                 };
 
                 currentRow.Children.Add(swatch);
@@ -144,65 +149,64 @@ namespace ShakyDoodle
             double newOpacity = layerOpacitySlider.Value / 100.0;
             doodleCanvas.OnUpdateOpacity(newOpacity);
         }
-        private void OnSizeSmall(object? sender, RoutedEventArgs events)
+        private void SelectSize(SizeType size, Button sender)
         {
-            doodleCanvas.SelectSize(SizeType.Small);
-            logoCanvas.SelectSize(SizeType.Small);
-            UpdateSizeSelection(sender as Button);
+            doodleCanvas.SelectSize(size);
+            logoCanvas.SelectSize(size);
+            _uiManager.UpdateSelection("sizes", sender);
         }
-        private void OnErase(object? sender, RoutedEventArgs events)
+
+        private void OnSizeSmall(object? sender, RoutedEventArgs e) => SelectSize(SizeType.Small, (Button)sender);
+        private void OnSizeMedium(object? sender, RoutedEventArgs e) => SelectSize(SizeType.Medium, (Button)sender);
+        private void OnSizeLarge(object? sender, RoutedEventArgs e) => SelectSize(SizeType.Large, (Button)sender);
+        private void OnSizeXLarge(object? sender, RoutedEventArgs e) => SelectSize(SizeType.ExtraLarge, (Button)sender);
+
+        private void ChangeBrushTip(PenLineCap tip, Button sender)
+        {
+            doodleCanvas.ChangeBrushTip(tip);
+            logoCanvas.ChangeBrushTip(tip);
+            _uiManager.UpdateSelection("tips", sender);
+        }
+
+        private void OnBrushSquare(object? sender, RoutedEventArgs e) => ChangeBrushTip(PenLineCap.Square, (Button)sender);
+        private void OnBrushFlat(object? sender, RoutedEventArgs e) => ChangeBrushTip(PenLineCap.Flat, (Button)sender);
+        private void OnBrushRound(object? sender, RoutedEventArgs e) => ChangeBrushTip(PenLineCap.Round, (Button)sender);
+
+        private void ChangeBrushType(BrushType type, bool enableTips, Button sender)
+        {
+            doodleCanvas.ChangeBrushType(type);
+            logoCanvas.ChangeBrushType(type);
+            if (type == BrushType.Standard || type == BrushType.Shaking)
+            {
+                doodleCanvas.ShouldShake(type == BrushType.Shaking);
+                logoCanvas.ShouldShake(type == BrushType.Shaking);
+            }
+            _uiManager.UpdateSelection("brushes", sender);
+            _uiManager.UpdateButtonsState(new[] { brushRoundButton, brushSquareButton, brushFlatButton }, enableTips);
+        }
+
+        private void OnErase(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.OnErase();
-            UpdateBrushSelection(sender as Button);
-            UpdateTipButtonsState(false);
+            _uiManager.UpdateSelection("brushes", (Button)sender);
+            _uiManager.UpdateButtonsState(new[] { brushRoundButton, brushSquareButton, brushFlatButton }, false);
         }
+
+        private void OnUnshake(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Standard, true, (Button)sender);
+        private void OnShake(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Shaking, true, (Button)sender);
+        private void OnAcr(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Acrylic, false, (Button)sender);
+        private void OnAirbrush(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Airbrush, false, (Button)sender);
+        private void OnLassoFill(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Lasso, false, (Button)sender);
+
         private void OnToggleNoise(object? sender, RoutedEventArgs events)
         {
             doodleCanvas.ToggleNoise();
         }
-        private void OnSizeMedium(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectSize(SizeType.Medium);
-            logoCanvas.SelectSize(SizeType.Medium);
-            UpdateSizeSelection(sender as Button);
-        }
-        private void OnSizeLarge(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectSize(SizeType.Large);
-            logoCanvas.SelectSize(SizeType.Large);
-            UpdateSizeSelection(sender as Button);
-        }
-        private void OnSizeXLarge(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.SelectSize(SizeType.ExtraLarge);
-            logoCanvas.SelectSize(SizeType.ExtraLarge);
-            UpdateSizeSelection(sender as Button);
-        }
+        
         private void OnAlphaChanged(object? sender, RangeBaseValueChangedEventArgs events)
         {
             doodleCanvas.ChangeAlpha((double)events.NewValue);
             logoCanvas.ChangeAlpha((double)events.NewValue);
-        }
-
-        private void OnBrushSquare(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Square);
-            logoCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Square);
-            UpdateTipSelection(sender as Button);
-        }
-
-        private void OnBrushFlat(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Flat);
-            logoCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Flat);
-            UpdateTipSelection(sender as Button);
-        }
-
-        private void OnBrushRound(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Round);
-            logoCanvas.ChangeBrushTip(Avalonia.Media.PenLineCap.Round);
-            UpdateTipSelection(sender as Button);
         }
 
         private void OnDuplicateFrame(object? sender, RoutedEventArgs events)
@@ -210,26 +214,6 @@ namespace ShakyDoodle
             doodleCanvas.DuplicateFrame();
             UpdateFrameLabel();
             UpdateLayerLabel();
-        }
-
-        private void OnShake(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.ShouldShake(true);
-            logoCanvas.ShouldShake(true);
-            doodleCanvas.ChangeBrushType(BrushType.Shaking);
-            logoCanvas.ChangeBrushType(BrushType.Shaking);
-            UpdateBrushSelection(sender as Button);
-            UpdateTipButtonsState(true);
-        }
-
-        private void OnUnshake(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.ShouldShake(false);
-            logoCanvas.ShouldShake(false);
-            doodleCanvas.ChangeBrushType(BrushType.Standard);
-            logoCanvas.ChangeBrushType(BrushType.Standard);
-            UpdateBrushSelection(sender as Button);
-            UpdateTipButtonsState(true);
         }
 
         private void OnNextFrame(object? sender, RoutedEventArgs events)
@@ -268,44 +252,20 @@ namespace ShakyDoodle
             UpdatePlayLabel();
             UpdateLayerLabel();
         }
-        private void OnColorChanged(object? sender, ColorChangedEventArgs events)
+        
+        private void ChangeColor(Color newColor)
         {
-            var newColor = events.NewColor;
             doodleCanvas.ChangeColor(newColor);
             logoCanvas.ChangeColor(newColor);
+            colorPicker.Color = newColor;
             PopulateRecentColorSwatches();
         }
-        private void OnChangeBlack(object? sender, RoutedEventArgs events)
-        {
-            var col = new Color(255, 0, 0, 0);
-            doodleCanvas.ChangeColor(col);
-            logoCanvas.ChangeColor(col);
-            colorPicker.Color = col;
-        }
 
-        private void OnChangeRed(object? sender, RoutedEventArgs events)
-        {
-            var col = new Color(255, 255, 0, 0);
-            doodleCanvas.ChangeColor(col);
-            logoCanvas.ChangeColor(col);
-            colorPicker.Color = col;
-        }
-
-        private void OnChangeBlue(object? sender, RoutedEventArgs events)
-        {
-            var col = new Color(255, 0, 0, 255);
-            doodleCanvas.ChangeColor(col);
-            logoCanvas.ChangeColor(col);
-            colorPicker.Color = col;
-        }
-
-        private void OnChangeGreen(object? sender, RoutedEventArgs events)
-        {
-            var col = new Color(255, 0, 255, 0);
-            doodleCanvas.ChangeColor(col);
-            logoCanvas.ChangeColor(col);
-            colorPicker.Color = col;
-        }
+        private void OnColorChanged(object? sender, ColorChangedEventArgs e) => ChangeColor(e.NewColor);
+        private void OnChangeBlack(object? sender, RoutedEventArgs e) => ChangeColor(Colors.Black);
+        private void OnChangeRed(object? sender, RoutedEventArgs e) => ChangeColor(Colors.Red);
+        private void OnChangeBlue(object? sender, RoutedEventArgs e) => ChangeColor(Colors.Blue);
+        private void OnChangeGreen(object? sender, RoutedEventArgs e) => ChangeColor(Colors.Green);
 
         private void ToggleLightbox(object? sender, RoutedEventArgs events)
         {
@@ -354,30 +314,7 @@ namespace ShakyDoodle
 
             doodleCanvas.ExportFramesAsGif(filePath, width, height);
         }
-
-        private void OnAcr(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.ChangeBrushType(BrushType.Acrylic);
-            logoCanvas.ChangeBrushType(BrushType.Acrylic);
-            UpdateBrushSelection(sender as Button);
-            UpdateTipButtonsState(false);
-        }
-
-        private void OnAirbrush(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.ChangeBrushType(BrushType.Airbrush);
-            logoCanvas.ChangeBrushType(BrushType.Airbrush);
-            UpdateBrushSelection(sender as Button);
-            UpdateTipButtonsState(false);
-        }
-
-        private void OnLassoFill(object? sender, RoutedEventArgs events)
-        {
-            doodleCanvas.ChangeBrushType(BrushType.Lasso);
-            logoCanvas.ChangeBrushType(BrushType.Lasso);
-            UpdateBrushSelection(sender as Button);
-            UpdateTipButtonsState(false);
-        }
+        
         private void OnTips(object? sender, RoutedEventArgs events)
         {
             TooltipsPopup.IsOpen = true;
@@ -385,42 +322,6 @@ namespace ShakyDoodle
         private void OnTipsOff(object? sender, PointerPressedEventArgs e)
         {
             TooltipsPopup.IsOpen = false;
-        }
-        void UpdateBrushSelection(Button? selectedButton)
-        {
-            var buttons = new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton };
-            foreach (var button in buttons)
-            {
-                if (button != null) button.Opacity = 0.5;
-            }
-            if (selectedButton != null) selectedButton.Opacity = 1.0;
-        }
-
-        private void UpdateSizeSelection(Button? selectedButton)
-        {
-            var buttons = new[] { sizeSmallButton, sizeMediumButton, sizeLargeButton, sizeXLargeButton };
-            foreach (var button in buttons)
-            {
-                if (button != null) button.Opacity = 0.5;
-            }
-            if (selectedButton != null) selectedButton.Opacity = 1.0;
-        }
-
-        private void UpdateTipSelection(Button? selectedButton)
-        {
-            var buttons = new[] { brushRoundButton, brushSquareButton, brushFlatButton };
-            foreach (var button in buttons)
-            {
-                if (button != null) button.Opacity = 0.5;
-            }
-            if (selectedButton != null) selectedButton.Opacity = 1.0;
-        }
-
-        private void UpdateTipButtonsState(bool isEnabled)
-        {
-            brushRoundButton.IsEnabled = isEnabled;
-            brushSquareButton.IsEnabled = isEnabled;
-            brushFlatButton.IsEnabled = isEnabled;
         }
     }
 }
