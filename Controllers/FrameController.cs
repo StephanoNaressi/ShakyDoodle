@@ -175,7 +175,7 @@ namespace ShakyDoodle.Controllers
             ActiveLayerIndex = index;
             OnLayerChanged?.Invoke(ActiveLayerIndex + 1, layers.Count);
         }
-        public void AddLayerToCurrentFrame(string name)
+        public void AddLayerToCurrentFrame(String name)
         {
             if (CurrentFrame < 0 || CurrentFrame >= _frames.Count) return;
             _frames[CurrentFrame].Layers.Add(new Layer
@@ -245,12 +245,10 @@ namespace ShakyDoodle.Controllers
 
             if (next >= TotalFrames)
                 AddEmptyFrame();
-            SetCurrentLayer(4);
             LoadFrame(next, visual);
         }
         public void PreviousFrame(Visual visual)
         {
-            SetCurrentLayer(4);
             SaveCurrentFrame();
             if (CurrentFrame > 0) LoadFrame(CurrentFrame - 1, visual);
         }
