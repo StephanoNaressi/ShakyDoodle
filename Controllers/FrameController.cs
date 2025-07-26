@@ -121,7 +121,7 @@ namespace ShakyDoodle.Controllers
             OnLayerChanged?.Invoke(ActiveLayerIndex + 1, layers.Count);
         }
 
-        public void LoadFrame(int index, Visual visual)
+        public void LoadFrame(int index)
         {
             if (index < 0 || index >= _frames.Count) return;
 
@@ -129,7 +129,7 @@ namespace ShakyDoodle.Controllers
             _frames[CurrentFrame].CachedBitmap = null;
             _frames[CurrentFrame].IsDirty = true;
             SyncFrameToStrokes();
-            visual.InvalidateVisual();
+            OnInvalidateRequested?.Invoke();
 
             OnFrameChanged?.Invoke(CurrentFrame + 1, TotalFrames);
         }
@@ -217,7 +217,7 @@ namespace ShakyDoodle.Controllers
                    .SelectMany(l => l.Strokes)
                    .ToList();
         }
-        public void DuplicateFrame(Control canvas)
+        public void DuplicateFrame()
         {
             int cur = CurrentFrame;
             if (cur < 0 || cur >= _frames.Count) return;
@@ -236,23 +236,23 @@ namespace ShakyDoodle.Controllers
             };
 
             _frames.Insert(cur + 1, newFrame);
-            LoadFrame(cur + 1, canvas);
+            LoadFrame(cur + 1);
         }
-        public void NextFrame(Visual visual)
+        public void NextFrame()
         {
             SaveCurrentFrame();
             int next = CurrentFrame + 1;
 
             if (next >= TotalFrames)
                 AddEmptyFrame();
-            LoadFrame(next, visual);
+            LoadFrame(next);
         }
-        public void PreviousFrame(Visual visual)
+        public void PreviousFrame()
         {
             SaveCurrentFrame();
-            if (CurrentFrame > 0) LoadFrame(CurrentFrame - 1, visual);
+            if (CurrentFrame > 0) LoadFrame(CurrentFrame - 1);
         }
-        public async void Play(Visual visual)
+        public async void Play()
         {
             if (TotalFrames == 0) return;
             SetCurrentLayer(0);
@@ -260,15 +260,15 @@ namespace ShakyDoodle.Controllers
             while (_isPlaying)
             {
                 int next = (CurrentFrame + 1) % TotalFrames;
-                LoadFrame(next, visual);
+                LoadFrame(next);
                 await Task.Delay(150);
             }
         }
         public void Stop() => _isPlaying = false;
-        public void TogglePlay(Visual visual)
+        public void TogglePlay()
         {
             if (_isPlaying) Stop();
-            else Play(visual);
+            else Play();
         }
         public void MarkDirty()
         {

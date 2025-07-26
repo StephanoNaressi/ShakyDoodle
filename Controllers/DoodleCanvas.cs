@@ -36,7 +36,7 @@ namespace ShakyDoodle.Controllers
         private readonly LogoPreloader _logoPreloader = new();
         private readonly StrokeRenderer _strokeRenderer;
         private readonly AvaloniaExtras _helper;
-        private readonly ShortcutHelper _shortcutHelper;
+        public readonly ShortcutHelper ShortcutHelper;
         private readonly Export _exportHelper;
         public readonly InputHandler InputHandler;
         public readonly FrameController FrameController;
@@ -75,10 +75,10 @@ namespace ShakyDoodle.Controllers
             InputHandler = dependencies.InputHandler;
             _strokeRenderer = dependencies.StrokeRenderer;
             FrameController = dependencies.FrameController;
-            _shortcutHelper = dependencies.ShortcutHelper;
+            ShortcutHelper = dependencies.ShortcutHelper;
             _exportHelper = dependencies.ExportHelper;
 
-            InputHandler.Initialize(FrameController, _shortcutHelper);
+            InputHandler.Initialize(FrameController, ShortcutHelper);
 
             FrameController.AddEmptyFrame();
             Focusable = true;
@@ -107,29 +107,6 @@ namespace ShakyDoodle.Controllers
             InputHandler.UpdateSettings(new Color(255, 0, 0, 0), SizeType.Small, 1,PenLineCap.Round, false);
             Cursor = new Cursor(StandardCursorType.Cross);
 
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-            switch (e.Key)
-            {
-                case Key.X:
-                case Key.Left:
-                    PreviousFrame();
-                    break;
-                case Key.C:
-                case Key.Right:
-                    NextFrame();
-                    break;
-                case Key.Up:
-                    NextLayer();
-                    break;
-                case Key.Down:
-                    PrevLayer();
-                    break;
-            }
-            _helper.RequestInvalidateThrottled();
         }
 
         protected override void OnInitialized()
@@ -170,13 +147,13 @@ namespace ShakyDoodle.Controllers
             _helper.RequestInvalidateThrottled();
         }
 
-        public void NextFrame() => FrameController.NextFrame(this);
-        public void PreviousFrame() => FrameController.PreviousFrame(this);
+        public void NextFrame() => FrameController.NextFrame();
+        public void PreviousFrame() => FrameController.PreviousFrame();
 
-        public void Play() => FrameController.Play(this);
+        public void Play() => FrameController.Play();
 
         public void Stop() => FrameController.Stop();
-        public void TogglePlay() => FrameController.TogglePlay(this);
+        public void TogglePlay() => FrameController.TogglePlay();
 
         public void ToggleLightbox()
         {
@@ -186,17 +163,17 @@ namespace ShakyDoodle.Controllers
 
         public void HandleUndo()
         {
-            _shortcutHelper.Undo();
+            ShortcutHelper.Undo();
             _helper.RequestInvalidateThrottled();
         }
 
         public void HandleRedo()
         {
-            _shortcutHelper.Redo();
+            ShortcutHelper.Redo();
             _helper.RequestInvalidateThrottled();
         }
         public void ToggleNoise() => _isNoise = _isNoise ? false : true;
-        public void DuplicateFrame() => FrameController.DuplicateFrame(this);
+        public void DuplicateFrame() => FrameController.DuplicateFrame();
 
         public void ExportFramesAsPng(string folderPath, int width, int height) => _exportHelper.ExportFramesAsPng(folderPath, width, height, _currentBG);
         public void ExportFramesAsGif(string folderPath, int width, int height) => _exportHelper.ExportAsGif(folderPath, width, height, _currentBG);

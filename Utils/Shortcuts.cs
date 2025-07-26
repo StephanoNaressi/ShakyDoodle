@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Avalonia.Input;
 using ShakyDoodle.Controllers;
 using ShakyDoodle.Models;
 
@@ -14,6 +15,50 @@ namespace ShakyDoodle.Utils
         public ShortcutHelper(FrameController frameController)
         {
             _frameController = frameController;
+        }
+
+        public void HandleKeyDown(KeyEventArgs e)
+        {
+            var isCtrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
+
+            if (isCtrl)
+            {
+                switch (e.Key)
+                {
+                    case Key.Z:
+                        Undo();
+                        e.Handled = true;
+                        break;
+                    case Key.Y:
+                        Redo();
+                        e.Handled = true;
+                        break;
+                }
+            }
+            else
+            {
+                switch (e.Key)
+                {
+                    case Key.X:
+                    case Key.Left:
+                        _frameController.PreviousFrame();
+                        e.Handled = true;
+                        break;
+                    case Key.C:
+                    case Key.Right:
+                        _frameController.NextFrame();
+                        e.Handled = true;
+                        break;
+                    case Key.Up:
+                        _frameController.SetCurrentLayer(_frameController.ActiveLayerIndex + 1);
+                        e.Handled = true;
+                        break;
+                    case Key.Down:
+                        _frameController.SetCurrentLayer(_frameController.ActiveLayerIndex - 1);
+                        e.Handled = true;
+                        break;
+                }
+            }
         }
 
         public void PushUndoState(List<Stroke> strokes)

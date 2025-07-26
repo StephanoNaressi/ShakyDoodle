@@ -58,16 +58,11 @@ namespace ShakyDoodle
 
         private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
         {
-            var isCtrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
-            if (isCtrl && e.Key == Key.Z)
+            doodleCanvas.ShortcutHelper.HandleKeyDown(e);
+            if (e.Handled)
             {
-                doodleCanvas.HandleUndo();
-                e.Handled = true;
-            }
-            else if (isCtrl && e.Key == Key.Y)
-            {
-                doodleCanvas.HandleRedo();
-                e.Handled = true;
+                UpdateFrameLabel();
+                UpdateLayerLabel();
             }
         }
         private void PopulateRecentColorSwatches()
