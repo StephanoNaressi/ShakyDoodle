@@ -65,7 +65,7 @@ namespace ShakyDoodle.Rendering
 
             foreach (var layer in frame.Layers.Where(l => l.IsVisible))
             {
-                var nonShakingStrokes = layer.Strokes.Where(s => !s.Shake).ToList();
+                var nonShakingStrokes = layer.Strokes.Where(s => s != null && !s.Shake).ToList();
                 if (layer.IsDirty || layer.CachedBitmap == null)
                 {
                     layer.CachedBitmap = RasterizeStrokes(nonShakingStrokes, _canvasSize);
@@ -86,7 +86,7 @@ namespace ShakyDoodle.Rendering
             foreach (var layer in frame.Layers.Where(l => l.IsVisible))
             {
                 double layerOpacity = layer.Opacity;
-                foreach (var stroke in layer.Strokes.Where(s => s.Shake))
+                foreach (var stroke in layer.Strokes.Where(s => s != null && s.Shake))
                 {
                     if (stroke == _inputHandler.CurrentStroke)
                         continue;

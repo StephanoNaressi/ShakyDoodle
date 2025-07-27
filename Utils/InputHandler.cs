@@ -142,7 +142,10 @@ namespace ShakyDoodle.Utils
             var layer = _frameController.GetCurrentLayer();
             if (layer != null) layer.IsDirty = true;
             var strokes = _frameController.GetStrokes();
-            strokes.Add(CurrentStroke);
+            if (CurrentStroke != null)
+            {
+                strokes.Add(CurrentStroke);
+            }
             CurrentStroke = null;
         }
 
