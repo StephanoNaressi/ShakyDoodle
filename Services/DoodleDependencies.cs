@@ -21,7 +21,7 @@ namespace ShakyDoodle.Services
             
             var frameRendererService = new FrameRendererService(strokeRenderer, canvas.CanvasWidth, canvas.CanvasHeight);
             
-            strokeRenderer.SetFrameRendererService(frameRendererService);
+            //strokeRenderer.SetFrameRendererService(frameRendererService);
 
             FrameController = new FrameController(canvas.Bounds, strokeRenderer);
             ShortcutHelper = new ShortcutHelper(FrameController);

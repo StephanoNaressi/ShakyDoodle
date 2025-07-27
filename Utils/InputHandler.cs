@@ -55,8 +55,6 @@ namespace ShakyDoodle.Utils
             var strokes = _frameController.GetStrokes();
             _shortcutHelper.PushUndoState(strokes.Select(s => s.Clone()).ToList());
 
-            bool isShakeForStroke = _currentBrushType == BrushType.Shaking && _isShake;
-
             CurrentStroke = new Stroke(
                 _currentColor,
                 position,
@@ -64,7 +62,7 @@ namespace ShakyDoodle.Utils
                 _alpha,
                 _currentCap,
                 pressure,
-                isShakeForStroke,
+                _isShake,
                 _currentBrushType
             );
             var layer = _frameController.GetCurrentLayer();
@@ -143,6 +141,8 @@ namespace ShakyDoodle.Utils
             _frameController.SaveCurrentFrame();
             var layer = _frameController.GetCurrentLayer();
             if (layer != null) layer.IsDirty = true;
+            var strokes = _frameController.GetStrokes();
+            strokes.Add(CurrentStroke);
             CurrentStroke = null;
         }
 

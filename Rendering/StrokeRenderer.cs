@@ -1,15 +1,14 @@
-﻿using Avalonia.Media;
-using Avalonia;
-using System.Collections.Generic;
-using ShakyDoodle.Utils;
-using ShakyDoodle.Models;
-using System.Threading.Tasks;
-using System.Linq;
-using System;
-using ShakyDoodle.Controllers;
+﻿using Avalonia;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using ShakyDoodle.Services;
+using ShakyDoodle.Controllers;
+using ShakyDoodle.Models;
 using ShakyDoodle.Models.Brushes;
+using ShakyDoodle.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ShakyDoodle.Rendering
 {
@@ -17,14 +16,13 @@ namespace ShakyDoodle.Rendering
     {
         private readonly double _canvasWidth;
         private readonly double _canvasHeight;
-        private readonly InputHandler _inputHandler;
-        private readonly ShakeController _shakeController = new();
-        private readonly BrushHelper _brushHelper = new();
-        private readonly AvaloniaExtras _helper;
-        private readonly int _gridSize = 50;
-        private readonly Pen _gridPen = new(new SolidColorBrush(Colors.LightBlue), 1);
-        private readonly Size _canvasSize;
-        private FrameRendererService _frameRendererService;
+        private InputHandler _inputHandler;
+        private ShakeController _shakeController = new();
+        private BrushHelper _brushHelper = new();
+        private AvaloniaExtras _helper;
+        private int _gridSize = 50;
+        private Pen _gridPen = new(new SolidColorBrush(Colors.LightBlue), 1);
+        private Size _canvasSize;
 
         private RenderTargetBitmap? _prevFrameCache;
         private int _prevFrameCacheIndex = -1;
@@ -32,13 +30,11 @@ namespace ShakyDoodle.Rendering
         private int _nextFrameCacheIndex = -1;
         private RenderTargetBitmap? _noiseTexture;
 
-        private readonly StandardBrush _standardBrush = new();
-        private readonly ShakingBrush _shakingBrush;
-        private readonly Models.Brushes.ImageBrush _acrylicBrush = new("Assets/acr_tip.png");
-        private readonly Models.Brushes.ImageBrush _airbrush = new("Assets/air_tip.png");
-        private readonly DitherBrush _ditherBrush = new("Assets/dither_tip.png");
-
-        private RenderTargetBitmap? _activeStrokeCache;
+        private StandardBrush _standardBrush = new();
+        private ShakingBrush _shakingBrush;
+        private DitherBrush _ditherBrush = new("Assets/dither_tip.png");
+        private Models.Brushes.ImageBrush _airBrush = new("Assets/air_tip.png");
+        private Models.Brushes.ImageBrush _acrylicBrush = new("Assets/acr_tip.png");
 
         public StrokeRenderer(Rect bounds, AvaloniaExtras helper, InputHandler inputHandler, double canvasWidth, double canvasHeight)
         {
@@ -50,64 +46,64 @@ namespace ShakyDoodle.Rendering
             _canvasSize = new Size(canvasWidth, canvasHeight);
         }
 
-        public void SetFrameRendererService(FrameRendererService service)
-        {
-            _frameRendererService = service;
-        }
-
         public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds, bool noise, BGType bg)
         {
-            using (context.PushClip(new Rect(bounds.Size)))
+            using var clip = context.PushClip(new Rect(bounds.Size));
+            context.FillRectangle(Brushes.White, new Rect(bounds.Size));
+            DrawGrid(context, new Rect(bounds.Size), bg);
+
+            if (!IsValidFrame(currentFrame, frames))
+                return;
+
+            var frame = frames[currentFrame];
+
+            if (lightbox)
             {
-                if (!IsValidFrame(currentFrame, frames))
+                DrawFrameCache(context, frames, currentFrame - 1, Brushes.LightBlue, ref _prevFrameCache, ref _prevFrameCacheIndex, bounds);
+                DrawFrameCache(context, frames, currentFrame + 1, Brushes.Pink, ref _nextFrameCache, ref _nextFrameCacheIndex, bounds);
+            }
+
+            foreach (var layer in frame.Layers.Where(l => l.IsVisible))
+            {
+                var nonShakingStrokes = layer.Strokes.Where(s => !s.Shake).ToList();
+                if (layer.IsDirty || layer.CachedBitmap == null)
                 {
-                    context.FillRectangle(Brushes.White, new Rect(bounds.Size));
-                    DrawGrid(context, new Rect(bounds.Size), bg);
-                    return;
+                    layer.CachedBitmap = RasterizeStrokes(nonShakingStrokes, _canvasSize);
+                    layer.IsDirty = false;
                 }
-
-                var frame = frames[currentFrame];
-
-                _frameRendererService.RenderFrame(context, frame, bg, _shakeController.GetShakeTime());
-
-                if (lightbox)
+                if (layer.CachedBitmap != null)
                 {
-                    DrawLightboxFrames(context, frames, currentFrame, bounds);
-                }
-
-                RenderActiveStroke(context);
-
-                if (noise)
-                {
-                    DrawNoise(context, bounds);
+                    using (context.PushOpacity(layer.Opacity))
+                    {
+                        context.DrawImage(
+                            layer.CachedBitmap,
+                            new Rect(0, 0, _canvasWidth, _canvasHeight),
+                            new Rect(0, 0, _canvasWidth, _canvasHeight));
+                    }
                 }
             }
-        }
 
-        private void RenderActiveStroke(DrawingContext context)
-        {
+            foreach (var layer in frame.Layers.Where(l => l.IsVisible))
+            {
+                double layerOpacity = layer.Opacity;
+                foreach (var stroke in layer.Strokes.Where(s => s.Shake))
+                {
+                    if (stroke == _inputHandler.CurrentStroke)
+                        continue;
+
+                    double shakeIntensity = _shakeController.GetShakeIntensity(0, new() { stroke }, 1);
+                    DrawStroke(stroke, shakeIntensity, context, layerOpacity);
+                }
+            }
+
             var activeStroke = _inputHandler.CurrentStroke;
-            if (activeStroke == null) return;
-
-            if (_activeStrokeCache == null || _activeStrokeCache.PixelSize.Width != (int)_canvasSize.Width || _activeStrokeCache.PixelSize.Height != (int)_canvasSize.Height)
+            if (activeStroke != null)
             {
-                _activeStrokeCache = new RenderTargetBitmap(new PixelSize((int)_canvasSize.Width, (int)_canvasSize.Height));
-            }
-
-            using (var ctx = _activeStrokeCache.CreateDrawingContext(true))
-            {
-                ctx.FillRectangle(Brushes.Transparent, new Rect(_activeStrokeCache.Size));
                 double shakeIntensity = activeStroke.Shake ? _shakeController.GetShakeIntensity(0, new() { activeStroke }, 1) : 0;
-                DrawStroke(activeStroke, shakeIntensity, ctx, 1.0);
+                DrawStroke(activeStroke, shakeIntensity, context);
             }
 
-            context.DrawImage(_activeStrokeCache, new Rect(_activeStrokeCache.Size), new Rect(_canvasSize));
-        }
-
-        private void DrawLightboxFrames(DrawingContext context, List<Frame> frames, int currentFrame, Rect bounds)
-        {
-            DrawFrameCache(context, frames, currentFrame - 1, Brushes.LightBlue, ref _prevFrameCache, ref _prevFrameCacheIndex, bounds);
-            DrawFrameCache(context, frames, currentFrame + 1, Brushes.Pink, ref _nextFrameCache, ref _nextFrameCacheIndex, bounds);
+            if (noise) DrawNoise(context, bounds);
         }
 
         private void DrawNoise(DrawingContext context, Rect bounds)
@@ -169,13 +165,13 @@ namespace ShakyDoodle.Rendering
                     _shakingBrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
                     break;
                 case BrushType.Acrylic:
-                    _acrylicBrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
-                    break;
-                case BrushType.Airbrush:
-                    _airbrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
+                    _acrylicBrush.DrawStroke(stroke, context, layerOpacity);
                     break;
                 case BrushType.Dither:
                     _ditherBrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
+                    break;
+                case BrushType.Airbrush:
+                    _airBrush.DrawStroke(stroke, context, layerOpacity, shakeIntensity);
                     break;
                 case BrushType.Lasso:
                     if (stroke.Points.Count > 2)
@@ -188,6 +184,7 @@ namespace ShakyDoodle.Rendering
                         context.DrawGeometry(fillBrush, null, geometry);
                     }
                     break;
+
             }
         }
 
