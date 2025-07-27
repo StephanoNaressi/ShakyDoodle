@@ -32,6 +32,8 @@ namespace ShakyDoodle.Controllers
         private bool _isPlaying = false;
         public bool IsLocked { get; private set; }
 
+        public Action<bool>? OnLockStateChanged;
+
         public FrameController(Rect bounds, StrokeRenderer strokeRenderer, int startingFrame = 0)
         {
             _strokeRenderer = strokeRenderer;
@@ -41,6 +43,7 @@ namespace ShakyDoodle.Controllers
         public void ToggleLock()
         {
             IsLocked = !IsLocked;
+            OnLockStateChanged?.Invoke(IsLocked);
         }
 
         public void EraseStrokes(List<Stroke> strokes, Point eraserCenter, double eraserRadius)
@@ -198,11 +201,14 @@ namespace ShakyDoodle.Controllers
 
         public void ClearAll()
         {
-            if (IsLocked) return;
+            if (IsLocked)
+            {
+                IsLocked = false;
+                OnLockStateChanged?.Invoke(IsLocked);
+            }
+            
             _frames.Clear();
-
             AddEmptyFrame();
-
             CurrentFrame = 0;
             ActiveLayerIndex = 4; 
 

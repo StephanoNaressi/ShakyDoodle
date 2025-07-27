@@ -34,6 +34,15 @@ namespace ShakyDoodle
             {
                 LayerIndicator.Text = $"Layers: {current}/{total}";
             };
+            
+            doodleCanvas.FrameController.OnLockStateChanged = (isLocked) =>
+            {
+                _framesLocked = isLocked;
+                LockFramesButton.Content = isLocked ? "🔒" : "🔓";
+                DuplicateFrameButton.IsEnabled = !isLocked;
+                DeleteFrameButton.IsEnabled = !isLocked;
+            };
+            
             colorPicker.Color = Colors.Black;
             UpdateLayerLabel();
             UpdateFrameLabel();
@@ -259,21 +268,7 @@ namespace ShakyDoodle
         
         private void OnLockFramesClick(object? sender, RoutedEventArgs e)
         {
-            _framesLocked = !_framesLocked;
-            doodleCanvas.ToggleFramesLock();
-
-            if (_framesLocked)
-            {
-                LockFramesButton.Content = "🔒";
-                DuplicateFrameButton.IsEnabled = false;
-                DeleteFrameButton.IsEnabled = false;
-            }
-            else
-            {
-                LockFramesButton.Content = "🔓";
-                DuplicateFrameButton.IsEnabled = true;
-                DeleteFrameButton.IsEnabled = true;
-            }
+            doodleCanvas.FrameController.ToggleLock();
         }
 
         private void ChangeColor(Color newColor)
