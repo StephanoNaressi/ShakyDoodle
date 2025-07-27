@@ -62,11 +62,13 @@ namespace ShakyDoodle
             _uiManager.RegisterButtonGroup("brushes", new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton, ditherButton, eyedropperButton});
             _uiManager.RegisterButtonGroup("sizes", new[] { sizeSmallButton, sizeMediumButton, sizeLargeButton, sizeXLargeButton });
             _uiManager.RegisterButtonGroup("tips", new[] { brushRoundButton, brushSquareButton, brushFlatButton });
+            //_uiManager.RegisterMenuItemGroup("backgrounds", new[] { backgroundWhiteButton, backgroundGrayButton, backgroundDarkGrayButton, backgroundYellowButton, backgroundBlackButton });
 
             // Set initial selection
             _uiManager.UpdateSelection("brushes", unshakeButton);
             _uiManager.UpdateSelection("sizes", sizeSmallButton);
             _uiManager.UpdateSelection("tips", brushRoundButton);
+            _uiManager.UpdateMenuSelection("backgrounds", backgroundWhiteButton);
 
             LockFramesButton.IsEnabled = true;
         }
@@ -284,6 +286,17 @@ namespace ShakyDoodle
         private void OnChangeRed(object? sender, RoutedEventArgs e) => ChangeColor(Colors.Red);
         private void OnChangeBlue(object? sender, RoutedEventArgs e) => ChangeColor(Colors.Blue);
         private void OnChangeGreen(object? sender, RoutedEventArgs e) => ChangeColor(Colors.Green);
+
+        private void ChangeBackgroundColor(BGColor bgColor)
+        {
+            doodleCanvas.SetBackgroundColor(bgColor);
+        }
+
+        private void OnBackgroundWhite(object? sender, RoutedEventArgs e) => ChangeBackgroundColor(BGColor.White);
+        private void OnBackgroundGray(object? sender, RoutedEventArgs e) => ChangeBackgroundColor(BGColor.Gray);
+        private void OnBackgroundDarkGray(object? sender, RoutedEventArgs e) => ChangeBackgroundColor(BGColor.DarkGray);
+        private void OnBackgroundYellow(object? sender, RoutedEventArgs e) => ChangeBackgroundColor(BGColor.Yellow);
+        private void OnBackgroundBlack(object? sender, RoutedEventArgs e) => ChangeBackgroundColor(BGColor.Black);
 
         private void ToggleLightbox(object? sender, RoutedEventArgs events)
         {

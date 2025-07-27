@@ -22,10 +22,17 @@
 			<MenuItem Header="Canvas">
 				<MenuItem Header="Re-Center Canvas" Click="OnRecenterClicked"/>
 				<MenuItem Header="Toggle Noise" Click="OnToggleNoise"/>
-				<MenuItem Header="Background">
+				<MenuItem Header="Pattern">
 					<MenuItem Header="Grid" Click="ToggleGrid"/>
 					<MenuItem Header="Lines" Click="ToggleLines"/>
 					<MenuItem Header="Blank" Click="ToggleBlank"/>
+				</MenuItem>
+				<MenuItem Header="Background">
+					<MenuItem x:Name="backgroundWhiteButton" Header="White" Click="OnBackgroundWhite"/>
+					<MenuItem x:Name="backgroundGrayButton" Header="Gray" Click="OnBackgroundGray"/>
+					<MenuItem x:Name="backgroundDarkGrayButton" Header="DarkGray" Click="OnBackgroundDarkGray"/>
+					<MenuItem x:Name="backgroundYellowButton" Header="Yellow" Click="OnBackgroundYellow"/>
+					<MenuItem x:Name="backgroundBlackButton" Header="Black" Click="OnBackgroundBlack"/>
 				</MenuItem>
 			</MenuItem>
 			<MenuItem Header="Layers">

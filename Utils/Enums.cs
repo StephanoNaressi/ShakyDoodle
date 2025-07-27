@@ -19,3 +19,11 @@ public enum BrushType
     Airbrush,
     Dither
 }
+public enum BGColor
+{
+    White,
+    Gray,
+    DarkGray,
+    Yellow,
+    Black
+}

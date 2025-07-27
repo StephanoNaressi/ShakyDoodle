@@ -21,8 +21,9 @@ namespace ShakyDoodle.Rendering
         private BrushHelper _brushHelper = new();
         private AvaloniaExtras _helper;
         private int _gridSize = 50;
-        private Pen _gridPen = new(new SolidColorBrush(Colors.LightBlue), 1);
         private Size _canvasSize;
+        private Pen _gridPen = new(new SolidColorBrush(Colors.LightBlue), 1);
+
 
         private RenderTargetBitmap? _prevFrameCache;
         private int _prevFrameCacheIndex = -1;
@@ -46,10 +47,10 @@ namespace ShakyDoodle.Rendering
             _canvasSize = new Size(canvasWidth, canvasHeight);
         }
 
-        public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds, bool noise, BGType bg)
+        public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds, bool noise, BGType bg, SolidColorBrush gridColor)
         {
             using var clip = context.PushClip(new Rect(bounds.Size));
-            context.FillRectangle(Brushes.White, new Rect(bounds.Size));
+            _gridPen = new Pen(gridColor, 1);
             DrawGrid(context, new Rect(bounds.Size), bg);
 
             if (!IsValidFrame(currentFrame, frames))

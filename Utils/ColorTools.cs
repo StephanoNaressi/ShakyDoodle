@@ -42,7 +42,29 @@ namespace ShakyDoodle.Utils
             return renderTarget;
         }
 
-
-
+        public Color GetAvaloniaBGColor(BGColor bgColor)
+        {
+            return bgColor switch
+            {
+                BGColor.White => Colors.White,
+                BGColor.Gray => Colors.LightGray,
+                BGColor.DarkGray => Colors.DarkGray,
+                BGColor.Yellow => Colors.LightYellow,
+                BGColor.Black => Colors.Black,
+                _ => Colors.White
+            };
+        }
+        public Color GetAvaloniaGridColor(BGColor bgColor)
+        {
+            return bgColor switch
+            {
+                BGColor.White => Colors.LightBlue,
+                BGColor.Gray => Colors.DarkGray,
+                BGColor.DarkGray => Colors.DimGray,
+                BGColor.Yellow => Colors.SandyBrown,
+                BGColor.Black => Colors.Gray,
+                _ => Colors.White
+            };
+        }
     }
 }
