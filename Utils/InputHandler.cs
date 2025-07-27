@@ -67,7 +67,6 @@ namespace ShakyDoodle.Utils
                 isShakeForStroke,
                 _currentBrushType
             );
-            strokes.Add(CurrentStroke);
             var layer = _frameController.GetCurrentLayer();
             if (layer != null) layer.IsDirty = true;
 
