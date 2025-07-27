@@ -120,12 +120,9 @@ namespace ShakyDoodle.Controllers
         public override void Render(DrawingContext context)
         {
             var canvasBounds = new Rect(0, 0, CanvasWidth, CanvasHeight);
-            var color = ColorTools.Instance.GetAvaloniaBGColor(_bgColor);
-            var gridColor = new SolidColorBrush(ColorTools.Instance.GetAvaloniaGridColor(_bgColor));
-            context.FillRectangle(new SolidColorBrush(color), canvasBounds);
             _strokeRenderer.Render(context, _lightbox, FrameController.CurrentFrame, 
                 FrameController.GetAllVisibleStrokes(), FrameController.GetAllFrames(), 
-                canvasBounds, _isNoise, _currentBG, gridColor);
+                canvasBounds, _isNoise, _currentBG);
         }
 
         public void ClearCanvas()
@@ -202,7 +199,8 @@ namespace ShakyDoodle.Controllers
         public void ToggleBackground(BGType bg) => _currentBG = bg;
         public void SetBackgroundColor(BGColor bgColor)
         {
-            _bgColor = bgColor;
+            ColorTools.Instance.SetAvaloniaBGColor(bgColor);
+            ColorTools.Instance.SetAvaloniaGridColor(bgColor);
             _helper.RequestInvalidateThrottled();
         }
         public void OnUpdateOpacity(double val)

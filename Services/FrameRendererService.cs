@@ -3,6 +3,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using ShakyDoodle.Models;
 using ShakyDoodle.Rendering;
+using ShakyDoodle.Utils;
 using System.Linq;
 
 namespace ShakyDoodle.Services
@@ -23,7 +24,7 @@ namespace ShakyDoodle.Services
         public void RenderFrame(DrawingContext context, Frame frame, BGType bg, double time = 0)
         {
             var bounds = new Rect(0, 0, _canvasWidth, _canvasHeight);
-            context.FillRectangle(Brushes.White, bounds);
+            context.FillRectangle(new SolidColorBrush(ColorTools.Instance.BackgroundColor), bounds);
             _strokeRenderer.DrawGrid(context, bounds, bg);
 
             if (time > 0)

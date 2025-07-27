@@ -2,6 +2,7 @@
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Rendering.Composition;
 
 namespace ShakyDoodle.Utils
 {
@@ -10,7 +11,8 @@ namespace ShakyDoodle.Utils
         public static ColorTools Instance { get; } = new ColorTools();
 
         Random _r = new();
-
+        public Color BackgroundColor { get; set; } = Colors.White;
+        public Color GridColor { get; set; } = Colors.LightBlue;
         public bool AreColorsSimilar(Color a, Color b, int tolerance = 25)
         {
             return Math.Abs(a.R - b.R) < tolerance &&
@@ -42,9 +44,9 @@ namespace ShakyDoodle.Utils
             return renderTarget;
         }
 
-        public Color GetAvaloniaBGColor(BGColor bgColor)
+        public void SetAvaloniaBGColor(BGColor bgColor)
         {
-            return bgColor switch
+            var color = bgColor switch
             {
                 BGColor.White => Colors.White,
                 BGColor.Gray => Colors.LightGray,
@@ -53,10 +55,13 @@ namespace ShakyDoodle.Utils
                 BGColor.Black => Colors.Black,
                 _ => Colors.White
             };
+            BackgroundColor = color;
+
         }
-        public Color GetAvaloniaGridColor(BGColor bgColor)
+
+        public void SetAvaloniaGridColor(BGColor bgColor)
         {
-            return bgColor switch
+            var color = bgColor switch
             {
                 BGColor.White => Colors.LightBlue,
                 BGColor.Gray => Colors.DarkGray,
@@ -65,6 +70,8 @@ namespace ShakyDoodle.Utils
                 BGColor.Black => Colors.Gray,
                 _ => Colors.White
             };
+            GridColor = color;
+
         }
     }
 }

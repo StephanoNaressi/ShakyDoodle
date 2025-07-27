@@ -22,8 +22,12 @@ namespace ShakyDoodle.Rendering
         private AvaloniaExtras _helper;
         private int _gridSize = 50;
         private Size _canvasSize;
-        private Pen _gridPen = new(new SolidColorBrush(Colors.LightBlue), 1);
-
+        
+        // Cache the brushes and colors to avoid recreation every frame
+        private SolidColorBrush _backgroundBrush;
+        private Pen _gridPen;
+        private Color _cachedBackgroundColor = Colors.White;
+        private Color _cachedGridColor = Colors.LightBlue;
 
         private RenderTargetBitmap? _prevFrameCache;
         private int _prevFrameCacheIndex = -1;
@@ -45,12 +49,17 @@ namespace ShakyDoodle.Rendering
             _canvasWidth = canvasWidth;
             _canvasHeight = canvasHeight;
             _canvasSize = new Size(canvasWidth, canvasHeight);
+            
+            _backgroundBrush = new SolidColorBrush(_cachedBackgroundColor);
+            _gridPen = new Pen(new SolidColorBrush(_cachedGridColor), 1);
         }
 
-        public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds, bool noise, BGType bg, SolidColorBrush gridColor)
+        public void Render(DrawingContext context, bool lightbox, int currentFrame, List<Stroke> strokes, List<Frame> frames, Rect bounds, bool noise, BGType bg)
         {
+            UpdateCachedBrushesIfNeeded();
+            
             using var clip = context.PushClip(new Rect(bounds.Size));
-            _gridPen = new Pen(gridColor, 1);
+            context.FillRectangle(_backgroundBrush, bounds); 
             DrawGrid(context, new Rect(bounds.Size), bg);
 
             if (!IsValidFrame(currentFrame, frames))
@@ -105,6 +114,24 @@ namespace ShakyDoodle.Rendering
             }
 
             if (noise) DrawNoise(context, bounds);
+        }
+
+        private void UpdateCachedBrushesIfNeeded()
+        {
+            var currentBgColor = ColorTools.Instance.BackgroundColor;
+            var currentGridColor = ColorTools.Instance.GridColor;
+            
+            if (!_cachedBackgroundColor.Equals(currentBgColor))
+            {
+                _cachedBackgroundColor = currentBgColor;
+                _backgroundBrush = new SolidColorBrush(_cachedBackgroundColor);
+            }
+            
+            if (!_cachedGridColor.Equals(currentGridColor))
+            {
+                _cachedGridColor = currentGridColor;
+                _gridPen = new Pen(new SolidColorBrush(_cachedGridColor), 1);
+            }
         }
 
         private void DrawNoise(DrawingContext context, Rect bounds)
