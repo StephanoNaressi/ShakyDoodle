@@ -5,13 +5,13 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using System.Timers;
 using Avalonia;
 using Avalonia.Layout;
 using ShakyDoodle.Views.Controls;
 using ShakyDoodle.Utils;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
+using ShakyDoodle.Services;
+using Avalonia.Platform.Storage;
 
 namespace ShakyDoodle
 {
@@ -22,6 +22,7 @@ namespace ShakyDoodle
         private readonly UIManager _uiManager = new UIManager();
         private bool _framesLocked = false;
         private bool _isEyeDropperActive = false;
+        private FileService? _fileService;
 
         #endregion
 
@@ -75,6 +76,8 @@ namespace ShakyDoodle
             _uiManager.UpdateMenuSelection("backgrounds", backgroundWhiteButton);
 
             LockFramesButton.IsEnabled = true;
+
+            _fileService = new FileService(doodleCanvas.FrameController);
         }
 
         #endregion
@@ -388,7 +391,6 @@ namespace ShakyDoodle
 
             Directory.CreateDirectory(folderPath);
 
-            // Add a filename to the path
             string fileName = $"animation_{DateTime.Now:yyyyMMdd_HHmmss}.gif";
             string filePath = Path.Combine(folderPath, fileName);
 
@@ -397,7 +399,73 @@ namespace ShakyDoodle
 
             doodleCanvas.ExportFramesAsGif(filePath, width, height);
         }
+        private async void OnSaveProject(object? sender, RoutedEventArgs e)
+        {
+            var storageProvider = StorageProvider;
+            if (storageProvider == null) return;
 
+            var fileTypes = new FilePickerFileType[]
+            {
+                new("ShakyDoodle Files")
+                {
+                    Patterns = new[] { "*.shaky" }
+                },
+                FilePickerFileTypes.All
+            };
+
+            var options = new FilePickerSaveOptions
+            {
+                Title = "Save ShakyDoodle Project",
+                DefaultExtension = "shaky",
+                FileTypeChoices = fileTypes,
+                SuggestedFileName = $"project_{DateTime.Now:yyyyMMdd_HHmmss}.shaky"
+            };
+
+            var result = await storageProvider.SaveFilePickerAsync(options);
+            if (result != null)
+            {
+                _fileService?.SaveProject(result.Path.LocalPath);
+            }
+        }
+
+        private async void OnLoadProject(object? sender, RoutedEventArgs e)
+        {
+            var storageProvider = StorageProvider;
+            if (storageProvider == null) return;
+
+            var fileTypes = new FilePickerFileType[]
+            {
+                new("ShakyDoodle Files")
+                {
+                    Patterns = new[] { "*.shaky" }
+                },
+                FilePickerFileTypes.All
+            };
+
+            var options = new FilePickerOpenOptions
+            {
+                Title = "Load ShakyDoodle Project",
+                FileTypeFilter = fileTypes,
+                AllowMultiple = false
+            };
+
+            var result = await storageProvider.OpenFilePickerAsync(options);
+            if (result != null && result.Count > 0)
+            {
+                _fileService?.LoadProject(result[0].Path.LocalPath);
+                UpdateFrameLabel();
+                UpdateLayerLabel();
+                layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
+                doodleCanvas.InvalidateVisual();
+            }
+        }
+        public void LoadProjectFromPath(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                _fileService?.LoadProject(filePath);
+            }
+        }
         #endregion
 
         #region Tooltips
@@ -476,6 +544,10 @@ namespace ShakyDoodle
         private void OnA4HorizontalAR(object? sender, RoutedEventArgs e) => SetAspectRatio(1956, 1555);
         private void OnA4VerticalAR(object? sender, RoutedEventArgs e) => SetAspectRatio(1555, 1956);
         private void SetAspectRatio(double width, double height) => doodleCanvas.SetAspectRatio(width, height);
+
+        private void MenuItem_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+        }
 
         #endregion
     }

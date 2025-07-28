@@ -199,7 +199,7 @@ namespace ShakyDoodle.Controllers
             MarkDirty();
         }
 
-        public void ClearAll()
+        public void ClearAll(bool addEmpty = true)
         {
             if (IsLocked)
             {
@@ -208,7 +208,7 @@ namespace ShakyDoodle.Controllers
             }
             
             _frames.Clear();
-            AddEmptyFrame();
+            if(addEmpty) AddEmptyFrame();
             CurrentFrame = 0;
             ActiveLayerIndex = 4; 
 
@@ -318,5 +318,35 @@ namespace ShakyDoodle.Controllers
             return layers[_activeLayerIndex];
         }
 
+        public void AddFrame(Frame frame)
+        {
+            _frames.Add(frame);
+            OnFrameChanged?.Invoke(CurrentFrame + 1, TotalFrames);
+        }
+
+        public void SetFrames(List<Frame> frames)
+        {
+            _frames.Clear();
+            _frames.AddRange(frames);
+            CurrentFrame = 0;
+            ActiveLayerIndex = _frames.Count > 0 && _frames[0].Layers.Count > 0 ? 0 : 0;
+            
+            CachedBitmap = null;
+            _strokeRenderer.ClearCaches();
+            
+            foreach (var frame in _frames)
+            {
+                frame.CachedBitmap = null;
+                frame.IsDirty = true;
+                foreach (var layer in frame.Layers)
+                {
+                    layer.CachedBitmap = null;
+                    layer.IsDirty = true;
+                }
+            }
+            
+            OnFrameChanged?.Invoke(CurrentFrame + 1, TotalFrames);
+            OnInvalidateRequested?.Invoke();
+        }
     }
 }
