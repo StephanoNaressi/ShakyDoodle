@@ -16,7 +16,7 @@ namespace ShakyDoodle.Utils
         public Stroke? MirroredStroke;
         public bool IsErasing { get; set; } = false;
         public double EraserRadius { get; set; } = 5.0;
-        public bool SymmetryEnabled { get; set; } = false; // Add symmetry toggle
+        public bool SymmetryEnabled { get; set; } = false;
         private double _alpha;
         private Color _currentColor;
         private SizeType _currentSize;
@@ -61,6 +61,25 @@ namespace ShakyDoodle.Utils
             double mirroredX = centerX + (centerX - originalPoint.X);
             return new Point(mirroredX, originalPoint.Y);
         }
+
+        private Point ConstrainToStraightLine(Point start, Point current)
+        {
+            var dx = Math.Abs(current.X - start.X);
+            var dy = Math.Abs(current.Y - start.Y);
+            
+            if (dx > dy * 2) // Horizontal
+                return new Point(current.X, start.Y);
+            else if (dy > dx * 2) // Vertical
+                return new Point(start.X, current.Y);
+            else // 45-degree diagonal
+            {
+                var distance = Math.Min(dx, dy);
+                var signX = Math.Sign(current.X - start.X);
+                var signY = Math.Sign(current.Y - start.Y);
+                return new Point(start.X + distance * signX, start.Y + distance * signY);
+            }
+        }
+
         public void PointerPressed(Point position, float pressure)
         {
             _isClicking = true;
@@ -96,7 +115,7 @@ namespace ShakyDoodle.Utils
 
         }
 
-        public void PointerMoved(Point position, float pressure)
+        public void PointerMoved(Point position, float pressure, bool isShiftPressed = false)
         {
             if (IsErasing && _isClicking)
             {
@@ -126,6 +145,13 @@ namespace ShakyDoodle.Utils
             }
             if (CurrentStroke == null)
                 return;
+
+            // Constrain position if Shift is held
+            if (isShiftPressed && CurrentStroke.Points.Count > 0)
+            {
+                var startPoint = CurrentStroke.Points[0];
+                position = ConstrainToStraightLine(startPoint, position);
+            }
 
             float clampedPressure = Math.Max(pressure, 0.1f);
 

@@ -32,6 +32,7 @@ namespace ShakyDoodle.Controllers
         public bool IsPanning { get; set; }
         public bool IsSpacePressed { get; set; }
         public bool IsMirrored { get; set; }
+        public bool IsShiftPressed { get; set; } 
 
         private readonly ShakeController _shakeController = new();
         private readonly LogoPreloader _logoPreloader = new();
@@ -87,6 +88,10 @@ namespace ShakyDoodle.Controllers
 
             FrameController.AddEmptyFrame();
             Focusable = true;
+            
+            this.KeyDown += OnKeyDown;
+            this.KeyUp += OnKeyUp;
+            
             PointerPressed += (s, e) =>
             {
                 if (IsPanning) return;
@@ -99,7 +104,7 @@ namespace ShakyDoodle.Controllers
             {
                 if (IsPanning) return;
                 var point = e.GetPosition(this);
-                InputHandler.PointerMoved(point, e.GetCurrentPoint(this).Properties.Pressure);
+                InputHandler.PointerMoved(point, e.GetCurrentPoint(this).Properties.Pressure, IsShiftPressed);
                 _helper.RequestInvalidateThrottled();
             };
             PointerReleased += (s, e) =>
@@ -113,6 +118,22 @@ namespace ShakyDoodle.Controllers
             Cursor = new Cursor(StandardCursorType.Cross);
             InputHandler.UpdateCanvasSize(CanvasWidth, CanvasHeight);
 
+        }
+
+        private void OnKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                IsShiftPressed = true;
+            }
+        }
+
+        private void OnKeyUp(object? sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                IsShiftPressed = false;
+            }
         }
 
         protected override void OnInitialized()
