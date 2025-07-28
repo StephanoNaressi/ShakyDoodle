@@ -13,9 +13,10 @@ namespace ShakyDoodle.Utils
         private FrameController _frameController;
         private ShortcutHelper _shortcutHelper;
         public Stroke? CurrentStroke;
+        public Stroke? MirroredStroke;
         public bool IsErasing { get; set; } = false;
         public double EraserRadius { get; set; } = 5.0;
-
+        public bool SymmetryEnabled { get; set; } = false; // Add symmetry toggle
         private double _alpha;
         private Color _currentColor;
         private SizeType _currentSize;
@@ -25,13 +26,19 @@ namespace ShakyDoodle.Utils
         public List<Color> RecentColors => _recentColors;
         private bool _isClicking = false;
         private BrushType _currentBrushType = BrushType.Standard;
-
+        private double _canvasWidth;
+        private double _canvasHeight;
         public void Initialize(FrameController frameController, ShortcutHelper shortcutHelper)
         {
             for (int i = 0; i < 24; i++)
                 _recentColors.Add(Colors.White);
             _frameController = frameController;
             _shortcutHelper = shortcutHelper;
+        }
+        public void UpdateCanvasSize(double width, double height)
+        {
+            _canvasWidth = width;
+            _canvasHeight = height;
         }
         public void UpdateSettings(Color color, SizeType size, double alpha, PenLineCap cap, bool isShake)
         {
@@ -48,7 +55,12 @@ namespace ShakyDoodle.Utils
                     _recentColors.RemoveAt(_recentColors.Count - 1);
             }
         }
-
+        private Point GetMirroredPoint(Point originalPoint)
+        {
+            double centerX = _canvasWidth / 2;
+            double mirroredX = centerX + (centerX - originalPoint.X);
+            return new Point(mirroredX, originalPoint.Y);
+        }
         public void PointerPressed(Point position, float pressure)
         {
             _isClicking = true;
@@ -65,6 +77,20 @@ namespace ShakyDoodle.Utils
                 _isShake,
                 _currentBrushType
             );
+            if (SymmetryEnabled)
+            {
+                var mirroredPosition = GetMirroredPoint(position);
+                MirroredStroke = new Stroke(
+                    _currentColor,
+                    mirroredPosition,
+                    _currentSize,
+                    _alpha,
+                    _currentCap,
+                    pressure,
+                    _isShake,
+                    _currentBrushType
+                );
+            }
             var layer = _frameController.GetCurrentLayer();
             if (layer != null) layer.IsDirty = true;
 
@@ -79,6 +105,13 @@ namespace ShakyDoodle.Utils
                     return;
 
                 _frameController.EraseStrokes(strokes, position, EraserRadius);
+
+                if (SymmetryEnabled)
+                {
+                    var mirroredPosition = GetMirroredPoint(position);
+                    _frameController.EraseStrokes(strokes, mirroredPosition, EraserRadius);
+                }
+
                 var frames = _frameController.GetAllFrames();
                 if (_frameController.CurrentFrame >= 0 && _frameController.CurrentFrame < frames.Count)
                 {
@@ -119,6 +152,13 @@ namespace ShakyDoodle.Utils
                     var interpolatedPoint = lastPoint + normalizedDirection * (i * spacing);
                     CurrentStroke.Points.Add(interpolatedPoint);
                     CurrentStroke.Pressures.Add(clampedPressure);
+
+                    if (SymmetryEnabled && MirroredStroke != null)
+                    {
+                        var mirroredPoint = GetMirroredPoint(interpolatedPoint);
+                        MirroredStroke.Points.Add(mirroredPoint);
+                        MirroredStroke.Pressures.Add(clampedPressure);
+                    }
                 }
             }
         }
@@ -146,7 +186,12 @@ namespace ShakyDoodle.Utils
             {
                 strokes.Add(CurrentStroke);
             }
+            if (SymmetryEnabled && MirroredStroke != null)
+            {
+                strokes.Add(MirroredStroke);
+            }
             CurrentStroke = null;
+            MirroredStroke = null;
         }
 
         public void ChangeShake(bool shake)
@@ -170,8 +215,12 @@ namespace ShakyDoodle.Utils
         {
             _isClicking = false;
             CurrentStroke = null;
+            MirroredStroke = null;
         }
-
+        public void ToggleSymmetry()
+        {
+            SymmetryEnabled = !SymmetryEnabled;
+        }
         public void ChangeSize(SizeType size) => _currentSize = size;
         public void ChangeCap(PenLineCap cap) => _currentCap = cap;
 

@@ -49,6 +49,9 @@ namespace ShakyDoodle.Controllers
 
         private BGType _currentBG = BGType.Grid;
         private BGColor _bgColor = BGColor.White;
+
+        private Pen _symmetryPen = new(new SolidColorBrush(Colors.Violet), 1, dashStyle: DashStyle.Dash);
+
         public bool IsLogo
         {
             get => _isLogo;
@@ -108,6 +111,7 @@ namespace ShakyDoodle.Controllers
             FrameController.OnInvalidateRequested += () => _helper.RequestInvalidateThrottled();
             InputHandler.UpdateSettings(new Color(255, 0, 0, 0), SizeType.Small, 1,PenLineCap.Round, false);
             Cursor = new Cursor(StandardCursorType.Cross);
+            InputHandler.UpdateCanvasSize(CanvasWidth, CanvasHeight);
 
         }
 
@@ -120,9 +124,13 @@ namespace ShakyDoodle.Controllers
         public override void Render(DrawingContext context)
         {
             var canvasBounds = new Rect(0, 0, CanvasWidth, CanvasHeight);
+
             _strokeRenderer.Render(context, _lightbox, FrameController.CurrentFrame, 
                 FrameController.GetAllVisibleStrokes(), FrameController.GetAllFrames(), 
                 canvasBounds, _isNoise, _currentBG);
+
+            double centerX = canvasBounds.Width / 2;
+            if(InputHandler.SymmetryEnabled) context.DrawLine(_symmetryPen, new Point(centerX, 0), new Point(centerX, canvasBounds.Height));
         }
 
         public void ClearCanvas()
@@ -213,6 +221,12 @@ namespace ShakyDoodle.Controllers
             CanvasWidth = width;
             CanvasHeight = height;
             _strokeRenderer.UpdateCanvasSize(width, height);
+            InputHandler.UpdateCanvasSize(width, height);
+            _helper.RequestInvalidateThrottled();
+        }
+        public void ToggleSymmetry()
+        {
+            InputHandler.SymmetryEnabled = InputHandler.SymmetryEnabled ? false : true;
             _helper.RequestInvalidateThrottled();
         }
         public double CurrentLayerOpacity() => FrameController.GetCurrentLayer()?.Opacity ?? 1.0;

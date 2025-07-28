@@ -216,7 +216,9 @@ namespace ShakyDoodle
         private void OnBrushRound(object? sender, RoutedEventArgs e) => ChangeBrushTip(PenLineCap.Round, (Button)sender);
 
         #endregion
-
+        #region Symmetry
+        private void OnToggleSymmetry(object? sender, RoutedEventArgs e) => doodleCanvas.ToggleSymmetry();
+        #endregion
         #region Brush Type Selection
 
         private void ChangeBrushType(BrushType type, bool enableTips, Button sender)

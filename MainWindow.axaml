@@ -24,6 +24,7 @@
 			<MenuItem Header="Canvas">
 				<MenuItem Header="Re-Center Canvas" Click="OnRecenterClicked"/>
 				<MenuItem Header="Toggle Noise" Click="OnToggleNoise"/>
+				<MenuItem Header="Toggle Symmetry" Click="OnToggleSymmetry"/>
 				<MenuItem Header="Pattern">
 					<MenuItem Header="Grid" Click="ToggleGrid"/>
 					<MenuItem Header="Lines" Click="ToggleLines"/>
