@@ -80,7 +80,7 @@
 			<Border Grid.Column="1" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Center">
 				<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
 					<StackPanel Background="PeachPuff">
-						<Border Width="200" Height="80" CornerRadius="15" ClipToBounds="True" Margin="0,5">
+						<Border Width="200" Height="100" CornerRadius="15" ClipToBounds="True" Margin="0,5">
 							<local:DoodleCanvas Name="logoCanvas" IsLogo="True" />
 						</Border>
 						<UniformGrid Columns="3" Margin="3" HorizontalAlignment="Center">
