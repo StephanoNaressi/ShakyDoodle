@@ -17,9 +17,16 @@ namespace ShakyDoodle
 {
     public partial class MainWindow : Window
     {
+        #region Fields
+
         private readonly UIManager _uiManager = new UIManager();
         private bool _framesLocked = false;
         private bool _isEyeDropperActive = false;
+
+        #endregion
+
+        #region Constructor
+
         public MainWindow()
         {
             InitializeComponent();
@@ -34,7 +41,7 @@ namespace ShakyDoodle
             {
                 LayerIndicator.Text = $"Layers: {current}/{total}";
             };
-            
+
             doodleCanvas.FrameController.OnLockStateChanged = (isLocked) =>
             {
                 _framesLocked = isLocked;
@@ -42,7 +49,7 @@ namespace ShakyDoodle
                 DuplicateFrameButton.IsEnabled = !isLocked;
                 DeleteFrameButton.IsEnabled = !isLocked;
             };
-            
+
             colorPicker.Color = Colors.Black;
             UpdateLayerLabel();
             UpdateFrameLabel();
@@ -58,7 +65,7 @@ namespace ShakyDoodle
                 }
             };
 
-            _uiManager.RegisterButtonGroup("brushes", new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton, ditherButton, eyedropperButton});
+            _uiManager.RegisterButtonGroup("brushes", new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton, ditherButton, eyedropperButton });
             _uiManager.RegisterButtonGroup("sizes", new[] { sizeSmallButton, sizeMediumButton, sizeLargeButton, sizeXLargeButton });
             _uiManager.RegisterButtonGroup("tips", new[] { brushRoundButton, brushSquareButton, brushFlatButton });
 
@@ -70,6 +77,10 @@ namespace ShakyDoodle
             LockFramesButton.IsEnabled = true;
         }
 
+        #endregion
+
+        #region Event Handlers - Global
+
         private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
         {
             doodleCanvas.ShortcutHelper.HandleKeyDown(e);
@@ -79,6 +90,11 @@ namespace ShakyDoodle
                 UpdateLayerLabel();
             }
         }
+
+        #endregion
+
+        #region Color Swatches
+
         private void PopulateRecentColorSwatches()
         {
             RecentColorsPanel.Children.Clear();
@@ -121,44 +137,58 @@ namespace ShakyDoodle
             }
         }
 
+        #endregion
 
+        #region UI Updates
 
         private void UpdateFrameLabel() => FrameIndicator.Text = $"Frames: {doodleCanvas.FrameController.CurrentFrame + 1}/{doodleCanvas.FrameController.TotalFrames}";
         private void UpdateLayerLabel() => LayerIndicator.Text = $"Layers: {doodleCanvas.FrameController.ActiveLayerIndex + 1}/{doodleCanvas.FrameController.TotalLayers}";
         private void UpdatePlayLabel() => PlayButton.Content = PlayButton.Content as string == "▶" ? "■" : "▶";
-        private void OnClearClick(object? sender, RoutedEventArgs events)
+
+        #endregion
+
+        #region Frame & Layer Actions
+
+        private void OnClearClick(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.ClearCanvas();
             UpdateFrameLabel();
             UpdateLayerLabel();
             layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
         }
-        private void OnDeleteFrame(object? sender, RoutedEventArgs events)
-        {
 
+        private void OnDeleteFrame(object? sender, RoutedEventArgs e)
+        {
             layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
             doodleCanvas.DeleteCurrentFrame();
             UpdateFrameLabel();
             UpdateLayerLabel();
         }
-        private void OnDeleteLayer(object? sender, RoutedEventArgs events)
+
+        private void OnDeleteLayer(object? sender, RoutedEventArgs e)
         {
             layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
             doodleCanvas.OnDeleteLayer();
             UpdateFrameLabel();
             UpdateLayerLabel();
         }
-        private void OnRecenterClicked(object? sender, RoutedEventArgs events)
+
+        private void OnRecenterClicked(object? sender, RoutedEventArgs e)
         {
             var zoomBorder = this.FindControl<ZoomBorder>("zoomBorder");
             zoomBorder?.Recenter();
         }
 
-        private void UpdateLayerOpacity(object? sender, RoutedEventArgs events)
+        private void UpdateLayerOpacity(object? sender, RoutedEventArgs e)
         {
             double newOpacity = layerOpacitySlider.Value / 100.0;
             doodleCanvas.OnUpdateOpacity(newOpacity);
         }
+
+        #endregion
+
+        #region Size & Tip Selection
+
         private void SelectSize(SizeType size, Button sender)
         {
             doodleCanvas.SelectSize(size);
@@ -181,6 +211,10 @@ namespace ShakyDoodle
         private void OnBrushSquare(object? sender, RoutedEventArgs e) => ChangeBrushTip(PenLineCap.Square, (Button)sender);
         private void OnBrushFlat(object? sender, RoutedEventArgs e) => ChangeBrushTip(PenLineCap.Flat, (Button)sender);
         private void OnBrushRound(object? sender, RoutedEventArgs e) => ChangeBrushTip(PenLineCap.Round, (Button)sender);
+
+        #endregion
+
+        #region Brush Type Selection
 
         private void ChangeBrushType(BrushType type, bool enableTips, Button sender)
         {
@@ -210,40 +244,47 @@ namespace ShakyDoodle
         private void OnAirbrush(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Airbrush, false, (Button)sender);
         private void OnLassoFill(object? sender, RoutedEventArgs e) => ChangeBrushType(BrushType.Lasso, false, (Button)sender);
 
-        private void OnToggleNoise(object? sender, RoutedEventArgs events)
+        #endregion
+
+        #region Miscellaneous Actions
+
+        private void OnToggleNoise(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.ToggleNoise();
         }
-        
-        private void OnAlphaChanged(object? sender, RangeBaseValueChangedEventArgs events)
+
+        private void OnAlphaChanged(object? sender, RangeBaseValueChangedEventArgs e)
         {
-            doodleCanvas.ChangeAlpha((double)events.NewValue);
-            logoCanvas.ChangeAlpha((double)events.NewValue);
+            doodleCanvas.ChangeAlpha((double)e.NewValue);
+            logoCanvas.ChangeAlpha((double)e.NewValue);
         }
 
-        private void OnDuplicateFrame(object? sender, RoutedEventArgs events)
+        #endregion
+
+        #region Frame & Layer Navigation
+
+        private void OnDuplicateFrame(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.DuplicateFrame();
             UpdateFrameLabel();
             UpdateLayerLabel();
         }
 
-        private void OnNextFrame(object? sender, RoutedEventArgs events)
+        private void OnNextFrame(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.NextFrame();
             UpdateFrameLabel();
             UpdateLayerLabel();
-
         }
 
-        private void OnPrevFrame(object? sender, RoutedEventArgs events)
+        private void OnPrevFrame(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.PreviousFrame();
             UpdateFrameLabel();
             UpdateLayerLabel();
-
         }
-        private void OnNextLayer(object? sender, RoutedEventArgs events)
+
+        private void OnNextLayer(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.NextLayer();
             UpdateFrameLabel();
@@ -251,24 +292,29 @@ namespace ShakyDoodle
             layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
         }
 
-        private void OnPrevLayer(object? sender, RoutedEventArgs events)
+        private void OnPrevLayer(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.PrevLayer();
             UpdateFrameLabel();
             UpdateLayerLabel();
             layerOpacitySlider.Value = doodleCanvas.CurrentLayerOpacity() * 100;
         }
-        private void OnTogglePlay(object? sender, RoutedEventArgs events)
+
+        private void OnTogglePlay(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.TogglePlay();
             UpdatePlayLabel();
             UpdateLayerLabel();
         }
-        
+
         private void OnLockFramesClick(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.FrameController.ToggleLock();
         }
+
+        #endregion
+
+        #region Color & Background
 
         private void ChangeColor(Color newColor)
         {
@@ -277,14 +323,6 @@ namespace ShakyDoodle
             colorPicker.Color = newColor;
             PopulateRecentColorSwatches();
         }
-
-        private void On45AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1100, 1375);
-        private void On11AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1400, 1400);
-        private void On169AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1956, 1100);
-        private void On916AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1100, 1956);
-        private void OnA4HorizontalAR(object? sender, RoutedEventArgs e) => SetAspectRatio(1956, 1555);
-        private void OnA4VerticalAR(object? sender, RoutedEventArgs e) => SetAspectRatio(1555, 1956);
-        private void SetAspectRatio(double w, double h) => doodleCanvas.SetAspectRatio(w, h);
 
         private void OnColorChanged(object? sender, ColorChangedEventArgs e) => ChangeColor(e.NewColor);
         private void OnChangeBlack(object? sender, RoutedEventArgs e) => ChangeColor(Colors.Black);
@@ -303,23 +341,31 @@ namespace ShakyDoodle
         private void OnBackgroundYellow(object? sender, RoutedEventArgs e) => ChangeBackgroundColor(BGColor.Yellow);
         private void OnBackgroundBlack(object? sender, RoutedEventArgs e) => ChangeBackgroundColor(BGColor.Black);
 
-        private void ToggleLightbox(object? sender, RoutedEventArgs events)
+        #endregion
+
+        #region Canvas Background Types
+
+        private void ToggleLightbox(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.ToggleLightbox();
         }
-        private void ToggleGrid(object? sender, RoutedEventArgs events)
+        private void ToggleGrid(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.ToggleBackground(BGType.Grid);
         }
-        private void ToggleLines(object? sender, RoutedEventArgs events)
+        private void ToggleLines(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.ToggleBackground(BGType.Lines);
-
         }
-        private void ToggleBlank(object? sender, RoutedEventArgs events)
+        private void ToggleBlank(object? sender, RoutedEventArgs e)
         {
             doodleCanvas.ToggleBackground(BGType.Blank);
         }
+
+        #endregion
+
+        #region File Operations
+
         private void OnSaveFile(object? sender, RoutedEventArgs e)
         {
             string baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
@@ -333,6 +379,7 @@ namespace ShakyDoodle
 
             doodleCanvas.ExportFramesAsPng(folderPath, width, height);
         }
+
         private void OnSaveGif(object? sender, RoutedEventArgs e)
         {
             string baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
@@ -350,8 +397,12 @@ namespace ShakyDoodle
 
             doodleCanvas.ExportFramesAsGif(filePath, width, height);
         }
-        
-        private void OnTips(object? sender, RoutedEventArgs events)
+
+        #endregion
+
+        #region Tooltips
+
+        private void OnTips(object? sender, RoutedEventArgs e)
         {
             TooltipsPopup.IsOpen = true;
         }
@@ -359,6 +410,10 @@ namespace ShakyDoodle
         {
             TooltipsPopup.IsOpen = false;
         }
+
+        #endregion
+
+        #region Eye Dropper
 
         private void OnEyeDropperClick(object? sender, RoutedEventArgs e)
         {
@@ -409,5 +464,19 @@ namespace ShakyDoodle
             ChangeBrushType(BrushType.Standard, false, unshakeButton);
             return Color.FromArgb(pixel.A, pixel.R, pixel.G, pixel.B);
         }
+
+        #endregion
+
+        #region Aspect Ratio
+
+        private void On45AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1100, 1375);
+        private void On11AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1400, 1400);
+        private void On169AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1956, 1100);
+        private void On916AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1100, 1956);
+        private void OnA4HorizontalAR(object? sender, RoutedEventArgs e) => SetAspectRatio(1956, 1555);
+        private void OnA4VerticalAR(object? sender, RoutedEventArgs e) => SetAspectRatio(1555, 1956);
+        private void SetAspectRatio(double width, double height) => doodleCanvas.SetAspectRatio(width, height);
+
+        #endregion
     }
 }
