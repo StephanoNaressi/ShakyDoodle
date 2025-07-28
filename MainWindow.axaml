@@ -8,10 +8,11 @@
 		xmlns:views="clr-namespace:ShakyDoodle.Views.Controls"
 		xmlns:controllers="clr-namespace:ShakyDoodle.Controllers"
 
-        Width="1200" Height="1000"
+        MinWidth="800" MinHeight="600"
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1000"
         x:Class="ShakyDoodle.MainWindow"
-        Title="ShakyDoodle" Background="PeachPuff">
+        Title="ShakyDoodle" Background="PeachPuff"
+        WindowState="Maximized">
 	<DockPanel>
 		<Menu DockPanel.Dock="Top">
 			<MenuItem Header="File">
@@ -66,98 +67,99 @@
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="40" />
 				<!-- holes on the far left -->
-				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" MinWidth="220" MaxWidth="250" />
 				<!-- tools next to holes -->
 				<ColumnDefinition Width="*" />
 				<!-- canvas takes the rest -->
 			</Grid.ColumnDefinitions>
 
 			<!-- Notebook holes panel on the left -->
-			<ui:NotebookHoles Width="40" Height="600" Grid.Column="0" VerticalAlignment="Stretch"/>
+			<ui:NotebookHoles Width="40" Grid.Column="0" VerticalAlignment="Stretch"/>
 
 			<!-- Tools toolbar next to holes -->
-			<Border Grid.Column="1" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Center">
-				<StackPanel  Background="PeachPuff">
-					<Border Width="200" Height="100" CornerRadius="15" ClipToBounds="True">
-						<local:DoodleCanvas Name="logoCanvas" IsLogo="True" />
-					</Border>
-					<UniformGrid Columns="4" Rows="2" Margin="5" HorizontalAlignment="Center">
-						<Button x:Name="unshakeButton" Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnUnshake">
-							<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/Pen.png" Stretch="Uniform"/>
-						</Button>
-						<Button x:Name="airbrushButton" Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnAirbrush">
-							<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/AirBrush.png" Stretch="Uniform"/>
-						</Button>
-						<Button x:Name="shakeButton" Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnShake">
-							<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/shakyPen.png" Stretch="Uniform"/>
-						</Button>
-						<Button x:Name="acrButton" Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnAcr">
-							<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/acrPen.png" Stretch="Uniform"/>
-						</Button>
-
-						<Button x:Name="ditherButton" Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnDither">
-							<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/ditherPen.png" Stretch="Uniform"/>
-						</Button>
-						<Button x:Name="lassoFillButton" Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnLassoFill">
-							<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/Lasso.png" Stretch="Uniform"/>
-						</Button>
-						<Button x:Name="eraseButton" Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnErase">
-							<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/vEraser.png" Stretch="Uniform"/>
-						</Button>
-						<Button x:Name="eyedropperButton" Width="50" Height="100" Background="Transparent" BorderThickness="0" Click="OnEyeDropperClick">
-							<Image  Width="50" Height="100" Source="avares://ShakyDoodle/Assets/eyeDropper.png" Stretch="Uniform"/>
-						</Button>
-					</UniformGrid>
-
-					<UniformGrid Columns="1" Rows="2" Margin="5" HorizontalAlignment="Center">
-						<UniformGrid Columns="4" Margin="5" HorizontalAlignment="Center">
-							<!-- Sizes -->
-							<Button x:Name="sizeSmallButton" Width="15" Height="15" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeSmall" BorderBrush="Black" BorderThickness="1" />
-							<Button x:Name="sizeMediumButton" Width="20" Height="20" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeMedium" BorderBrush="Black" BorderThickness="1" />
-							<Button x:Name="sizeLargeButton" Width="25" Height="25" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeLarge" BorderBrush="Black" BorderThickness="1" />
-							<Button x:Name="sizeXLargeButton" Width="30" Height="30" CornerRadius="20" Background="DarkGoldenrod" Margin="5" Click="OnSizeXLarge" BorderBrush="Black" BorderThickness="1" />
+			<Border Grid.Column="1" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Center">
+				<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+					<StackPanel Background="PeachPuff">
+						<Border Width="200" Height="80" CornerRadius="15" ClipToBounds="True" Margin="0,5">
+							<local:DoodleCanvas Name="logoCanvas" IsLogo="True" />
+						</Border>
+						<UniformGrid Columns="3" Margin="3" HorizontalAlignment="Center">
+							<TextBlock Text="Frames: 1/1" x:Name="FrameIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="9"/>
+							<Separator></Separator>
+							<TextBlock Text="Layers: 1/1" x:Name="LayerIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="9"/>
 						</UniformGrid>
-						<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
-							<!-- Shapes -->
-							<Button x:Name="brushRoundButton" Width="15" Height="15" CornerRadius="20" Background="DarkSlateBlue" Margin="5" Click="OnBrushRound" BorderBrush="Black" BorderThickness="1" />
-							<Button x:Name="brushSquareButton" Width="15" Height="15" Background="DarkSlateBlue" Margin="5" Click="OnBrushSquare" BorderBrush="Black" BorderThickness="1" />
-							<Button x:Name="brushFlatButton" Width="10" Height="15" CornerRadius="0" Background="DarkSlateBlue" Margin="5" Click="OnBrushFlat" BorderBrush="Black" BorderThickness="1" />
-						</UniformGrid>
-					</UniformGrid>
-					<ColorPicker Name="colorPicker" Width="100" IsColorPaletteVisible="True" ColorChanged="OnColorChanged" IsColorSpectrumVisible="True" IsAlphaEnabled="True"/>
-					<UniformGrid Columns="4" Margin="8" HorizontalAlignment="Center">
-						<Button Background="Black" Click="OnChangeBlack" Margin="2" BorderBrush="Black" BorderThickness="1" Width="24" Height="24"/>
-						<Button Background="Blue" Click="OnChangeBlue" Margin="2" BorderBrush="Black" BorderThickness="1" Width="24" Height="24"/>
-						<Button Background="Red" Click="OnChangeRed" Margin="2" BorderBrush="Black" BorderThickness="1" Width="24" Height="24"/>
-						<Button Background="Green" Click="OnChangeGreen" Margin="2" BorderBrush="Black" BorderThickness="1" Width="24" Height="24"/>
-					</UniformGrid>
-					<StackPanel x:Name="RecentColorsPanel" Orientation="Vertical" Margin="8" HorizontalAlignment="Center"/>
+						<UniformGrid Columns="4" Rows="2" Margin="3" HorizontalAlignment="Center">
+							<Button x:Name="unshakeButton" Width="40" Height="80" Background="Transparent" BorderThickness="0" Click="OnUnshake">
+								<Image Width="35" Height="70" Source="avares://ShakyDoodle/Assets/Pen.png" Stretch="Uniform"/>
+							</Button>
+							<Button x:Name="airbrushButton" Width="40" Height="80" Background="Transparent" BorderThickness="0" Click="OnAirbrush">
+								<Image Width="35" Height="70" Source="avares://ShakyDoodle/Assets/AirBrush.png" Stretch="Uniform"/>
+							</Button>
+							<Button x:Name="shakeButton" Width="40" Height="80" Background="Transparent" BorderThickness="0" Click="OnShake">
+								<Image Width="35" Height="70" Source="avares://ShakyDoodle/Assets/shakyPen.png" Stretch="Uniform"/>
+							</Button>
+							<Button x:Name="acrButton" Width="40" Height="80" Background="Transparent" BorderThickness="0" Click="OnAcr">
+								<Image Width="35" Height="70" Source="avares://ShakyDoodle/Assets/acrPen.png" Stretch="Uniform"/>
+							</Button>
 
-					<UniformGrid Columns="3" Margin="5" HorizontalAlignment="Center">
-						<Button Content="🠈" Click="OnPrevFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
+							<Button x:Name="ditherButton" Width="40" Height="80" Background="Transparent" BorderThickness="0" Click="OnDither">
+								<Image Width="35" Height="70" Source="avares://ShakyDoodle/Assets/ditherPen.png" Stretch="Uniform"/>
+							</Button>
+							<Button x:Name="lassoFillButton" Width="40" Height="80" Background="Transparent" BorderThickness="0" Click="OnLassoFill">
+								<Image Width="35" Height="70" Source="avares://ShakyDoodle/Assets/Lasso.png" Stretch="Uniform"/>
+							</Button>
+							<Button x:Name="eraseButton" Width="40" Height="80" Background="Transparent" BorderThickness="0" Click="OnErase">
+								<Image Width="35" Height="70" Source="avares://ShakyDoodle/Assets/vEraser.png" Stretch="Uniform"/>
+							</Button>
+							<Button x:Name="eyedropperButton" Width="40" Height="80" Background="Transparent" BorderThickness="0" Click="OnEyeDropperClick">
+								<Image Width="35" Height="70" Source="avares://ShakyDoodle/Assets/eyeDropper.png" Stretch="Uniform"/>
+							</Button>
+						</UniformGrid>
+
+						<UniformGrid Columns="2" Rows="1" Margin="5" HorizontalAlignment="Center">
+							<UniformGrid Columns="4" Margin="0" HorizontalAlignment="Center">
+								<!-- Sizes -->
+								<Button x:Name="sizeSmallButton" Width="15" Height="15" CornerRadius="20" Background="DarkGoldenrod" Margin="3" Click="OnSizeSmall" BorderBrush="Black" BorderThickness="1" />
+								<Button x:Name="sizeMediumButton" Width="18" Height="18" CornerRadius="20" Background="DarkGoldenrod" Margin="3" Click="OnSizeMedium" BorderBrush="Black" BorderThickness="1" />
+								<Button x:Name="sizeLargeButton" Width="21" Height="21" CornerRadius="20" Background="DarkGoldenrod" Margin="3" Click="OnSizeLarge" BorderBrush="Black" BorderThickness="1" />
+								<Button x:Name="sizeXLargeButton" Width="24" Height="24" CornerRadius="20" Background="DarkGoldenrod" Margin="3" Click="OnSizeXLarge" BorderBrush="Black" BorderThickness="1" />
+							</UniformGrid>
+							<UniformGrid Columns="3" Margin="0" HorizontalAlignment="Center">
+								<!-- Shapes -->
+								<Button x:Name="brushRoundButton" Width="15" Height="15" CornerRadius="20" Background="DarkSlateBlue" Margin="3" Click="OnBrushRound" BorderBrush="Black" BorderThickness="1" />
+								<Button x:Name="brushSquareButton" Width="15" Height="15" Background="DarkSlateBlue" Margin="3" Click="OnBrushSquare" BorderBrush="Black" BorderThickness="1" />
+								<Button x:Name="brushFlatButton" Width="10" Height="15" CornerRadius="0" Background="DarkSlateBlue" Margin="3" Click="OnBrushFlat" BorderBrush="Black" BorderThickness="1" />
+							</UniformGrid>
+						</UniformGrid>
 						<UniformGrid Columns="1" Margin="5" HorizontalAlignment="Center">
-							<Button Content="🠉" Click="OnNextLayer" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
-							<Button x:Name="PlayButton" Content="▶" Click="OnTogglePlay" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-							<Button Content="🠋" Click="OnPrevLayer" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
+							<ColorPicker Name="colorPicker" Width="100" IsColorPaletteVisible="True" ColorChanged="OnColorChanged" IsColorSpectrumVisible="True" IsAlphaEnabled="True"/>
+							<UniformGrid Columns="4" Margin="2" HorizontalAlignment="Center">
+								<Button Background="Black" Click="OnChangeBlack" Margin="1" BorderBrush="Black" BorderThickness="1" Width="20" Height="20"/>
+								<Button Background="Blue" Click="OnChangeBlue" Margin="1" BorderBrush="Black" BorderThickness="1" Width="20" Height="20"/>
+								<Button Background="Red" Click="OnChangeRed" Margin="1" BorderBrush="Black" BorderThickness="1" Width="20" Height="20"/>
+								<Button Background="Green" Click="OnChangeGreen" Margin="1" BorderBrush="Black" BorderThickness="1" Width="20" Height="20"/>
+							</UniformGrid>
 						</UniformGrid>
-						<Button Content="🠊" Click="OnNextFrame" Margin="2" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
-					</UniformGrid>
-
-					<TextBlock Text="Layer Alpha" HorizontalAlignment="Center"/>
-					<Slider x:Name="layerOpacitySlider" Minimum="0" Maximum="100" Value="100" Width="100" ValueChanged="UpdateLayerOpacity" />
-					<UniformGrid Columns="1" Margin="5" HorizontalAlignment="Center">
-						<TextBlock Text="Lock Frames" HorizontalAlignment="Center"/>
-						<Button x:Name="LockFramesButton" Content="🔓" HorizontalAlignment="Center" Click="OnLockFramesClick"  Background="DarkOrchid" BorderBrush="Black" BorderThickness="1"/>
-					</UniformGrid>
-
-
-					<UniformGrid Columns="1" Margin="5" HorizontalAlignment="Center">
-						<TextBlock Text="Frames: 1/1" x:Name="FrameIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
-						<TextBlock Text="Layers: 1/1" x:Name="LayerIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
-					</UniformGrid>
-
-				</StackPanel>
-
+						<StackPanel x:Name="RecentColorsPanel" Orientation="Vertical" Margin="5" HorizontalAlignment="Center"/>
+						<UniformGrid Columns="3" Margin="3" HorizontalAlignment="Center">
+							<Button Content="🠈" Click="OnPrevFrame" Margin="1" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
+							<UniformGrid Columns="1" Margin="3" HorizontalAlignment="Center">
+								<Button Content="🠉" Click="OnNextLayer" Margin="1" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
+								<Button x:Name="PlayButton" Content="▶" Click="OnTogglePlay" Margin="1" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+								<Button Content="🠋" Click="OnPrevLayer" Margin="1" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" />
+							</UniformGrid>
+							<Button Content="🠊" Click="OnNextFrame" Margin="1" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black"/>
+						</UniformGrid>
+						<UniformGrid Columns="2" Margin="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+							<TextBlock Text="Layer Alpha" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="9"/>
+							<Slider x:Name="layerOpacitySlider" Minimum="0" Maximum="100" Value="100" Width="80" ValueChanged="UpdateLayerOpacity" />
+						</UniformGrid>
+						<UniformGrid Columns="2" Margin="3" HorizontalAlignment="Center">
+							<TextBlock Text="Lock Frames" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="9"/>
+							<Button x:Name="LockFramesButton" Content="🔓" HorizontalAlignment="Center" Click="OnLockFramesClick"  Background="DarkOrchid" BorderBrush="Black" BorderThickness="1"/>
+						</UniformGrid>
+					</StackPanel>
+				</ScrollViewer>
 			</Border>
 
 			<!-- Canvas Area takes remaining space -->
