@@ -19,12 +19,13 @@ namespace ShakyDoodle.UIVisuals
         public double BindSpacing = 80;
         public Color BindColor = Colors.Gray;
         public Color BindBorderColor = Colors.Chocolate;
+        private Color _bgColor = Colors.White;
         public double BindBorderThickness = 3;
         #endregion
         public override void Render(DrawingContext context)
         {
             base.Render(context);
-
+            context.FillRectangle(new SolidColorBrush(_bgColor), new Rect(0, 0, Bounds.Width, Bounds.Height));
             var brush = new SolidColorBrush(HoleColor);
             var pen = new Pen(new SolidColorBrush(HoleBorderColor), HoleBorderThickness);
 
@@ -52,6 +53,14 @@ namespace ShakyDoodle.UIVisuals
 
             }
         }
+        public void UpdateColors(Color main, Color secondary)
+        {
+            _bgColor = main;
+            HoleBorderColor = secondary;
+            BindBorderColor = secondary;
+            InvalidateVisual();
+        }
+
     }
 
 }

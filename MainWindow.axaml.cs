@@ -4,6 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -27,6 +28,7 @@ namespace ShakyDoodle
         private bool _isEyeDropperActive = false;
         private FileService? _fileService;
         private string _templatesFolder = string.Empty;
+        private Color _defaultMain = Colors.PeachPuff, _defaultSecondary = Colors.Chocolate;
         #endregion
 
         #region Constructor
@@ -82,6 +84,7 @@ namespace ShakyDoodle
 
             _fileService = new FileService(doodleCanvas.FrameController);
             InitializeTemplates();
+            ChangeUIColors(_defaultMain, _defaultSecondary);
         }
 
         #endregion
@@ -109,7 +112,7 @@ namespace ShakyDoodle
                 return;
 
             var shakyFiles = Directory.GetFiles(_templatesFolder, "*.shaky");
- 
+
             if (shakyFiles.Length == 0)
             {
                 var noTemplatesItem = new MenuItem
@@ -232,7 +235,95 @@ namespace ShakyDoodle
         private void UpdateFrameLabel() => FrameIndicator.Text = $"Frames: {doodleCanvas.FrameController.CurrentFrame + 1}/{doodleCanvas.FrameController.TotalFrames}";
         private void UpdateLayerLabel() => LayerIndicator.Text = $"Layers: {doodleCanvas.FrameController.ActiveLayerIndex + 1}/{doodleCanvas.FrameController.TotalLayers}";
         private void UpdatePlayLabel() => PlayButton.Content = PlayButton.Content as string == "▶" ? "■" : "▶";
+        private void OnLightMode(object? sender, RoutedEventArgs e) => ChangeUIColors(_defaultMain, _defaultSecondary);
+        private void OnDarkMode(object? sender, RoutedEventArgs e) => ChangeUIColors(new Color(255, 28, 31, 43), new Color(255, 176, 179, 191));
+        private void ChangeUIColors(Color main, Color secondary)
+        {
+            zoomBorder.Background = new SolidColorBrush(new Color(255,48,49,51));
+            this.Background = new SolidColorBrush(main);
+            notebookHoles.UpdateColors(main, secondary);
 
+            // Update Menu
+            MenuDock.Background = new SolidColorBrush(main);
+            foreach (var item in MenuDock.Items.OfType<MenuItem>())
+            {
+                item.Foreground = new SolidColorBrush(secondary);
+                UpdateMenuItemRecursively(item, secondary);
+            }
+
+            ToolsPanel.Background = new SolidColorBrush(main);
+
+            UpdateTextBlocksRecursively(ToolsPanel, secondary);
+
+            UpdateButtonsRecursively(ToolsPanel, secondary);
+
+            if (this.FindControl<Border>("") is Border canvasBorder)
+            {
+                canvasBorder.BorderBrush = new SolidColorBrush(secondary);
+            }
+
+            var canvasAreaBorder = this.GetLogicalDescendants().OfType<Border>()
+                .FirstOrDefault(b => b.BorderThickness.Left == 3);
+            if (canvasAreaBorder != null)
+            {
+                canvasAreaBorder.BorderBrush = new SolidColorBrush(secondary);
+            }
+
+            if (TooltipsPopup?.Child is Border tooltipBorder)
+            {
+                tooltipBorder.BorderBrush = new SolidColorBrush(secondary);
+                UpdateTextBlocksRecursively(tooltipBorder, secondary);
+            }
+
+            UpdateColorSwatchBorders(secondary);
+        }
+
+        private void UpdateMenuItemRecursively(MenuItem menuItem, Color textColor)
+        {
+            menuItem.Foreground = new SolidColorBrush(textColor);
+
+            foreach (var subItem in menuItem.Items.OfType<MenuItem>())
+            {
+                UpdateMenuItemRecursively(subItem, textColor);
+            }
+        }
+
+        private void UpdateTextBlocksRecursively(Control parent, Color textColor)
+        {
+            foreach (var child in parent.GetLogicalDescendants())
+            {
+                if (child is TextBlock textBlock)
+                {
+                    textBlock.Foreground = new SolidColorBrush(textColor);
+                }
+            }
+        }
+
+        private void UpdateButtonsRecursively(Control parent, Color borderAndTextColor)
+        {
+            foreach (var child in parent.GetLogicalDescendants())
+            {
+                if (child is Button button)
+                {
+                    button.Foreground = new SolidColorBrush(borderAndTextColor);
+                    button.BorderBrush = new SolidColorBrush(borderAndTextColor);
+                }
+            }
+        }
+
+        private void UpdateColorSwatchBorders(Color borderColor)
+        {
+            foreach (var child in RecentColorsPanel.Children)
+            {
+                if (child is StackPanel row)
+                {
+                    foreach (var swatch in row.Children.OfType<Button>())
+                    {
+                        swatch.BorderBrush = new SolidColorBrush(borderColor);
+                    }
+                }
+            }
+        }
         #endregion
 
         #region Frame & Layer Actions

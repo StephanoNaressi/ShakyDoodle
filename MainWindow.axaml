@@ -12,19 +12,21 @@
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1000"
         x:Class="ShakyDoodle.MainWindow"
         Title="ShakyDoodle" Background="PeachPuff"
-        WindowState="Maximized">
+        WindowState="Normal">
 	<DockPanel>
-		<Menu DockPanel.Dock="Top">
+		<Menu DockPanel.Dock="Top" x:Name="MenuDock">
 			<MenuItem Header="File">
 				<MenuItem Header="Save File" Click="OnSaveProject"/>
 				<MenuItem Header="Load File" Click="OnLoadProject"/>
 				<MenuItem Header="Save PNG" Click="OnSaveFile"/>
 				<MenuItem Header="Save GIF" Click="OnSaveGif"/>
 				<MenuItem Header="Clear All" Click="OnClearClick"/>
-				<MenuItem Header="Templates" x:Name="Templates">
-
+				<MenuItem Header="Templates" x:Name="Templates"/>
+				<MenuItem Header="UI">
+					<MenuItem Header="Light Mode" Click="OnLightMode"/>
+					<MenuItem Header="Dark Mode" Click="OnDarkMode"/>
 				</MenuItem>
-			</MenuItem>
+				</MenuItem>
 			<MenuItem Header="Canvas">
 				<MenuItem Header="Re-Center Canvas" Click="OnRecenterClicked"/>
 				<MenuItem Header="Toggle Noise" Click="OnToggleNoise"/>
@@ -74,12 +76,12 @@
 			</Grid.ColumnDefinitions>
 
 			<!-- Notebook holes panel on the left -->
-			<ui:NotebookHoles Width="40" Grid.Column="0" VerticalAlignment="Stretch"/>
+			<ui:NotebookHoles x:Name="notebookHoles" Width="40" Grid.Column="0" VerticalAlignment="Stretch"/>
 
 			<!-- Tools toolbar next to holes -->
 			<Border Grid.Column="1" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Center">
 				<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-					<StackPanel Background="PeachPuff">
+					<StackPanel x:Name="ToolsPanel" Background="PeachPuff">
 						<Border Width="200" Height="100" CornerRadius="15" ClipToBounds="True" Margin="0,5">
 							<local:DoodleCanvas Name="logoCanvas" IsLogo="True" />
 						</Border>
