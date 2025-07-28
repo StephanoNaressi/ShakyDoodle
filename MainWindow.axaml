@@ -20,6 +20,9 @@
 				<MenuItem Header="Save PNG" Click="OnSaveFile"/>
 				<MenuItem Header="Save GIF" Click="OnSaveGif"/>
 				<MenuItem Header="Clear All" Click="OnClearClick"/>
+				<MenuItem Header="Templates" x:Name="Templates">
+
+				</MenuItem>
 			</MenuItem>
 			<MenuItem Header="Canvas">
 				<MenuItem Header="Re-Center Canvas" Click="OnRecenterClicked"/>

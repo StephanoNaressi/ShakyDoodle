@@ -1,17 +1,20 @@
-﻿using System;
-using System.IO;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
-using Avalonia;
 using Avalonia.Layout;
-using ShakyDoodle.Views.Controls;
-using ShakyDoodle.Utils;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using ShakyDoodle.Services;
 using Avalonia.Platform.Storage;
+using ShakyDoodle.Services;
+using ShakyDoodle.Utils;
+using ShakyDoodle.Views.Controls;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace ShakyDoodle
 {
@@ -23,7 +26,7 @@ namespace ShakyDoodle
         private bool _framesLocked = false;
         private bool _isEyeDropperActive = false;
         private FileService? _fileService;
-
+        private string _templatesFolder = string.Empty;
         #endregion
 
         #region Constructor
@@ -78,10 +81,92 @@ namespace ShakyDoodle
             LockFramesButton.IsEnabled = true;
 
             _fileService = new FileService(doodleCanvas.FrameController);
+            InitializeTemplates();
         }
 
         #endregion
+        #region Templates
 
+        private void InitializeTemplates()
+        {
+            string executablePath = Assembly.GetExecutingAssembly().Location;
+            string executableDirectory = Path.GetDirectoryName(executablePath) ?? string.Empty;
+
+            _templatesFolder = Path.Combine(executableDirectory, "templates");
+
+            if (!Directory.Exists(_templatesFolder))
+            {
+                Directory.CreateDirectory(_templatesFolder);
+            }
+
+            LoadTemplateMenuItems();
+        }
+        private void LoadTemplateMenuItems()
+        {
+            Templates.Items.Clear();
+
+            if (!Directory.Exists(_templatesFolder))
+                return;
+
+            var shakyFiles = Directory.GetFiles(_templatesFolder, "*.shaky");
+ 
+            if (shakyFiles.Length == 0)
+            {
+                var noTemplatesItem = new MenuItem
+                {
+                    Header = "No templates found",
+                    IsEnabled = false
+                };
+                Templates.Items.Add(noTemplatesItem);
+                return;
+            }
+
+            foreach (var filePath in shakyFiles.OrderBy(f => Path.GetFileNameWithoutExtension(f)))
+            {
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var menuItem = new MenuItem
+                {
+                    Header = fileName,
+                    Tag = filePath
+                };
+                menuItem.Click += OnTemplateMenuItemClick;
+                Templates.Items.Add(menuItem);
+            }
+
+            Templates.Items.Add(new Separator());
+            var refreshItem = new MenuItem
+            {
+                Header = "Refresh Templates"
+            };
+
+            refreshItem.Click += OnRefreshTemplates;
+            Templates.Items.Add(refreshItem);
+            var folderOpen = new MenuItem
+            {
+                Header = "Open Template Folder"
+            };
+
+            folderOpen.Click += OnTemplateFolderOpen;
+            Templates.Items.Add(folderOpen);
+        }
+
+        private void OnTemplateMenuItemClick(object? sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Tag is string filePath)
+            {
+                LoadProjectFromPath(filePath);
+            }
+        }
+
+        private void OnRefreshTemplates(object? sender, RoutedEventArgs e)
+        {
+            LoadTemplateMenuItems();
+        }
+        private void OnTemplateFolderOpen(object? sender, RoutedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("explorer.exe", $"\"{_templatesFolder}\"") { UseShellExecute = true });
+        }
+        #endregion
         #region Event Handlers - Global
 
         private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
