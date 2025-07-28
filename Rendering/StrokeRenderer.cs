@@ -304,6 +304,11 @@ namespace ShakyDoodle.Rendering
             _prevFrameCacheIndex = -1;
             _nextFrameCacheIndex = -1;
         }
+        public void UpdateCanvasSize(double width, double height)
+        {
+            _canvasSize = new Size(width, height);
+            _noiseTexture = null;
+        }
         private bool IsValidFrame(int index, List<Frame> frames) => index >= 0 && index < frames.Count;
     }
 

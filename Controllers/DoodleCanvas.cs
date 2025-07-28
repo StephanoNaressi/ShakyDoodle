@@ -16,7 +16,7 @@ namespace ShakyDoodle.Controllers
             AvaloniaProperty.Register<DoodleCanvas, double>(nameof(CanvasWidth), 1100);
             
         public static StyledProperty<double> CanvasHeightProperty = 
-            AvaloniaProperty.Register<DoodleCanvas, double>(nameof(CanvasHeight), 1500);
+            AvaloniaProperty.Register<DoodleCanvas, double>(nameof(CanvasHeight), 1375);
             
         public double CanvasWidth
         {
@@ -207,6 +207,13 @@ namespace ShakyDoodle.Controllers
         {
             FrameController.UpdateLayerOpacity(val);
             FrameController.MarkDirty();
+        }
+        public void SetAspectRatio(double width, double height)
+        {
+            CanvasWidth = width;
+            CanvasHeight = height;
+            _strokeRenderer.UpdateCanvasSize(width, height);
+            _helper.RequestInvalidateThrottled();
         }
         public double CurrentLayerOpacity() => FrameController.GetCurrentLayer()?.Opacity ?? 1.0;
     }

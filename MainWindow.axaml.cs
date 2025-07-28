@@ -58,13 +58,10 @@ namespace ShakyDoodle
                 }
             };
 
-            // Register button groups with the UIManager
             _uiManager.RegisterButtonGroup("brushes", new[] { unshakeButton, shakeButton, acrButton, airbrushButton, lassoFillButton, eraseButton, ditherButton, eyedropperButton});
             _uiManager.RegisterButtonGroup("sizes", new[] { sizeSmallButton, sizeMediumButton, sizeLargeButton, sizeXLargeButton });
             _uiManager.RegisterButtonGroup("tips", new[] { brushRoundButton, brushSquareButton, brushFlatButton });
-            //_uiManager.RegisterMenuItemGroup("backgrounds", new[] { backgroundWhiteButton, backgroundGrayButton, backgroundDarkGrayButton, backgroundYellowButton, backgroundBlackButton });
 
-            // Set initial selection
             _uiManager.UpdateSelection("brushes", unshakeButton);
             _uiManager.UpdateSelection("sizes", sizeSmallButton);
             _uiManager.UpdateSelection("tips", brushRoundButton);
@@ -280,6 +277,14 @@ namespace ShakyDoodle
             colorPicker.Color = newColor;
             PopulateRecentColorSwatches();
         }
+
+        private void On45AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1100, 1375);
+        private void On11AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1400, 1400);
+        private void On169AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1956, 1100);
+        private void On916AR(object? sender, RoutedEventArgs e) => SetAspectRatio(1100, 1956);
+        private void OnA4HorizontalAR(object? sender, RoutedEventArgs e) => SetAspectRatio(1956, 1555);
+        private void OnA4VerticalAR(object? sender, RoutedEventArgs e) => SetAspectRatio(1555, 1956);
+        private void SetAspectRatio(double w, double h) => doodleCanvas.SetAspectRatio(w, h);
 
         private void OnColorChanged(object? sender, ColorChangedEventArgs e) => ChangeColor(e.NewColor);
         private void OnChangeBlack(object? sender, RoutedEventArgs e) => ChangeColor(Colors.Black);

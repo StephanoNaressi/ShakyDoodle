@@ -27,6 +27,14 @@
 					<MenuItem Header="Lines" Click="ToggleLines"/>
 					<MenuItem Header="Blank" Click="ToggleBlank"/>
 				</MenuItem>
+				<MenuItem Header="Aspect Ratio">
+					<MenuItem  Header="4:5" Click="On45AR"/>
+					<MenuItem  Header="1:1" Click="On11AR"/>
+					<MenuItem  Header="16:9" Click="On169AR"/>
+					<MenuItem  Header="9:16" Click="On916AR"/>
+					<MenuItem  Header="A4 Horizontal" Click="OnA4HorizontalAR"/>
+					<MenuItem  Header="A4 Vertical" Click="OnA4VerticalAR"/>
+				</MenuItem>
 				<MenuItem Header="Background">
 					<MenuItem x:Name="backgroundWhiteButton" Header="White" Click="OnBackgroundWhite"/>
 					<MenuItem x:Name="backgroundGrayButton" Header="Gray" Click="OnBackgroundGray"/>
@@ -152,8 +160,8 @@
 				<views:ZoomBorder x:Name="zoomBorder" ClipToBounds="True" Background="LightGray">
 					<controllers:DoodleCanvas
 						Name="doodleCanvas"
-						Width="1100"
-						Height="1500"
+						Width="{Binding CanvasWidth, RelativeSource={RelativeSource Self}}"
+						Height="{Binding CanvasHeight, RelativeSource={RelativeSource Self}}"
 						HorizontalAlignment="Center"
 						VerticalAlignment="Center"/>
 				</views:ZoomBorder>
