@@ -245,7 +245,7 @@ namespace ShakyDoodle.Rendering
             var pixelSize = new PixelSize((int)size.Width, (int)size.Height);
             var renderTarget = new RenderTargetBitmap(pixelSize);
 
-            using (var ctx = renderTarget.CreateDrawingContext(true))
+            using (var ctx = renderTarget.CreateDrawingContext(false))
             {
                 foreach (var layer in frame.Layers.Where(l => l.IsVisible))
                 {
