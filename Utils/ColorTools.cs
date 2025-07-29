@@ -10,9 +10,11 @@ namespace ShakyDoodle.Utils
     {
         public static ColorTools Instance { get; } = new ColorTools();
 
-        Random _r = new();
+        private readonly Random _random = new();
+        
         public Color BackgroundColor { get; set; } = Colors.White;
         public Color GridColor { get; set; } = Colors.LightBlue;
+        
         public bool AreColorsSimilar(Color a, Color b, int tolerance = 25)
         {
             return Math.Abs(a.R - b.R) < tolerance &&
@@ -30,11 +32,11 @@ namespace ShakyDoodle.Utils
             {
                 for (int i = 0; i < width * height / density; i++)
                 {
-                    int x = _r.Next(width);
-                    int y = _r.Next(height);
-                    byte red = (byte)_r.Next(0, 256);
-                    byte green = (byte)_r.Next(0, 256);
-                    byte blue = (byte)_r.Next(0, 256);
+                    int x = _random.Next(width);
+                    int y = _random.Next(height);
+                    byte red = (byte)_random.Next(0, 256);
+                    byte green = (byte)_random.Next(0, 256);
+                    byte blue = (byte)_random.Next(0, 256);
 
                     var brush = new SolidColorBrush(Color.FromArgb(alpha, red, green, blue));
                     ctx.FillRectangle(brush, new Rect(x, y, 1, 1));
@@ -56,7 +58,6 @@ namespace ShakyDoodle.Utils
                 _ => Colors.White
             };
             BackgroundColor = color;
-
         }
 
         public void SetAvaloniaGridColor(BGColor bgColor)
@@ -71,7 +72,6 @@ namespace ShakyDoodle.Utils
                 _ => Colors.White
             };
             GridColor = color;
-
         }
     }
 }

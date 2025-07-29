@@ -6,26 +6,30 @@ namespace ShakyDoodle.UIVisuals
 {
     public class NotebookHoles : Control
     {
-        #region params
-        public int HoleCount = 7;
-        public double HoleDiameter = 20;
-        public double HoleSpacing = 80;
-        public Color HoleColor = Colors.White;
-        public Color HoleBorderColor = Colors.Chocolate;
-        public double HoleBorderThickness = 3;
+        #region Properties
+        public int HoleCount { get; set; } = 7;
+        public double HoleDiameter { get; set; } = 20;
+        public double HoleSpacing { get; set; } = 80;
+        public Color HoleColor { get; set; } = Colors.White;
+        public Color HoleBorderColor { get; set; } = Colors.Chocolate;
+        public double HoleBorderThickness { get; set; } = 3;
 
-        public int BindCount = 7;
-        public double BindDiameter = 20;
-        public double BindSpacing = 80;
-        public Color BindColor = Colors.Gray;
-        public Color BindBorderColor = Colors.Chocolate;
-        private Color _bgColor = Colors.White;
-        public double BindBorderThickness = 3;
+        public int BindCount { get; set; } = 7;
+        public double BindDiameter { get; set; } = 20;
+        public double BindSpacing { get; set; } = 80;
+        public Color BindColor { get; set; } = Colors.Gray;
+        public Color BindBorderColor { get; set; } = Colors.Chocolate;
+        public double BindBorderThickness { get; set; } = 3;
         #endregion
+
+        #region Private Fields
+        private Color _backgroundColor = Colors.White;
+        #endregion
+
         public override void Render(DrawingContext context)
         {
             base.Render(context);
-            context.FillRectangle(new SolidColorBrush(_bgColor), new Rect(0, 0, Bounds.Width, Bounds.Height));
+            context.FillRectangle(new SolidColorBrush(_backgroundColor), new Rect(0, 0, Bounds.Width, Bounds.Height));
             var brush = new SolidColorBrush(HoleColor);
             var pen = new Pen(new SolidColorBrush(HoleBorderColor), HoleBorderThickness);
 
@@ -49,18 +53,15 @@ namespace ShakyDoodle.UIVisuals
                 );
 
                 context.DrawRectangle(bindBrush, bindPen, rect);
-
-
             }
         }
+
         public void UpdateColors(Color main, Color secondary)
         {
-            _bgColor = main;
+            _backgroundColor = main;
             HoleBorderColor = secondary;
             BindBorderColor = secondary;
             InvalidateVisual();
         }
-
     }
-
 }

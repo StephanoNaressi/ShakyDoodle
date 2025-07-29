@@ -1,7 +1,8 @@
-﻿using Avalonia.Media;
+﻿using System;
 using System.Collections.Generic;
-using System;
 using Avalonia;
+using Avalonia.Media;
+
 namespace ShakyDoodle.Models
 {
     public class Stroke

@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 
 namespace ShakyDoodle.Models
 {
     public class Layer
     {
-        public double Opacity = 1.0;
-        public string Name;
-        public bool IsVisible = true;
-        public List<Stroke> Strokes = new();
+        public double Opacity { get; set; } = 1.0;
+        public string Name { get; set; } = string.Empty;
+        public bool IsVisible { get; set; } = true;
+        public List<Stroke> Strokes { get; set; } = new();
         public RenderTargetBitmap? CachedBitmap { get; set; }
         public bool IsDirty { get; set; } = true;
-
     }
 }

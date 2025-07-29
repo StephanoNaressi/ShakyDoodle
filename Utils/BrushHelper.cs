@@ -6,7 +6,8 @@ namespace ShakyDoodle.Utils
 {
     public class BrushHelper
     {
-        private ColorTools _colorHelper = new();
+        private readonly ColorTools _colorHelper = new();
+        
         #region Brush Setup
 
         public Pen SetupMainPen(Stroke stroke, int i, double shakeIntensity)
@@ -35,9 +36,6 @@ namespace ShakyDoodle.Utils
             return new Pen(new SolidColorBrush(color), thickness) {LineCap = stroke.PenLineCap};
         }
 
-
-
-
         public Pen ChooseBrushSettings(Stroke stroke, double scaledPressure, double rawPressure)
         {
             var color = stroke.Color;
@@ -45,6 +43,7 @@ namespace ShakyDoodle.Utils
 
             return new Pen(new SolidColorBrush(color, stroke.Alpha * scaledPressure), size * rawPressure);
         }
+        
         public double GetStrokeSize(Stroke stroke)
         {
             return stroke.Size switch
@@ -56,9 +55,10 @@ namespace ShakyDoodle.Utils
                 _ => 5
             };
         }
-        public IBrush GetSolidBrush(Color col, double alpha)
+        
+        public IBrush GetSolidBrush(Color color, double alpha)
         {
-            return new SolidColorBrush(col, alpha);
+            return new SolidColorBrush(color, alpha);
         }
 
         #endregion
