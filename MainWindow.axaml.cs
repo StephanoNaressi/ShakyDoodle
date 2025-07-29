@@ -434,11 +434,6 @@ namespace ShakyDoodle
             doodleCanvas.ToggleNoise();
         }
 
-        private void OnAlphaChanged(object? sender, RangeBaseValueChangedEventArgs e)
-        {
-            doodleCanvas.ChangeAlpha((double)e.NewValue);
-            logoCanvas.ChangeAlpha((double)e.NewValue);
-        }
 
         #endregion
 
@@ -499,8 +494,13 @@ namespace ShakyDoodle
 
         private void ChangeColor(Color newColor)
         {
+
+            double alpha = newColor.A / 255.0; 
+            
             doodleCanvas.ChangeColor(newColor);
+            doodleCanvas.ChangeAlpha(alpha); 
             logoCanvas.ChangeColor(newColor);
+            logoCanvas.ChangeAlpha(alpha);
             colorPicker.Color = newColor;
             PopulateRecentColorSwatches();
         }

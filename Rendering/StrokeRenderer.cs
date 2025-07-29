@@ -286,6 +286,8 @@ namespace ShakyDoodle.Rendering
 
             using (var ctx = target.CreateDrawingContext(true))
             {
+                ctx.FillRectangle(Brushes.Transparent, new Rect(0, 0, size.Width, size.Height));
+
                 foreach (var stroke in strokes)
                 {
                     DrawStroke(stroke, 0, ctx, layerOpacity);

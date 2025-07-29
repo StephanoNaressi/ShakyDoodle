@@ -146,7 +146,6 @@ namespace ShakyDoodle.Utils
             if (CurrentStroke == null)
                 return;
 
-            // Constrain position if Shift is held
             if (isShiftPressed && CurrentStroke.Points.Count > 0)
             {
                 var startPoint = CurrentStroke.Points[0];
@@ -155,7 +154,7 @@ namespace ShakyDoodle.Utils
 
             float clampedPressure = Math.Max(pressure, 0.1f);
 
-            float spacing = _currentBrushType == BrushType.Acrylic ? GetSpacingForSize(_currentSize) : (_isShake ? 5f : 2f);
+            float spacing = GetSpacingForSize(_currentSize, _currentBrushType);
 
             if (CurrentStroke.Points.Count < 1)
             {
@@ -189,16 +188,68 @@ namespace ShakyDoodle.Utils
             }
         }
 
-        private float GetSpacingForSize(SizeType size)
+        private float GetSpacingForSize(SizeType size, BrushType bt)
         {
-            return size switch
+            switch (bt)
             {
-                SizeType.Small => 4f,
-                SizeType.Medium => 6f,
-                SizeType.Large => 10f,
-                SizeType.ExtraLarge => 15f,
-                _ => 4f
-            };
+                case BrushType.Standard:
+                    return size switch
+                    {
+                        SizeType.Small => 2f,
+                        SizeType.Medium => 4f,
+                        SizeType.Large => 7f,
+                        SizeType.ExtraLarge => 13f,
+                        _ => 2f
+                    };
+                case BrushType.Acrylic:
+                    return size switch
+                    {
+                        SizeType.Small => 4f,
+                        SizeType.Medium => 6f,
+                        SizeType.Large => 10f,
+                        SizeType.ExtraLarge => 15f,
+                        _ => 4f
+                    };
+                case BrushType.Shaking:
+                    return size switch
+                    {
+                        SizeType.Small => 5f,
+                        SizeType.Medium => 10f,
+                        SizeType.Large => 20f,
+                        SizeType.ExtraLarge => 30f,
+                        _ => 5f
+                    };
+                case BrushType.Lasso:
+                    return size switch
+                    {
+                        SizeType.Small => 4f,
+                        SizeType.Medium => 6f,
+                        SizeType.Large => 10f,
+                        SizeType.ExtraLarge => 15f,
+                        _ => 4f
+                    };
+                case BrushType.Airbrush:
+                    return size switch
+                    {
+                        SizeType.Small => 2f,
+                        SizeType.Medium => 4f,
+                        SizeType.Large => 10f,
+                        SizeType.ExtraLarge => 15f,
+                        _ => 2f
+                    };
+                case BrushType.Dither:
+                    return size switch
+                    {
+                        SizeType.Small => 4f,
+                        SizeType.Medium => 6f,
+                        SizeType.Large => 10f,
+                        SizeType.ExtraLarge => 15f,
+                        _ => 4f
+                    };
+                default:
+                    break;
+            }
+            return 5f;
         }
 
         public void PointerReleased()
