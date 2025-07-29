@@ -284,7 +284,7 @@ namespace ShakyDoodle.Rendering
             var pixelSize = new PixelSize((int)size.Width, (int)size.Height);
             var target = new RenderTargetBitmap(pixelSize);
 
-            using (var ctx = target.CreateDrawingContext(true))
+            using (var ctx = target.CreateDrawingContext(false))
             {
                 ctx.FillRectangle(Brushes.Transparent, new Rect(0, 0, size.Width, size.Height));
 
